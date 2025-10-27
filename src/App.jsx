@@ -5,7 +5,9 @@ import QuestsPage from "./pages/quests/QuestsPage";
 import './App.css'
 import Header from "./components/common/header";
 import Navbar from "./components/common/navbar";
-import CreateStoryPage from "./pages/create/CreateStoryPage";
+import SignupPage from "./pages/auth/SignupPage";
+import LoginPage from "./pages/auth/LoginPage";
+import WelcomePage from "./pages/auth/WelcomePage";
 
 function App() {
   return (
