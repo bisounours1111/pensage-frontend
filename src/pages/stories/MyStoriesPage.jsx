@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import StoryRow from '../../components/stories/StoryRow';
 import colors from '../../utils/constants/colors';
 
 const MyStoriesPage = () => {
+    const navigate = useNavigate();
+    const [filter, setFilter] = useState('all');
     const [stories] = useState([
         {
             id: 1,
@@ -33,9 +36,26 @@ const MyStoriesPage = () => {
         }
     ]);
 
-    const inProgressStories = stories.filter(s => s.status === 'in-progress');
-    const draftStories = stories.filter(s => s.status === 'draft');
-    const publishedStories = stories.filter(s => s.status === 'published');
+    const handleNewStory = () => {
+        navigate('/create');
+    };
+
+    const handleFilterChange = (filterType) => {
+        setFilter(filterType);
+    };
+
+    // Filtrer les histoires selon le filtre actif
+    const inProgressStories = filter === 'all' || filter === 'in-progress'
+        ? stories.filter(s => s.status === 'in-progress')
+        : [];
+
+    const draftStories = filter === 'all' || filter === 'draft'
+        ? stories.filter(s => s.status === 'draft')
+        : [];
+
+    const publishedStories = filter === 'all' || filter === 'published'
+        ? stories.filter(s => s.status === 'published')
+        : [];
 
     return (
         <div className="min-h-screen bg-gradient-to-b" style={{ background: `linear-gradient(to bottom, ${colors.bgGradientFrom}, ${colors.bgGradientVia}, ${colors.bgGradientTo})` }}>
@@ -46,10 +66,11 @@ const MyStoriesPage = () => {
                         Mes Histoires
                     </h1>
                     <button
-                        className="text-white px-6 py-3 rounded-lg font-semibold transition shadow-lg"
+                        className="cursor-pointer text-white px-6 py-3 rounded-lg font-semibold transition shadow-lg hover:scale-105"
                         style={{ backgroundColor: colors.primary }}
                         onMouseEnter={(e) => e.target.style.backgroundColor = colors.primaryLight}
                         onMouseLeave={(e) => e.target.style.backgroundColor = colors.primary}
+                        onClick={handleNewStory}
                     >
                         + Nouvelle Histoire
                     </button>
@@ -58,46 +79,82 @@ const MyStoriesPage = () => {
                 {/* Filtres */}
                 <div className="flex flex-wrap gap-3">
                     <button
-                        className="px-4 py-2 rounded-lg transition shadow-sm backdrop-blur-sm"
+                        className="cursor-pointer px-4 py-2 rounded-lg transition shadow-sm backdrop-blur-sm"
                         style={{
-                            backgroundColor: colors.whiteTransparent,
-                            color: colors.text
+                            backgroundColor: filter === 'all' ? colors.primary : colors.whiteTransparent,
+                            color: filter === 'all' ? colors.white : colors.text
                         }}
-                        onMouseEnter={(e) => e.target.style.backgroundColor = colors.whiteTransparentLight}
-                        onMouseLeave={(e) => e.target.style.backgroundColor = colors.whiteTransparent}
+                        onMouseEnter={(e) => {
+                            if (filter !== 'all') {
+                                e.target.style.backgroundColor = colors.whiteTransparentLight;
+                            }
+                        }}
+                        onMouseLeave={(e) => {
+                            if (filter !== 'all') {
+                                e.target.style.backgroundColor = colors.whiteTransparent;
+                            }
+                        }}
+                        onClick={() => handleFilterChange('all')}
                     >
                         Tout
                     </button>
                     <button
-                        className="px-4 py-2 rounded-lg transition shadow-sm backdrop-blur-sm"
+                        className="cursor-pointer px-4 py-2 rounded-lg transition shadow-sm backdrop-blur-sm"
                         style={{
-                            backgroundColor: colors.whiteTransparent,
-                            color: colors.text
+                            backgroundColor: filter === 'in-progress' ? colors.primary : colors.whiteTransparent,
+                            color: filter === 'in-progress' ? colors.white : colors.text
                         }}
-                        onMouseEnter={(e) => e.target.style.backgroundColor = colors.whiteTransparentLight}
-                        onMouseLeave={(e) => e.target.style.backgroundColor = colors.whiteTransparent}
+                        onMouseEnter={(e) => {
+                            if (filter !== 'in-progress') {
+                                e.target.style.backgroundColor = colors.whiteTransparentLight;
+                            }
+                        }}
+                        onMouseLeave={(e) => {
+                            if (filter !== 'in-progress') {
+                                e.target.style.backgroundColor = colors.whiteTransparent;
+                            }
+                        }}
+                        onClick={() => handleFilterChange('in-progress')}
                     >
                         En cours
                     </button>
                     <button
-                        className="px-4 py-2 rounded-lg transition shadow-sm backdrop-blur-sm"
+                        className="cursor-pointer px-4 py-2 rounded-lg transition shadow-sm backdrop-blur-sm"
                         style={{
-                            backgroundColor: colors.whiteTransparent,
-                            color: colors.text
+                            backgroundColor: filter === 'draft' ? colors.primary : colors.whiteTransparent,
+                            color: filter === 'draft' ? colors.white : colors.text
                         }}
-                        onMouseEnter={(e) => e.target.style.backgroundColor = colors.whiteTransparentLight}
-                        onMouseLeave={(e) => e.target.style.backgroundColor = colors.whiteTransparent}
+                        onMouseEnter={(e) => {
+                            if (filter !== 'draft') {
+                                e.target.style.backgroundColor = colors.whiteTransparentLight;
+                            }
+                        }}
+                        onMouseLeave={(e) => {
+                            if (filter !== 'draft') {
+                                e.target.style.backgroundColor = colors.whiteTransparent;
+                            }
+                        }}
+                        onClick={() => handleFilterChange('draft')}
                     >
-                        Brouillons
+                        Terminées
                     </button>
                     <button
-                        className="px-4 py-2 rounded-lg transition shadow-sm backdrop-blur-sm"
+                        className="cursor-pointer px-4 py-2 rounded-lg transition shadow-sm backdrop-blur-sm"
                         style={{
-                            backgroundColor: colors.whiteTransparent,
-                            color: colors.text
+                            backgroundColor: filter === 'published' ? colors.primary : colors.whiteTransparent,
+                            color: filter === 'published' ? colors.white : colors.text
                         }}
-                        onMouseEnter={(e) => e.target.style.backgroundColor = colors.whiteTransparentLight}
-                        onMouseLeave={(e) => e.target.style.backgroundColor = colors.whiteTransparent}
+                        onMouseEnter={(e) => {
+                            if (filter !== 'published') {
+                                e.target.style.backgroundColor = colors.whiteTransparentLight;
+                            }
+                        }}
+                        onMouseLeave={(e) => {
+                            if (filter !== 'published') {
+                                e.target.style.backgroundColor = colors.whiteTransparent;
+                            }
+                        }}
+                        onClick={() => handleFilterChange('published')}
                     >
                         Publiées
                     </button>
@@ -109,16 +166,15 @@ const MyStoriesPage = () => {
                 {/* Continuer la lecture */}
                 {inProgressStories.length > 0 && (
                     <StoryRow
-                        title="Continuer la lecture"
+                        title="En cours d'écriture"
                         stories={inProgressStories}
-                        highlightProgress={true}
                     />
                 )}
 
                 {/* Brouillons */}
                 {draftStories.length > 0 && (
                     <StoryRow
-                        title="Brouillons"
+                        title="Terminées"
                         stories={draftStories}
                     />
                 )}
