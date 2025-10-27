@@ -19,7 +19,19 @@ const StoryCard = ({ story }) => {
                 >
                     <div className="text-white text-center p-4">
                         <p className="text-sm font-semibold mb-1">{story.title}</p>
-                        <span className="text-xs text-white/90">{story.category}</span>
+                        <span className="text-xs text-white/90 mb-2 block">{story.category}</span>
+                        {story.author && (
+                            <span className="text-xs text-white/80 block mb-2">par {story.author}</span>
+                        )}
+                        {story.likes && (
+                            <div className="flex items-center justify-center gap-2 text-xs">
+                                <span>❤️ {story.likes}</span>
+                                {story.views && <span>👁️ {Math.round(story.views / 1000)}k</span>}
+                            </div>
+                        )}
+                        {story.progress !== undefined && story.progress < 100 && (
+                            <span className="text-xs text-white/80 block mt-2">{story.progress}% complété</span>
+                        )}
                     </div>
                 </div>
 
@@ -40,10 +52,44 @@ const StoryCard = ({ story }) => {
                         Brouillon
                     </div>
                 )}
+                {story.status === 'in-progress' && (
+                    <div
+                        className="absolute top-2 right-2 text-xs px-2 py-1 rounded font-semibold shadow-md"
+                        style={{ backgroundColor: colors.primary, color: colors.white }}
+                    >
+                        En cours
+                    </div>
+                )}
             </div>
 
-            {/* Titre */}
-            <h3 className="font-medium text-sm truncate" style={{ color: colors.text }}>{story.title}</h3>
+            {/* Titre et informations */}
+            <div>
+                <h3 className="font-medium text-sm truncate mb-1" style={{ color: colors.text }}>{story.title}</h3>
+                {story.author && (
+                    <p className="text-xs truncate" style={{ color: colors.textSecondary }}>
+                        {story.author}
+                    </p>
+                )}
+                {story.likes && story.views && (
+                    <div className="flex items-center gap-3 text-xs mt-1" style={{ color: colors.textSecondary }}>
+                        <span>❤️ {story.likes}</span>
+                        <span>👁️ {Math.round(story.views / 1000)}k</span>
+                    </div>
+                )}
+                {story.progress !== undefined && story.progress < 100 && story.status === 'in-progress' && (
+                    <div className="mt-2">
+                        <div className="w-full bg-white/30 rounded-full h-1.5">
+                            <div
+                                className="h-1.5 rounded-full transition-all"
+                                style={{
+                                    width: `${story.progress}%`,
+                                    backgroundColor: colors.primary
+                                }}
+                            ></div>
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };
