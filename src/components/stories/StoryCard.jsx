@@ -1,7 +1,7 @@
 import React from 'react';
 import colors from '../../utils/constants/colors';
 
-const StoryCard = ({ story }) => {
+const StoryCard = ({ story, showStatusBadge = true, showProgress = true }) => {
     return (
         <div className="flex-shrink-0 w-48 md:w-56 group cursor-pointer">
             <div className="relative overflow-hidden rounded-lg bg-white/30 backdrop-blur-sm shadow-lg aspect-[2/3] mb-2 border border-white/40">
@@ -36,7 +36,7 @@ const StoryCard = ({ story }) => {
                 </div>
 
                 {/* Badge de statut */}
-                {story.status === 'published' && (
+                {showStatusBadge && story.status === 'published' && (
                     <div
                         className="absolute top-2 right-2 text-xs px-2 py-1 rounded font-semibold shadow-md"
                         style={{ backgroundColor: colors.published, color: colors.text }}
@@ -44,7 +44,7 @@ const StoryCard = ({ story }) => {
                         Publiée
                     </div>
                 )}
-                {story.status === 'draft' && (
+                {showStatusBadge && story.status === 'draft' && (
                     <div
                         className="absolute top-2 right-2 text-xs px-2 py-1 rounded font-semibold shadow-md"
                         style={{ backgroundColor: colors.draft, color: colors.text }}
@@ -52,7 +52,7 @@ const StoryCard = ({ story }) => {
                         Brouillon
                     </div>
                 )}
-                {story.status === 'in-progress' && (
+                {showStatusBadge && story.status === 'in-progress' && (
                     <div
                         className="absolute top-2 right-2 text-xs px-2 py-1 rounded font-semibold shadow-md"
                         style={{ backgroundColor: colors.primary, color: colors.white }}
@@ -76,7 +76,7 @@ const StoryCard = ({ story }) => {
                         <span>👁️ {Math.round(story.views / 1000)}k</span>
                     </div>
                 )}
-                {story.progress !== undefined && story.progress < 100 && story.status === 'in-progress' && (
+                {showProgress && story.progress !== undefined && story.progress < 100 && story.status === 'in-progress' && (
                     <div className="mt-2">
                         <div className="w-full bg-white/30 rounded-full h-1.5">
                             <div
