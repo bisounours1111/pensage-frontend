@@ -20,8 +20,26 @@
 
   /* Variables personnalisées pour le thème Pensaga */
   :root {
-    --color-primary: #8b5cf6;
-    --color-secondary: #06b6d4;
-    --color-accent: #f59e0b;
+    --color-primary: #FF99AC;
+    --color-primary-light: #FBB1BD;
+    --color-primary-medium: #F9BEC7;
+    --color-primary-soft: #F7CAD0;
+    --color-primary-very-light: #FAE0E4;
+    --color-text: #8B5A70;
+    --color-published: #F7CAD0;
+    --color-draft: #FAE0E4;
+    --color-bg-gradient-from: #FAE0E4;
+    --color-bg-gradient-via: #F7CAD0;
+    --color-bg-gradient-to: #F9BEC7;
+  }
+
+  /* Masquer la scrollbar tout en gardant le scroll */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }
