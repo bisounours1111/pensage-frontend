@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import MyStoriesPage from './pages/stories/MyStoriesPage'
 import ShopPage from './pages/shop/ShopPage'
+import QuestsPage from "./pages/quests/QuestsPage";
 import './App.css'
 import Header from "./components/common/header";
 import Navbar from "./components/common/navbar";
@@ -19,6 +20,7 @@ function App() {
           <Route path="/stories" element={<MyStoriesPage />} />
           <Route path="/create" element={<div>Éditeur</div>} />
           <Route path="/shop" element={<ShopPage />} /> 
+          <Route path="/quests" element={<QuestsPage />} />
           <Route path="/profile" element={<div>Profil</div>} />
           <Route path="/community" element={<div>Communauté</div>} />
           <Route path="/publish" element={<div>Publication</div>} />
