@@ -1,7 +1,7 @@
 import React from "react";
   import { NavLink } from "react-router-dom";
 import colors from "../../utils/constants/colors";
-import { MdAutoStories, MdHome, MdShoppingBag } from "react-icons/md";
+import { MdAutoStories, MdHome, MdShoppingBag, MdAccountCircle } from "react-icons/md";
 
 export default function Navbar() {
 
@@ -46,6 +46,17 @@ export default function Navbar() {
         >
           <MdShoppingBag className="w-6 h-6 flex-shrink-0" />
           <span className="text-xs font-medium whitespace-nowrap">Boutique</span>
+        </NavLink>
+
+        <NavLink 
+          to="/profile"
+          className={({ isActive }) => 
+            `p-3 rounded-lg hover:bg-white/50 transition-all flex flex-col items-center gap-1 ${isActive ? 'bg-white/60' : ''}`
+          }
+          style={{ color: colors.white }}
+        >
+          <MdAccountCircle className="w-6 h-6 flex-shrink-0" />
+          <span className="text-xs font-medium whitespace-nowrap">Profil</span>
         </NavLink>
       </div>
     </nav>
