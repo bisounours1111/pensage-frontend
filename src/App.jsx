@@ -18,6 +18,9 @@ function App() {
           <Route path="/stories" element={<MyStoriesPage />} />
           <Route path="/create" element={<CreateStoryPage />} />
           <Route path="/shop" element={<div>Boutique</div>} />
+          <Route path="/account" element={<div>Compte</div>} />
+          <Route path="/notifications" element={<div>Notifications</div>} />
+          <Route path="/quests" element={<div>Quests</div>} />
           <Route path="/profile" element={<div>Profil</div>} />
           <Route path="/community" element={<div>Communauté</div>} />
           <Route path="/publish" element={<div>Publication</div>} />
