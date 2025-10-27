@@ -10,6 +10,8 @@ import SignupPage from "./pages/auth/SignupPage";
 import LoginPage from "./pages/auth/LoginPage";
 import CreateStoryPage from "./pages/create/CreateStoryPage";
 import EpisodesPage from "./pages/episodes/EpisodesPage";
+import PaymentSuccessPage from "./pages/payment/PaymentSuccessPage";
+import PaymentCancelPage from "./pages/payment/PaymentCancelPage";
 import ProfilePage from "./pages/profile/ProfilePage";
 
 function App() {
@@ -34,6 +36,10 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/community" element={<div>Communauté</div>} />
           <Route path="/publish" element={<div>Publication</div>} />
+          
+          {/* Pages de paiement */}
+          <Route path="/payment/success" element={<PaymentSuccessPage />} />
+          <Route path="/payment/cancel" element={<PaymentCancelPage />} />
         </Routes>
       </div>
       <Navbar />

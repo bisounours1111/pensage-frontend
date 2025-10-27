@@ -2,7 +2,7 @@ import React from "react";
 import colors from "../../utils/constants/colors";
 import GhostImage from "./GhostImage";
 
-export default function ProductCard({ title, subtitle, price, onClick }) {
+export default function ProductCard({ title, subtitle, price, onClick, disabled }) {
   return (
     <div className="rounded-2xl p-4 bg-white/30 border border-white/20 backdrop-blur shadow-lg hover:shadow-xl transition">
       <GhostImage />
@@ -23,12 +23,21 @@ export default function ProductCard({ title, subtitle, price, onClick }) {
 
       <button
         onClick={onClick}
-        className="mt-3 text-white px-4 py-2 rounded-lg hover:scale-105 transition shadow-lg"
+        disabled={disabled}
+        className="mt-3 text-white px-4 py-2 rounded-lg hover:scale-105 transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
         style={{ backgroundColor: colors.primary }}
-        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = colors.primaryLight)}
-        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = colors.primary)}
+        onMouseEnter={(e) => {
+          if (!disabled) {
+            e.currentTarget.style.backgroundColor = colors.primaryLight;
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!disabled) {
+            e.currentTarget.style.backgroundColor = colors.primary;
+          }
+        }}
       >
-        Acheter
+        {disabled ? 'Achat...' : 'Acheter'}
       </button>
     </div>
   );
