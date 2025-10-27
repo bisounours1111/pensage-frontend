@@ -5,6 +5,9 @@ import QuestsPage from "./pages/quests/QuestsPage";
 import './App.css'
 import Header from "./components/common/header";
 import Navbar from "./components/common/navbar";
+import WelcomePage from "./pages/auth/WelcomePage";
+import SignupPage from "./pages/auth/SignupPage";
+import LoginPage from "./pages/auth/LoginPage";
 import CreateStoryPage from "./pages/create/CreateStoryPage";
 
 function App() {
@@ -22,7 +25,7 @@ function App() {
           {/* Routes principales */}
           <Route path="/home" element={<div>Home</div>} />
           <Route path="/stories" element={<MyStoriesPage />} />
-          <Route path="/create" element={<div>Éditeur</div>} />
+          <Route path="/create" element={<CreateStoryPage />} />
           <Route path="/shop" element={<ShopPage />} /> 
           <Route path="/quests" element={<QuestsPage />} />
           <Route path="/profile" element={<div>Profil</div>} />

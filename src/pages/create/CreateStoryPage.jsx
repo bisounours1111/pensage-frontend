@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import Stepper from "../../components/ui/Stepper";
 import colors from "../../utils/constants/colors";
 import storyApi from "../../utils/api/storyApi";
+import { webnovelsApi } from "../../lib/supabaseApi";
+import { getCurrentUser } from "../../lib/supabase";
 
 // Import des composants d'étapes
 import PitchStep from "../../components/create/PitchStep";
@@ -145,16 +147,49 @@ const CreateStoryPage = () => {
   };
 
   // ==================== FINALISATION ====================
-  const handleFinalize = () => {
-    navigate("/episodes", {
-      state: {
-        pitch,
-        synopsis,
-        characters,
+  const handleFinalize = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Récupérer l'utilisateur connecté
+      const user = await getCurrentUser();
+      if (!user) {
+        throw new Error("Vous devez être connecté pour créer une histoire");
+      }
+
+      // Préparer les données pour Supabase
+      const webnovelData = {
+        id_author: user.id,
         title: storyTitle,
+        pitch: pitch,
+        synopsis: synopsis,
+        characters: characters,
         genre: selectedGenre,
-      },
-    });
+        publish: false,
+        is_over: false
+      };
+
+      // Sauvegarder dans Supabase
+      const savedStory = await webnovelsApi.create(webnovelData);
+
+      // Naviguer vers la page des épisodes avec l'ID de l'histoire
+      navigate("/episodes", {
+        state: {
+          storyId: savedStory.id,
+          pitch,
+          synopsis,
+          characters,
+          title: storyTitle,
+          genre: selectedGenre,
+        },
+      });
+    } catch (err) {
+      console.error("Erreur lors de la finalisation:", err);
+      setError(err.message || "Erreur lors de la sauvegarde de l'histoire");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
