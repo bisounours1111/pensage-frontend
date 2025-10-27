@@ -246,45 +246,6 @@ export const userExtendApi = {
 };
 
 /**
- * LIKES & HISTORY API
- */
-
-export const historyApi = {
-  // Récupérer les webnovels likés par un utilisateur
-  getLikedWebnovels: async (userId) => {
-    const { data, error } = await supabase
-      .from("webnovels_likes")
-      .select(
-        `
-        *,
-        webnovels (*)
-      `
-      )
-      .eq("id_user", userId);
-
-    if (error) throw error;
-    return data;
-  },
-
-  // Récupérer l'historique de lecture d'un utilisateur
-  getReadingHistory: async (userId) => {
-    const { data, error } = await supabase
-      .from("webnovels_history")
-      .select(
-        `
-        *,
-        webnovels (*),
-        webnovels_episode (*)
-      `
-      )
-      .eq("id_user", userId);
-
-    if (error) throw error;
-    return data;
-  },
-};
-
-/**
  * QUEST API
  */
 
@@ -314,6 +275,227 @@ export const questApi = {
   },
 };
 
+/**
+ * LIKES & HISTORY API
+ */
+
+export const historyApi = {
+  // Récupérer les webnovels likés par un utilisateur
+  getLikedWebnovels: async (userId) => {
+    const { data, error } = await supabase
+      .from("webnovels_likes")
+      .select(
+        `
+        *,
+        webnovels (*)
+      `
+      )
+      .eq("id_user", userId);
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Récupérer l'historique de lecture d'un utilisateur
+  getReadingHistory: async (userId) => {
+    const { data, error } = await supabase
+      .from("user_read_history")
+      .select(
+        `
+        *,
+        webnovels (*)
+      `
+      )
+      .eq("id_user", userId)
+      .order("last_read_date", { ascending: false });
+
+    if (error) throw error;
+    return data;
+  },
+};
+
+/**
+ * SHOP API
+ */
+
+export const shopTokenApi = {
+  // Récupérer tous les packs de tokens disponibles
+  getAll: async () => {
+    const { data, error } = await supabase
+      .from("shop_token")
+      .select("*")
+      .order("token_amount", { ascending: true });
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Acheter un pack de tokens
+  buy: async (userId, shopTokenId) => {
+    // Créer la transaction
+    const { data: transaction, error: transactionError } = await supabase
+      .from("transaction")
+      .insert({
+        id_user: userId,
+        id_shop_token: shopTokenId,
+        status: "completed",
+        date: new Date().toISOString().split("T")[0],
+      })
+      .select()
+      .single();
+
+    if (transactionError) throw transactionError;
+
+    // Récupérer le nombre de tokens
+    const { data: shopToken } = await supabase
+      .from("shop_token")
+      .select("token_amount")
+      .eq("id", shopTokenId)
+      .single();
+
+    // Mettre à jour le solde de l'utilisateur
+    const { data: userExtend } = await supabase
+      .from("user_extend")
+      .select("token")
+      .eq("id", userId)
+      .single();
+
+    const { error: updateError } = await supabase
+      .from("user_extend")
+      .update({ token: (userExtend?.token || 0) + shopToken.token_amount })
+      .eq("id", userId);
+
+    if (updateError) throw updateError;
+
+    return transaction;
+  },
+};
+
+export const shopSubscriptionApi = {
+  // Récupérer tous les abonnements disponibles
+  getAll: async () => {
+    const { data, error } = await supabase
+      .from("shop_subscription")
+      .select("*")
+      .order("price", { ascending: true });
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Acheter un abonnement Premium
+  buy: async (userId, shopSubscriptionId) => {
+    // Créer la transaction
+    const { data: transaction, error: transactionError } = await supabase
+      .from("transaction")
+      .insert({
+        id_user: userId,
+        id_shop_subscription: shopSubscriptionId,
+        status: "completed",
+        date: new Date().toISOString().split("T")[0],
+      })
+      .select()
+      .single();
+
+    if (transactionError) throw transactionError;
+
+    // Activer l'abonnement Premium
+    const { error: updateError } = await supabase
+      .from("user_extend")
+      .update({ has_subscription: true })
+      .eq("id", userId);
+
+    if (updateError) throw updateError;
+
+    return transaction;
+  },
+};
+
+/**
+ * WEEKLY REWARD API
+ */
+
+export const weeklyRewardApi = {
+  // Vérifier si l'utilisateur peut récupérer sa récompense hebdomadaire
+  canClaimWeekly: async (userId) => {
+    // Récupérer l'utilisateur pour vérifier son statut premium
+    const { data: user } = await supabase
+      .from("user_extend")
+      .select("has_subscription")
+      .eq("id", userId)
+      .single();
+
+    const isPremium = user?.has_subscription || false;
+
+    // Calculer la date d'il y a 7 jours
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const dateThreshold = sevenDaysAgo.toISOString().split("T")[0];
+
+    // Vérifier s'il y a une transaction de type reward plus récente que 7 jours
+    const { data: recentTransactions, error } = await supabase
+      .from("transaction")
+      .select("*")
+      .eq("id_user", userId)
+      .eq("status", "completed")
+      .eq("type", "reward") // Seulement les récompenses gratuites
+      .gte("date", dateThreshold);
+
+    if (error) throw error;
+
+    // S'il n'y a pas de transaction reward dans les 7 derniers jours, on peut récupérer
+    const hasRecentReward = recentTransactions && recentTransactions.length > 0;
+
+    return {
+      canClaim: !hasRecentReward,
+      isPremium,
+      lastTransactionDate: hasRecentReward ? recentTransactions[0]?.date : null,
+    };
+  },
+
+  // Récupérer la récompense hebdomadaire
+  claimWeekly: async (userId) => {
+    // Vérifier si on peut récupérer
+    const { canClaim, isPremium } = await weeklyRewardApi.canClaimWeekly(
+      userId
+    );
+
+    if (!canClaim) {
+      throw new Error("Vous avez déjà récupéré votre récompense cette semaine");
+    }
+
+    const rewardAmount = isPremium ? 2000 : 100;
+
+    // Créer une transaction de type "reward" pour tracer les récompenses gratuites
+    const { error: transactionError } = await supabase
+      .from("transaction")
+      .insert({
+        id_user: userId,
+        status: "completed",
+        date: new Date().toISOString().split("T")[0],
+        type: "reward", // Type pour les récompenses gratuites
+      });
+
+    if (transactionError) throw transactionError;
+
+    // Mettre à jour le solde de l'utilisateur
+    const { data: userExtend } = await supabase
+      .from("user_extend")
+      .select("token")
+      .eq("id", userId)
+      .single();
+
+    const { error: updateError } = await supabase
+      .from("user_extend")
+      .update({ token: (userExtend?.token || 0) + rewardAmount })
+      .eq("id", userId);
+
+    if (updateError) throw updateError;
+
+    return rewardAmount;
+  },
+};
+
 export default {
   webnovelsApi,
   episodesApi,
@@ -322,4 +504,7 @@ export default {
   userExtendApi,
   questApi,
   historyApi,
+  shopTokenApi,
+  shopSubscriptionApi,
+  weeklyRewardApi,
 };
