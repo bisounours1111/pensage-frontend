@@ -1,9 +1,19 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import colors from '../../utils/constants/colors';
 
 const StoryCard = ({ story }) => {
+    const navigate = useNavigate();
+
+    const handleClick = () => {
+        navigate(`/episodes/${story.id}`);
+    };
+
     return (
-        <div className="flex-shrink-0 w-48 md:w-56 group cursor-pointer">
+        <div 
+            className="flex-shrink-0 w-48 md:w-56 group cursor-pointer"
+            onClick={handleClick}
+        >
             <div className="relative overflow-hidden rounded-lg bg-white/30 backdrop-blur-sm shadow-lg aspect-[2/3] mb-2 border border-white/40">
                 {/* Image de couverture */}
                 <img

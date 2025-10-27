@@ -1,40 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import StoryRow from '../../components/stories/StoryRow';
 import colors from '../../utils/constants/colors';
+import { webnovelsApi } from '../../lib/supabaseApi';
+import { getCurrentUser } from '../../lib/supabase';
 
 const MyStoriesPage = () => {
     const navigate = useNavigate();
     const [filter, setFilter] = useState('all');
-    const [stories] = useState([
-        {
-            id: 1,
-            title: "Histoire 1",
-            cover: "https://via.placeholder.com/300x450",
-            category: "Fantasy",
-            progress: 65,
-            status: "in-progress",
-            lastOpened: "2024-01-15"
-        },
-        {
-            id: 2,
-            title: "Histoire 2",
-            cover: "https://via.placeholder.com/300x450",
-            category: "Aventure",
-            progress: 0,
-            status: "draft",
-            lastOpened: "2024-01-10"
-        },
-        {
-            id: 3,
-            title: "Histoire 3",
-            cover: "https://via.placeholder.com/300x450",
-            category: "Romance",
-            progress: 100,
-            status: "published",
-            lastOpened: "2024-01-20"
-        }
-    ]);
+    const [stories, setStories] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    // Charger les histoires de l'utilisateur depuis Supabase
+    useEffect(() => {
+        const loadStories = async () => {
+            try {
+                setLoading(true);
+                const user = await getCurrentUser();
+                if (!user) {
+                    setError('Vous devez être connecté');
+                    setLoading(false);
+                    return;
+                }
+
+                const userStories = await webnovelsApi.getByUser(user.id);
+                
+                // Transformer les données Supabase en format attendu par StoryRow
+                const formattedStories = userStories.map(story => ({
+                    id: story.id,
+                    title: story.title || 'Sans titre',
+                    cover: "https://via.placeholder.com/300x450",
+                    category: story.genre || 'Non spécifié',
+                    progress: 0, // TODO: calculer le progrès basé sur les épisodes
+                    status: story.publish ? 'published' : story.is_over ? 'draft' : 'in-progress',
+                    ...story
+                }));
+
+                setStories(formattedStories);
+                setError(null);
+            } catch (err) {
+                console.error('Erreur lors du chargement des histoires:', err);
+                setError(err.message || 'Erreur lors du chargement des histoires');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadStories();
+    }, []);
 
     const handleNewStory = () => {
         navigate('/create');
@@ -161,32 +175,68 @@ const MyStoriesPage = () => {
                 </div>
             </header>
 
-            {/* Sections de catalogue */}
-            <div className="space-y-8 px-6 md:px-12 pb-12">
-                {/* Continuer la lecture */}
-                {inProgressStories.length > 0 && (
-                    <StoryRow
-                        title="En cours d'écriture"
-                        stories={inProgressStories}
-                    />
-                )}
+            {/* Message de chargement ou d'erreur */}
+            {loading && (
+                <div className="flex justify-center items-center py-12">
+                    <div className="text-lg" style={{ color: colors.text }}>
+                        Chargement de vos histoires...
+                    </div>
+                </div>
+            )}
 
-                {/* Brouillons */}
-                {draftStories.length > 0 && (
-                    <StoryRow
-                        title="Terminées"
-                        stories={draftStories}
-                    />
-                )}
+            {error && (
+                <div className="px-6 md:px-12 py-6">
+                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                        {error}
+                    </div>
+                </div>
+            )}
 
-                {/* Publiées */}
-                {publishedStories.length > 0 && (
-                    <StoryRow
-                        title="Publiées"
-                        stories={publishedStories}
-                    />
-                )}
-            </div>
+            {!loading && !error && (
+                <div className="space-y-8 px-6 md:px-12 pb-12">
+                    {/* Continuer la lecture */}
+                    {inProgressStories.length > 0 && (
+                        <StoryRow
+                            title="En cours d'écriture"
+                            stories={inProgressStories}
+                        />
+                    )}
+
+                    {/* Brouillons */}
+                    {draftStories.length > 0 && (
+                        <StoryRow
+                            title="Terminées"
+                            stories={draftStories}
+                        />
+                    )}
+
+                    {/* Publiées */}
+                    {publishedStories.length > 0 && (
+                        <StoryRow
+                            title="Publiées"
+                            stories={publishedStories}
+                        />
+                    )}
+
+                    {/* Aucune histoire */}
+                    {inProgressStories.length === 0 && draftStories.length === 0 && publishedStories.length === 0 && (
+                        <div className="flex flex-col items-center justify-center py-12">
+                            <p className="text-xl mb-4" style={{ color: colors.text }}>
+                                Vous n'avez pas encore d'histoires
+                            </p>
+                            <button
+                                className="cursor-pointer text-white px-6 py-3 rounded-lg font-semibold transition shadow-lg hover:scale-105"
+                                style={{ backgroundColor: colors.primary }}
+                                onMouseEnter={(e) => e.target.style.backgroundColor = colors.primaryLight}
+                                onMouseLeave={(e) => e.target.style.backgroundColor = colors.primary}
+                                onClick={handleNewStory}
+                            >
+                                Créer votre première histoire
+                            </button>
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 };

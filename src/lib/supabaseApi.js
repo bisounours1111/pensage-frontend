@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+import { supabase } from "./supabase";
 
 // ========================================
 // API HELPERS FOR PENSAGA
@@ -12,10 +12,10 @@ export const webnovelsApi = {
   // Récupérer tous les webnovels publiés
   getAllPublished: async () => {
     const { data, error } = await supabase
-      .from('webnovels')
-      .select('*')
-      .eq('publish', true)
-      .order('created_at', { ascending: false });
+      .from("webnovels")
+      .select("*")
+      .eq("publish", true)
+      .order("id", { ascending: false });
 
     if (error) throw error;
     return data;
@@ -24,10 +24,10 @@ export const webnovelsApi = {
   // Récupérer les webnovels d'un utilisateur
   getByUser: async (userId) => {
     const { data, error } = await supabase
-      .from('webnovels')
-      .select('*')
-      .eq('id_author', userId)
-      .order('created_at', { ascending: false });
+      .from("webnovels")
+      .select("*")
+      .eq("id_author", userId)
+      .order("id", { ascending: false });
 
     if (error) throw error;
     return data;
@@ -36,9 +36,9 @@ export const webnovelsApi = {
   // Récupérer un webnovel par ID
   getById: async (webnovelId) => {
     const { data, error } = await supabase
-      .from('webnovels')
-      .select('*')
-      .eq('id', webnovelId)
+      .from("webnovels")
+      .select("*")
+      .eq("id", webnovelId)
       .single();
 
     if (error) throw error;
@@ -48,7 +48,7 @@ export const webnovelsApi = {
   // Créer un nouveau webnovel
   create: async (webnovelData) => {
     const { data, error } = await supabase
-      .from('webnovels')
+      .from("webnovels")
       .insert(webnovelData)
       .select()
       .single();
@@ -60,9 +60,9 @@ export const webnovelsApi = {
   // Mettre à jour un webnovel
   update: async (webnovelId, updates) => {
     const { data, error } = await supabase
-      .from('webnovels')
+      .from("webnovels")
       .update(updates)
-      .eq('id', webnovelId)
+      .eq("id", webnovelId)
       .select()
       .single();
 
@@ -73,13 +73,13 @@ export const webnovelsApi = {
   // Supprimer un webnovel
   delete: async (webnovelId) => {
     const { error } = await supabase
-      .from('webnovels')
+      .from("webnovels")
       .delete()
-      .eq('id', webnovelId);
+      .eq("id", webnovelId);
 
     if (error) throw error;
     return true;
-  }
+  },
 };
 
 /**
@@ -90,10 +90,10 @@ export const episodesApi = {
   // Récupérer les épisodes d'un webnovel
   getByWebnovel: async (webnovelId) => {
     const { data, error } = await supabase
-      .from('webnovels_episode')
-      .select('*')
-      .eq('id_webnovels', webnovelId)
-      .order('number', { ascending: true });
+      .from("webnovels_episode")
+      .select("*")
+      .eq("id_webnovels", webnovelId)
+      .order("number", { ascending: true });
 
     if (error) throw error;
     return data;
@@ -102,7 +102,7 @@ export const episodesApi = {
   // Créer un nouvel épisode
   create: async (episodeData) => {
     const { data, error } = await supabase
-      .from('webnovels_episode')
+      .from("webnovels_episode")
       .insert(episodeData)
       .select()
       .single();
@@ -114,15 +114,26 @@ export const episodesApi = {
   // Mettre à jour un épisode
   update: async (episodeId, updates) => {
     const { data, error } = await supabase
-      .from('webnovels_episode')
+      .from("webnovels_episode")
       .update(updates)
-      .eq('id', episodeId)
+      .eq("id", episodeId)
       .select()
       .single();
 
     if (error) throw error;
     return data;
-  }
+  },
+
+  // Supprimer un épisode
+  delete: async (episodeId) => {
+    const { error } = await supabase
+      .from("webnovels_episode")
+      .delete()
+      .eq("id", episodeId);
+
+    if (error) throw error;
+    return true;
+  },
 };
 
 /**
@@ -134,29 +145,27 @@ export const likesApi = {
   toggleLike: async (webnovelId, userId) => {
     // Vérifier si le like existe
     const { data: existingLike } = await supabase
-      .from('webnovels_likes')
-      .select('id')
-      .eq('id_webnovels', webnovelId)
-      .eq('id_user', userId)
+      .from("webnovels_likes")
+      .select("id")
+      .eq("id_webnovels", webnovelId)
+      .eq("id_user", userId)
       .single();
 
     if (existingLike) {
       // Supprimer le like
       const { error } = await supabase
-        .from('webnovels_likes')
+        .from("webnovels_likes")
         .delete()
-        .eq('id', existingLike.id);
+        .eq("id", existingLike.id);
 
       if (error) throw error;
       return false;
     } else {
       // Ajouter le like
-      const { error } = await supabase
-        .from('webnovels_likes')
-        .insert({
-          id_webnovels: webnovelId,
-          id_user: userId
-        });
+      const { error } = await supabase.from("webnovels_likes").insert({
+        id_webnovels: webnovelId,
+        id_user: userId,
+      });
 
       if (error) throw error;
       return true;
@@ -166,13 +175,13 @@ export const likesApi = {
   // Compter les likes d'un webnovel
   countLikes: async (webnovelId) => {
     const { count, error } = await supabase
-      .from('webnovels_likes')
-      .select('*', { count: 'exact', head: true })
-      .eq('id_webnovels', webnovelId);
+      .from("webnovels_likes")
+      .select("*", { count: "exact", head: true })
+      .eq("id_webnovels", webnovelId);
 
     if (error) throw error;
     return count || 0;
-  }
+  },
 };
 
 /**
@@ -183,11 +192,10 @@ export const commentsApi = {
   // Récupérer les commentaires d'un webnovel
   getByWebnovel: async (webnovelId) => {
     const { data, error } = await supabase
-      .from('webnovels_comment')
-      .select('*')
-      .eq('id_webnovels', webnovelId)
-      .is('parent_comment_id', null)
-      .order('created_at', { ascending: false });
+      .from("webnovels_comment")
+      .select("*")
+      .eq("id_webnovels", webnovelId)
+      .is("parent_comment_id", null);
 
     if (error) throw error;
     return data;
@@ -196,14 +204,14 @@ export const commentsApi = {
   // Créer un commentaire
   create: async (commentData) => {
     const { data, error } = await supabase
-      .from('webnovels_comment')
+      .from("webnovels_comment")
       .insert(commentData)
       .select()
       .single();
 
     if (error) throw error;
     return data;
-  }
+  },
 };
 
 /**
@@ -214,9 +222,9 @@ export const userExtendApi = {
   // Mettre à jour les données utilisateur
   update: async (userId, updates) => {
     const { data, error } = await supabase
-      .from('user_extend')
+      .from("user_extend")
       .update(updates)
-      .eq('id', userId)
+      .eq("id", userId)
       .select()
       .single();
 
@@ -227,14 +235,14 @@ export const userExtendApi = {
   // Récupérer les données utilisateur
   get: async (userId) => {
     const { data, error } = await supabase
-      .from('user_extend')
-      .select('*')
-      .eq('id', userId)
+      .from("user_extend")
+      .select("*")
+      .eq("id", userId)
       .single();
 
     if (error) throw error;
     return data;
-  }
+  },
 };
 
 /**
@@ -244,9 +252,7 @@ export const userExtendApi = {
 export const questApi = {
   // Récupérer toutes les quêtes
   getAll: async () => {
-    const { data, error } = await supabase
-      .from('quest')
-      .select('*');
+    const { data, error } = await supabase.from("quest").select("*");
 
     if (error) throw error;
     return data;
@@ -255,16 +261,18 @@ export const questApi = {
   // Récupérer la progression d'un utilisateur
   getProgress: async (userId) => {
     const { data, error } = await supabase
-      .from('quest_progress')
-      .select(`
+      .from("quest_progress")
+      .select(
+        `
         *,
         quest:quest(*)
-      `)
-      .eq('id_user', userId);
+      `
+      )
+      .eq("id_user", userId);
 
     if (error) throw error;
     return data;
-  }
+  },
 };
 
 export default {
@@ -273,6 +281,5 @@ export default {
   likesApi,
   commentsApi,
   userExtendApi,
-  questApi
+  questApi,
 };
-
