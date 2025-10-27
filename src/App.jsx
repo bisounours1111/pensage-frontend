@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
 import MyStoriesPage from './pages/stories/MyStoriesPage'
 import ShopPage from './pages/shop/ShopPage'
 import QuestsPage from "./pages/quests/QuestsPage";
@@ -12,10 +12,13 @@ import CreateStoryPage from "./pages/create/CreateStoryPage";
 import EpisodesPage from "./pages/episodes/EpisodesPage";
 import ProfilePage from "./pages/profile/ProfilePage";
 
-function App() {
+function AppContent() {
+  const location = useLocation();
+  const isAuthPage = location.pathname === '/' || location.pathname === '/signup' || location.pathname === '/login';
+
   return (
-    <Router>
-      <Header />
+    <>
+      {!isAuthPage && <Header />}
 
       <div className="min-h-screen bg-gray-50 pb-16 lg:pb-0">
         <Routes>
@@ -36,7 +39,15 @@ function App() {
           <Route path="/publish" element={<div>Publication</div>} />
         </Routes>
       </div>
-      <Navbar />
+      {!isAuthPage && <Navbar />}
+    </>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
 }
