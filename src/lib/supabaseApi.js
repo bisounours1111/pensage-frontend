@@ -246,6 +246,45 @@ export const userExtendApi = {
 };
 
 /**
+ * LIKES & HISTORY API
+ */
+
+export const historyApi = {
+  // Récupérer les webnovels likés par un utilisateur
+  getLikedWebnovels: async (userId) => {
+    const { data, error } = await supabase
+      .from("webnovels_likes")
+      .select(
+        `
+        *,
+        webnovels (*)
+      `
+      )
+      .eq("id_user", userId);
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Récupérer l'historique de lecture d'un utilisateur
+  getReadingHistory: async (userId) => {
+    const { data, error } = await supabase
+      .from("webnovels_history")
+      .select(
+        `
+        *,
+        webnovels (*),
+        webnovels_episode (*)
+      `
+      )
+      .eq("id_user", userId);
+
+    if (error) throw error;
+    return data;
+  },
+};
+
+/**
  * QUEST API
  */
 
@@ -282,4 +321,5 @@ export default {
   commentsApi,
   userExtendApi,
   questApi,
+  historyApi,
 };

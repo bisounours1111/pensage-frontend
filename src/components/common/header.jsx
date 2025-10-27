@@ -54,7 +54,7 @@ export default function Header() {
         {/* Icônes principales - Compte, Notifications, Quests (toujours visibles) */}
         <div className="flex items-center gap-4 border-l pl-4" style={{ borderColor: 'rgba(255,255,255,0.3)' }}>
           <Link 
-            to="/account"
+            to="/profile"
             className="p-3 rounded-lg hover:bg-white/20 transition-all flex items-center gap-2 group"
             style={{ color: colors.white }}
           >

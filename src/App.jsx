@@ -10,6 +10,7 @@ import SignupPage from "./pages/auth/SignupPage";
 import LoginPage from "./pages/auth/LoginPage";
 import CreateStoryPage from "./pages/create/CreateStoryPage";
 import EpisodesPage from "./pages/episodes/EpisodesPage";
+import ProfilePage from "./pages/profile/ProfilePage";
 
 function App() {
   return (
@@ -30,7 +31,7 @@ function App() {
           <Route path="/episodes/:id" element={<EpisodesPage />} />
           <Route path="/shop" element={<ShopPage />} /> 
           <Route path="/quests" element={<QuestsPage />} />
-          <Route path="/profile" element={<div>Profil</div>} />
+          <Route path="/profile" element={<ProfilePage />} />
           <Route path="/community" element={<div>Communauté</div>} />
           <Route path="/publish" element={<div>Publication</div>} />
         </Routes>
