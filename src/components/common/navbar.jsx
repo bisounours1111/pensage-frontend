@@ -1,49 +1,52 @@
 import React from "react";
-import { NavLink, useNavigate } from "react-router-dom";
-
-import accountIcon from "../../assets/images/account.png";
-import historyIcon from "../../assets/images/histoires.png";
-import notificationsIcon from "../../assets/images/notifications.png";
-import arrowLeft from "../../assets/images/gauche.png";
-import arrowRight from "../../assets/images/droite.png";
+  import { NavLink } from "react-router-dom";
+import colors from "../../utils/constants/colors";
+import { MdAutoStories, MdHome, MdShoppingBag } from "react-icons/md";
 
 export default function Navbar() {
-  const navigate = useNavigate();
 
   return (
     <nav
-      className="
-        fixed bottom-0 left-0 right-0 z-50
-        bg-[#d6ccc2] border-t border-black/10
-        h-16 flex items-center justify-center
-        px-6 lg:hidden
-      "
+      className="fixed bottom-0 left-0 right-0 z-50 h-16 flex items-center justify-center px-6 lg:hidden"
+      style={{
+        background: `linear-gradient(to right, ${colors.primarySoft}, ${colors.primaryLight})`,
+        borderTop: `3px solid ${colors.primary}`,
+      }}
     >
-      {/* ✅ On ajoute ici flèche gauche + icônes + flèche droite */}
-      <div className="flex items-center justify-center gap-8">
+      <div className="flex items-center justify-center gap-4 overflow-x-auto max-w-full"> 
 
-        {/* Flèche gauche */}
-        <button onClick={() => navigate(-1)} aria-label="Retour">
-          <img src={arrowLeft} alt="Retour" className="w-6 h-6" />
-        </button>
-
-        {/* Icônes déjà existantes */}
-        <NavLink to="/histoires">
-          <img src={historyIcon} alt="Histoires" className="w-7 h-7" />
+        <NavLink 
+          to="/stories"
+          className={({ isActive }) => 
+            `p-3 rounded-lg hover:bg-white/50 transition-all flex flex-col items-center gap-1 ${isActive ? 'bg-white/60' : ''}`
+          }
+          style={{ color: colors.white }}
+        >
+          <MdAutoStories className="w-6 h-6 flex-shrink-0" />
+          <span className="text-xs font-medium whitespace-nowrap">Histoires</span>
         </NavLink>
 
-        <NavLink to="/account">
-          <img src={accountIcon} alt="Compte" className="w-7 h-7" />
+        <NavLink 
+          to="/home"
+          className={({ isActive }) => 
+            `p-3 rounded-lg hover:bg-white/50 transition-all flex flex-col items-center gap-1 ${isActive ? 'bg-white/60' : ''}`
+          }
+          style={{ color: colors.white }}
+        >
+          <MdHome className="w-6 h-6 flex-shrink-0" />
+          <span className="text-xs font-medium whitespace-nowrap">Accueil</span>
         </NavLink>
 
-        <NavLink to="/notifications">
-          <img src={notificationsIcon} alt="Notifications" className="w-7 h-7" />
+        <NavLink 
+          to="/shop"
+          className={({ isActive }) => 
+            `p-3 rounded-lg hover:bg-white/50 transition-all flex flex-col items-center gap-1 ${isActive ? 'bg-white/60' : ''}`
+          }
+          style={{ color: colors.white }}
+        >
+          <MdShoppingBag className="w-6 h-6 flex-shrink-0" />
+          <span className="text-xs font-medium whitespace-nowrap">Boutique</span>
         </NavLink>
-
-        {/* Flèche droite */}
-        <button onClick={() => navigate(1)} aria-label="Suivant">
-          <img src={arrowRight} alt="Suivant" className="w-6 h-6" />
-        </button>
       </div>
     </nav>
   );
