@@ -123,6 +123,17 @@ export const episodesApi = {
     if (error) throw error;
     return data;
   },
+
+  // Supprimer un épisode
+  delete: async (episodeId) => {
+    const { error } = await supabase
+      .from("webnovels_episode")
+      .delete()
+      .eq("id", episodeId);
+
+    if (error) throw error;
+    return true;
+  },
 };
 
 /**

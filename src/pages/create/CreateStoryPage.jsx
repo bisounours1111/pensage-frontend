@@ -174,16 +174,7 @@ const CreateStoryPage = () => {
       const savedStory = await webnovelsApi.create(webnovelData);
 
       // Naviguer vers la page des épisodes avec l'ID de l'histoire
-      navigate("/episodes", {
-        state: {
-          storyId: savedStory.id,
-          pitch,
-          synopsis,
-          characters,
-          title: storyTitle,
-          genre: selectedGenre,
-        },
-      });
+      navigate(`/episodes/${savedStory.id}`);
     } catch (err) {
       console.error("Erreur lors de la finalisation:", err);
       setError(err.message || "Erreur lors de la sauvegarde de l'histoire");
