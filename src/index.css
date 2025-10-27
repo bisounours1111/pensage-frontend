@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-/* Configuration personnalisée pour Pensaga */
 @layer base {
   :root {
     font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -18,7 +17,19 @@
     min-height: 100vh;
   }
 
-  /* Variables personnalisées pour le thème Pensaga */
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  input,
+  textarea,
+  select {
+    outline: none !important;
+  }
+
   :root {
     --color-primary: #FF99AC;
     --color-primary-light: #FBB1BD;
@@ -33,7 +44,6 @@
     --color-bg-gradient-to: #F9BEC7;
   }
 
-  /* Masquer la scrollbar tout en gardant le scroll */
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;

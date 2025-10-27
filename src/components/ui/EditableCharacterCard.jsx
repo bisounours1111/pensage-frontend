@@ -3,7 +3,14 @@ import colors from "../../utils/constants/colors";
 
 const EditableCharacterCard = ({ character, onUpdate, index }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [editedCharacter, setEditedCharacter] = useState({ ...character });
+  
+  // Normaliser le personnage pour utiliser "rôle" au lieu de "histoire"
+  const normalizedCharacter = {
+    ...character,
+    rôle: character.rôle || character.histoire || ""
+  };
+  
+  const [editedCharacter, setEditedCharacter] = useState(normalizedCharacter);
 
   const handleSave = () => {
     onUpdate(editedCharacter);
@@ -11,7 +18,7 @@ const EditableCharacterCard = ({ character, onUpdate, index }) => {
   };
 
   const handleCancel = () => {
-    setEditedCharacter({ ...character });
+    setEditedCharacter({ ...normalizedCharacter });
     setIsEditing(false);
   };
 
@@ -114,7 +121,7 @@ const EditableCharacterCard = ({ character, onUpdate, index }) => {
               className="block text-sm font-bold mb-2"
               style={{ color: colors.primary }}
             >
-              Histoire
+              Rôle dans l'histoire
             </label>
             <textarea
               className="w-full px-3 py-2 rounded-lg border-2 focus:outline-none focus:ring-2 resize-none"
@@ -124,8 +131,8 @@ const EditableCharacterCard = ({ character, onUpdate, index }) => {
                 color: colors.text,
                 minHeight: "80px",
               }}
-              value={editedCharacter.histoire || ""}
-              onChange={(e) => handleChange("histoire", e.target.value)}
+              value={editedCharacter.rôle || editedCharacter.histoire || ""}
+              onChange={(e) => handleChange("rôle", e.target.value)}
             />
           </div>
 
@@ -171,15 +178,15 @@ const EditableCharacterCard = ({ character, onUpdate, index }) => {
               color: colors.white,
             }}
           >
-            {character.nom?.charAt(0).toUpperCase() || index + 1}
+            {normalizedCharacter.nom?.charAt(0).toUpperCase() || index + 1}
           </div>
           <div>
             <h3 className="text-xl font-bold" style={{ color: colors.text }}>
-              {character.nom || `Personnage ${index + 1}`}
+              {normalizedCharacter.nom || `Personnage ${index + 1}`}
             </h3>
-            {character.âge && (
+            {normalizedCharacter.âge && (
               <p className="text-sm" style={{ color: colors.textSecondary }}>
-                {character.âge}
+                {normalizedCharacter.âge}
               </p>
             )}
           </div>
@@ -198,30 +205,30 @@ const EditableCharacterCard = ({ character, onUpdate, index }) => {
       </div>
 
       <div className="space-y-3">
-        {character.personnalité && (
+        {normalizedCharacter.personnalité && (
           <div>
             <span className="font-semibold" style={{ color: colors.primary }}>
               Personnalité:{" "}
             </span>
-            <span style={{ color: colors.text }}>{character.personnalité}</span>
+            <span style={{ color: colors.text }}>{normalizedCharacter.personnalité}</span>
           </div>
         )}
 
-        {character.apparence && (
+        {normalizedCharacter.apparence && (
           <div>
             <span className="font-semibold" style={{ color: colors.primary }}>
               Apparence:{" "}
             </span>
-            <span style={{ color: colors.text }}>{character.apparence}</span>
+            <span style={{ color: colors.text }}>{normalizedCharacter.apparence}</span>
           </div>
         )}
 
-        {character.histoire && (
+        {normalizedCharacter.rôle && (
           <div>
             <span className="font-semibold" style={{ color: colors.primary }}>
-              Histoire:{" "}
+              Rôle:{" "}
             </span>
-            <span style={{ color: colors.text }}>{character.histoire}</span>
+            <span style={{ color: colors.text }}>{normalizedCharacter.rôle}</span>
           </div>
         )}
       </div>

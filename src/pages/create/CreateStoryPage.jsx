@@ -13,9 +13,9 @@ const CreateStoryPage = () => {
   const [error, setError] = useState(null);
 
   // État pour l'étape 1 : Pitch
-  const [userRequest, setUserRequest] = useState("");
+  const [pitch, setPitch] = useState("");
   const [pitchOptions, setPitchOptions] = useState([]);
-  const [selectedPitch, setSelectedPitch] = useState(null);
+  const [showAIOptions, setShowAIOptions] = useState(false);
 
   // État pour l'étape 2 : Synopsis
   const [synopsis, setSynopsis] = useState("");
@@ -23,16 +23,22 @@ const CreateStoryPage = () => {
   // État pour l'étape 3 : Personnages
   const [characters, setCharacters] = useState([]);
 
+  // État pour l'étape 4 : Titre et Genre
+  const [storyTitle, setStoryTitle] = useState("");
+  const [selectedGenre, setSelectedGenre] = useState("");
+  const genres = ["Romance", "Fantastique", "Action", "Drame", "Comédie", "Thriller", "Mystère", "Science-Fiction", "Horreur", "Slice of Life", "Sport", "Historique"];
+
   const steps = [
     { title: "Pitch" },
     { title: "Synopsis" },
     { title: "Personnages" },
+    { title: "Titre & Genre" },
     { title: "Finalisation" },
   ];
 
   // ==================== ÉTAPE 1 : PITCH ====================
-  const handleGeneratePitch = async () => {
-    if (!userRequest.trim()) {
+  const handleGeneratePitchOptions = async () => {
+    if (!pitch.trim()) {
       setError("Veuillez entrer une description pour votre histoire");
       return;
     }
@@ -41,7 +47,7 @@ const CreateStoryPage = () => {
     setError(null);
 
     try {
-      const result = await storyApi.generatePitch(userRequest);
+      const result = await storyApi.generatePitch(pitch);
 
       // Parser les 5 pitchs depuis la réponse
       const pitchText = result.pitchs;
@@ -54,6 +60,7 @@ const CreateStoryPage = () => {
         setError("Aucun pitch n'a pu être extrait. Veuillez réessayer.");
       } else {
         setPitchOptions(pitchArray);
+        setShowAIOptions(true);
       }
     } catch (err) {
       setError(err.message);
@@ -145,28 +152,21 @@ const CreateStoryPage = () => {
     return chunks.slice(0, 5);
   };
 
-  const handleSelectPitch = (pitch) => {
-    console.log("Pitch sélectionné:", pitch);
-    setSelectedPitch(pitch);
-    setError(null); // Effacer les erreurs quand on sélectionne
+  const handleSelectPitchOption = (selectedOption) => {
+    setPitch(selectedOption);
+    setPitchOptions([]);
+    setShowAIOptions(false);
+    setError(null);
   };
 
   const handlePitchNext = () => {
-    console.log(
-      "Tentative de passage à l'étape suivante. Pitch sélectionné:",
-      selectedPitch
-    );
-
-    if (!selectedPitch) {
-      setError("Veuillez sélectionner un pitch");
+    if (!pitch.trim()) {
+      setError("Veuillez entrer ou sélectionner un pitch");
       return;
     }
 
     setError(null);
     setCurrentStep(2);
-    console.log("Passage à l'étape 2 - Synopsis");
-
-    // NE PAS générer automatiquement - l'utilisateur décidera
   };
 
   // ==================== ÉTAPE 2 : SYNOPSIS ====================
@@ -175,7 +175,7 @@ const CreateStoryPage = () => {
     setError(null);
 
     try {
-      const result = await storyApi.generateSynopsis(selectedPitch);
+      const result = await storyApi.generateSynopsis(pitch);
       setSynopsis(result.synopsis);
     } catch (err) {
       setError(err.message);
@@ -201,88 +201,23 @@ const CreateStoryPage = () => {
     setError(null);
 
     try {
-      const result = await storyApi.generateCharacters(selectedPitch, synopsis);
-      const parsedCharacters = parseCharacters(result.characters);
-      setCharacters(parsedCharacters);
+      const result = await storyApi.generateCharacters(pitch, synopsis);
+      
+      // L'API retourne maintenant directement un tableau JSON structuré
+      const charactersList = result.characters || [];
+      
+      // Ajouter un ID unique à chaque personnage pour le composant React
+      const charactersWithIds = charactersList.map((character, index) => ({
+        ...character,
+        id: index + 1
+      }));
+      
+      setCharacters(charactersWithIds);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  };
-
-  const parseCharacters = (text) => {
-    // Essayer d'abord de séparer par double saut de ligne (paragraphes)
-    let characterBlocks = text
-      .split(/\n\n+/)
-      .map((block) => block.trim())
-      .filter((block) => block.length > 0);
-
-    // Si on n'a pas au moins 3 blocs, essayer de séparer par numéros
-    if (characterBlocks.length < 3) {
-      characterBlocks = text
-        .split(/(?:^|\n)\s*\d+\.\s+/)
-        .filter((block) => block.trim());
-    }
-
-    return characterBlocks.map((block, index) => {
-      const lines = block.split("\n").filter((line) => line.trim());
-      const character = { id: index + 1 };
-
-      // Variables pour stocker les valeurs
-      let currentKey = null;
-
-      lines.forEach((line) => {
-        const cleanLine = line.replace(/^\*\*|\*\*$/g, "").trim();
-
-        // Détecter les clés avec deux points
-        const keyMatch = cleanLine.match(/^([^:]+):\s*(.+)$/);
-
-        if (keyMatch) {
-          const key = keyMatch[1].toLowerCase().trim();
-          const value = keyMatch[2].trim();
-
-          if (key.includes("nom")) {
-            character.nom = value;
-            currentKey = "nom";
-          } else if (key.includes("âge") || key.includes("age")) {
-            character.âge = value;
-            currentKey = "âge";
-          } else if (
-            key.includes("personnalité") ||
-            key.includes("personnalite")
-          ) {
-            character.personnalité = value;
-            currentKey = "personnalité";
-          } else if (key.includes("apparence")) {
-            character.apparence = value;
-            currentKey = "apparence";
-          } else if (
-            key.includes("histoire") ||
-            key.includes("background") ||
-            key.includes("rôle") ||
-            key.includes("role")
-          ) {
-            character.histoire = value;
-            currentKey = "histoire";
-          }
-        } else if (currentKey && cleanLine) {
-          // Continuer la valeur de la clé précédente sur plusieurs lignes
-          character[currentKey] =
-            (character[currentKey] || "") + " " + cleanLine;
-        } else if (!character.nom && cleanLine && index === 0) {
-          // Si c'est la première ligne et qu'on n'a pas encore de nom
-          character.nom = cleanLine;
-        }
-      });
-
-      // Si pas de nom trouvé, utiliser un nom par défaut
-      if (!character.nom) {
-        character.nom = `Personnage ${index + 1}`;
-      }
-
-      return character;
-    });
   };
 
   const handleCharactersNext = () => {
@@ -299,15 +234,30 @@ const CreateStoryPage = () => {
     setCharacters(newCharacters);
   };
 
-  // ==================== ÉTAPE 4 : FINALISATION ====================
+  // ==================== ÉTAPE 4 : TITRE ET GENRE ====================
+  const handleTextGenreNext = () => {
+    if (!storyTitle.trim()) {
+      setError("Veuillez entrer un titre pour votre histoire");
+      return;
+    }
+    if (!selectedGenre) {
+      setError("Veuillez sélectionner un genre");
+      return;
+    }
+    setCurrentStep(5);
+  };
+
+  // ==================== ÉTAPE 5 : FINALISATION ====================
   const handleFinalize = () => {
     // TODO: Sauvegarder l'histoire dans la base de données
     // Puis rediriger vers la page des épisodes
     navigate("/episodes", {
       state: {
-        pitch: selectedPitch,
+        pitch,
         synopsis,
         characters,
+        title: storyTitle,
+        genre: selectedGenre,
       },
     });
   };
@@ -374,42 +324,45 @@ const CreateStoryPage = () => {
                     className="text-4xl font-bold mb-4"
                     style={{ color: colors.text }}
                   >
-                    Décrivez votre histoire
+                    Créez votre pitch
                   </h2>
                   <p
                     className="text-xl"
                     style={{ color: colors.textSecondary }}
                   >
-                    Donnez-nous une idée de base et l'IA créera 5 pitchs uniques
-                    pour vous
+                    Écrivez votre pitch ou inspirez-vous de suggestions générées par l'IA
                   </p>
                 </div>
 
                 <textarea
-                  className="w-full p-6 rounded-xl border-3 resize-none focus:outline-none focus:ring-4 text-lg"
+                  className="w-full p-6 rounded-xl border-3 resize-none text-lg outline-none"
                   style={{
                     borderColor: colors.primary,
                     backgroundColor: colors.white,
                     color: colors.text,
-                    minHeight: "180px",
+                    minHeight: "200px",
                     borderWidth: "3px",
                   }}
-                  placeholder="Ex: Une jeune fille découvre qu'elle a des pouvoirs magiques et doit sauver son monde..."
-                  value={userRequest}
-                  onChange={(e) => setUserRequest(e.target.value)}
+                  placeholder="Écrivez ici votre pitch (résumé de votre histoire)..."
+                  value={pitch}
+                  onChange={(e) => setPitch(e.target.value)}
                   disabled={loading}
                 />
 
-                <button
-                  className="mt-6 w-full px-8 py-5 rounded-xl font-bold text-xl text-white transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-xl"
-                  style={{ backgroundColor: colors.primary }}
-                  onClick={handleGeneratePitch}
-                  disabled={loading || !userRequest.trim()}
-                >
-                  {loading
-                    ? "Génération en cours..."
-                    : "Générer 5 pitchs avec l'IA"}
-                </button>
+                {/* Options IA optionnel */}
+                <div className="mt-4 flex items-center justify-between gap-4">
+                  <p className="text-sm" style={{ color: colors.textSecondary }}>
+                    💡 Besoin d'aide ? Laissez l'IA générer des suggestions
+                  </p>
+                  <button
+                    className="px-6 py-3 rounded-xl font-semibold text-white transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                    style={{ backgroundColor: colors.primaryLight }}
+                    onClick={handleGeneratePitchOptions}
+                    disabled={loading || !pitch.trim()}
+                  >
+                    {loading ? "⏳ Génération..." : "✨ Suggestions IA"}
+                  </button>
+                </div>
 
                 {/* Indicateur de chargement */}
                 {loading && (
@@ -437,8 +390,8 @@ const CreateStoryPage = () => {
                 )}
               </div>
 
-              {/* Affichage des options de pitch */}
-              {pitchOptions.length > 0 && !loading && (
+              {/* Affichage des options de pitch suggérées par l'IA */}
+              {showAIOptions && pitchOptions.length > 0 && !loading && (
                 <div className="space-y-6">
                   {/* Message de succès */}
                   <div
@@ -472,25 +425,12 @@ const CreateStoryPage = () => {
                     {pitchOptions.map((pitch, index) => (
                       <div
                         key={index}
-                        className={`p-8 rounded-2xl cursor-pointer transition-all hover:scale-[1.02] hover:shadow-2xl ${
-                          selectedPitch === pitch
-                            ? "ring-4 shadow-2xl"
-                            : "shadow-lg"
-                        }`}
+                        className="p-8 rounded-2xl cursor-pointer transition-all hover:scale-[1.02] hover:shadow-2xl shadow-lg"
                         style={{
-                          backgroundColor:
-                            selectedPitch === pitch
-                              ? colors.primary
-                              : colors.white,
-                          border: `4px solid ${
-                            selectedPitch === pitch
-                              ? colors.primary
-                              : colors.primaryLight
-                          }`,
-                          ringColor: colors.primary,
-                          color: selectedPitch === pitch ? colors.white : colors.text,
+                          backgroundColor: colors.white,
+                          border: `4px solid ${colors.primaryLight}`,
                         }}
-                        onClick={() => handleSelectPitch(pitch)}
+                        onClick={() => handleSelectPitchOption(pitch)}
                       >
                         <div className="flex items-start gap-6">
                           <div
@@ -506,22 +446,10 @@ const CreateStoryPage = () => {
                           <div className="flex-1">
                             <p
                               className="text-lg leading-relaxed"
+                              style={{ color: colors.text }}
                             >
                               {pitch}
                             </p>
-                            {selectedPitch === pitch && (
-                              <div className="mt-4">
-                                <span
-                                  className="font-bold text-sm px-3 py-1 rounded-full"
-                                  style={{
-                                    color: colors.primary,
-                                    backgroundColor: colors.white,
-                                  }}
-                                >
-                                  SÉLECTIONNÉ
-                                </span>
-                              </div>
-                            )}
                           </div>
                         </div>
                       </div>
@@ -530,16 +458,25 @@ const CreateStoryPage = () => {
 
                   <button
                     className="w-full px-8 py-6 rounded-xl font-bold text-xl text-white transition-all hover:scale-105 disabled:opacity-50 shadow-xl"
-                    style={{ backgroundColor: colors.primary }}
-                    onClick={handlePitchNext}
-                    disabled={!selectedPitch}
+                    style={{ backgroundColor: colors.primaryLight }}
+                    onClick={() => { setShowAIOptions(false); setPitchOptions([]); }}
                   >
-                    {selectedPitch
-                      ? "Continuer avec ce pitch →"
-                      : "Sélectionnez un pitch pour continuer"}
+                    Annuler les suggestions
                   </button>
                 </div>
               )}
+
+              {/* Bouton continuer */}
+              <div className="mt-8">
+                <button
+                  className="w-full px-8 py-6 rounded-xl font-bold text-xl text-white transition-all hover:scale-105 disabled:opacity-50 shadow-xl"
+                  style={{ backgroundColor: colors.primary }}
+                  onClick={handlePitchNext}
+                  disabled={!pitch.trim() || loading}
+                >
+                  Continuer vers le synopsis →
+                </button>
+              </div>
             </div>
           )}
 
@@ -559,9 +496,9 @@ const CreateStoryPage = () => {
                   className="text-lg font-bold mb-2"
                   style={{ color: colors.white }}
                 >
-                  Pitch sélectionné
+                  Mon pitch
                 </h3>
-                <p style={{ color: colors.white }}>{selectedPitch}</p>
+                <p style={{ color: colors.white }}>{pitch}</p>
               </div>
 
               {/* Synopsis */}
@@ -582,15 +519,38 @@ const CreateStoryPage = () => {
                   className="mb-6 text-lg"
                   style={{ color: colors.textSecondary }}
                 >
-                  {loading
-                    ? "Génération du synopsis par l'IA en cours..."
-                    : synopsis.trim()
-                    ? "Le synopsis détaillé de votre histoire. Sélectionnez du texte pour corriger ou reformuler."
-                    : "Cliquez sur le bouton ci-dessous pour générer un synopsis avec l'IA."}
+                  Écrivez votre synopsis détaillé ou laissez l'IA le générer pour vous
                 </p>
 
-                {loading ? (
-                  <div className="flex flex-col justify-center items-center py-16">
+                <textarea
+                  className="w-full p-6 rounded-xl border-3 resize-none text-lg outline-none"
+                  style={{
+                    borderColor: colors.primary,
+                    backgroundColor: colors.white,
+                    color: colors.text,
+                    minHeight: "250px",
+                    borderWidth: "3px",
+                  }}
+                  placeholder="Écrivez ici le synopsis détaillé de votre histoire..."
+                  value={synopsis}
+                  onChange={(e) => setSynopsis(e.target.value)}
+                  disabled={loading}
+                />
+
+                {/* Options IA */}
+                <div className="mt-4 flex items-center justify-end gap-4">
+                  <button
+                    className="px-6 py-3 rounded-xl font-semibold text-white transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                    style={{ backgroundColor: colors.primaryLight }}
+                    onClick={handleGenerateSynopsis}
+                    disabled={loading}
+                  >
+                    {loading ? "⏳ Génération..." : "✨ Générer avec l'IA"}
+                  </button>
+                </div>
+
+                {loading && (
+                  <div className="mt-8 flex flex-col justify-center items-center py-8">
                     <div
                       className="animate-spin rounded-full h-16 w-16 border-4 mb-4"
                       style={{
@@ -604,28 +564,6 @@ const CreateStoryPage = () => {
                     >
                       L'IA rédige votre synopsis...
                     </p>
-                  </div>
-                ) : synopsis.trim() ? (
-                  <TextEditor
-                    text={synopsis}
-                    onTextChange={setSynopsis}
-                    placeholder="Votre synopsis..."
-                  />
-                ) : (
-                  <div className="text-center py-12">
-                    <p
-                      className="mb-6 text-lg"
-                      style={{ color: colors.textSecondary }}
-                    >
-                      Aucun synopsis généré pour le moment
-                    </p>
-                    <button
-                      className="px-8 py-4 rounded-xl font-bold text-lg text-white transition-all hover:scale-105 shadow-lg"
-                      style={{ backgroundColor: colors.primary }}
-                      onClick={handleGenerateSynopsis}
-                    >
-                      Générer le synopsis avec l'IA
-                    </button>
                   </div>
                 )}
               </div>
@@ -681,7 +619,7 @@ const CreateStoryPage = () => {
                     className="text-sm line-clamp-2"
                     style={{ color: colors.white }}
                   >
-                    {selectedPitch}
+                    {pitch}
                   </p>
                 </div>
                 <div
@@ -827,8 +765,163 @@ const CreateStoryPage = () => {
             </div>
           )}
 
-          {/* ÉTAPE 4 : FINALISATION */}
+          {/* ÉTAPE 4 : TITRE ET GENRE */}
           {currentStep === 4 && (
+            <div className="space-y-6">
+              {/* Récapitulatif */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div
+                  className="p-4 rounded-xl shadow-lg"
+                  style={{
+                    backgroundColor: colors.primary,
+                    border: `4px solid ${colors.primary}`,
+                    color: colors.white,
+                  }}
+                >
+                  <h3
+                    className="text-sm font-bold mb-2"
+                    style={{ color: colors.white }}
+                  >
+                    Pitch
+                  </h3>
+                  <p
+                    className="text-sm line-clamp-2"
+                    style={{ color: colors.white }}
+                  >
+                    {pitch}
+                  </p>
+                </div>
+                <div
+                  className="p-4 rounded-xl shadow-lg"
+                  style={{
+                    backgroundColor: colors.primary,
+                    border: `4px solid ${colors.primary}`,
+                    color: colors.white,
+                  }}
+                >
+                  <h3
+                    className="text-sm font-bold mb-2"
+                    style={{ color: colors.white }}
+                  >
+                    Synopsis
+                  </h3>
+                  <p
+                    className="text-sm line-clamp-2"
+                    style={{ color: colors.white }}
+                  >
+                    {synopsis.substring(0, 100)}...
+                  </p>
+                </div>
+              </div>
+
+              {/* Titre de l'histoire */}
+              <div
+                className="p-8 rounded-xl shadow-lg"
+                style={{ 
+                  backgroundColor: colors.white,
+                  border: `4px solid ${colors.primaryLight}`
+                }}
+              >
+                <h2
+                  className="text-3xl font-bold mb-4"
+                  style={{ color: colors.text }}
+                >
+                  Titre de votre histoire
+                </h2>
+                <p
+                  className="mb-6 text-lg"
+                  style={{ color: colors.textSecondary }}
+                >
+                  Choisissez un titre accrocheur pour votre histoire
+                </p>
+
+                <input
+                  type="text"
+                  className="w-full p-6 rounded-xl border-3 text-lg outline-none"
+                  style={{
+                    borderColor: colors.primary,
+                    backgroundColor: colors.white,
+                    color: colors.text,
+                    borderWidth: "3px",
+                  }}
+                  placeholder="Ex: Le Secret de la Montagne Perdue..."
+                  value={storyTitle}
+                  onChange={(e) => setStoryTitle(e.target.value)}
+                  disabled={loading}
+                />
+              </div>
+
+              {/* Sélection du genre */}
+              <div
+                className="p-8 rounded-xl shadow-lg"
+                style={{ 
+                  backgroundColor: colors.white,
+                  border: `4px solid ${colors.primaryLight}`
+                }}
+              >
+                <h2
+                  className="text-3xl font-bold mb-4"
+                  style={{ color: colors.text }}
+                >
+                  Choisissez le genre de votre histoire
+                </h2>
+                <p
+                  className="mb-6 text-lg"
+                  style={{ color: colors.textSecondary }}
+                >
+                  Sélectionnez le genre principal de votre histoire
+                </p>
+
+                <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
+                  {genres.map((genre) => (
+                    <button
+                      key={genre}
+                      onClick={() => setSelectedGenre(genre)}
+                      className={`p-4 rounded-xl font-semibold transition-all hover:scale-105 border-4 ${
+                        selectedGenre === genre ? 'shadow-lg' : 'shadow-md'
+                      }`}
+                      style={{
+                        backgroundColor: selectedGenre === genre ? colors.primary : colors.white,
+                        color: selectedGenre === genre ? colors.white : colors.text,
+                        borderColor: colors.primary,
+                      }}
+                    >
+                      {genre}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Boutons de navigation */}
+              <div className="flex gap-4">
+                <button
+                  className="px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 shadow-lg"
+                  style={{
+                    backgroundColor: colors.white,
+                    color: colors.primary,
+                    border: `4px solid ${colors.primary}`,
+                  }}
+                  onClick={handlePrevious}
+                >
+                  ← Retour
+                </button>
+                <button
+                  className="flex-1 px-8 py-4 rounded-xl font-bold text-lg text-white transition-all hover:scale-105 disabled:opacity-50 shadow-lg"
+                  style={{ 
+                    backgroundColor: colors.primary,
+                    border: `4px solid ${colors.primary}`
+                  }}
+                  onClick={handleTextGenreNext}
+                  disabled={!storyTitle.trim() || !selectedGenre}
+                >
+                  Finaliser →
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ÉTAPE 5 : FINALISATION */}
+          {currentStep === 5 && (
             <div className="space-y-6">
               <div
                 className="p-8 rounded-xl shadow-lg text-center"
@@ -874,7 +967,7 @@ const CreateStoryPage = () => {
                     >
                       Pitch
                     </h3>
-                    <p style={{ color: colors.white }}>{selectedPitch}</p>
+                    <p style={{ color: colors.white }}>{pitch}</p>
                   </div>
 
                   <div
@@ -917,6 +1010,44 @@ const CreateStoryPage = () => {
                       {characters.length} personnage
                       {characters.length > 1 ? "s" : ""} créé
                       {characters.length > 1 ? "s" : ""}
+                    </p>
+                  </div>
+
+                  <div
+                    className="p-6 rounded-lg border-4"
+                    style={{ 
+                      backgroundColor: colors.primary,
+                      borderColor: colors.primary,
+                      color: colors.white
+                    }}
+                  >
+                    <h3
+                      className="font-bold text-lg mb-2"
+                      style={{ color: colors.white }}
+                    >
+                      Genre
+                    </h3>
+                    <p style={{ color: colors.white }}>
+                      {selectedGenre || "Non défini"}
+                    </p>
+                  </div>
+
+                  <div
+                    className="p-6 rounded-lg border-4"
+                    style={{ 
+                      backgroundColor: colors.primary,
+                      borderColor: colors.primary,
+                      color: colors.white
+                    }}
+                  >
+                    <h3
+                      className="font-bold text-lg mb-2"
+                      style={{ color: colors.white }}
+                    >
+                      Titre
+                    </h3>
+                    <p style={{ color: colors.white }}>
+                      {storyTitle || "Non défini"}
                     </p>
                   </div>
                 </div>
