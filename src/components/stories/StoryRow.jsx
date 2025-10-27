@@ -2,7 +2,7 @@ import React from 'react';
 import StoryCard from './StoryCard';
 import colors from '../../utils/constants/colors';
 
-const StoryRow = ({ title, stories, highlightProgress = false }) => {
+const StoryRow = ({ title, stories }) => {
     return (
         <div className="mb-8">
             <h2 className="text-2xl md:text-3xl font-semibold mb-4" style={{ color: colors.text }}>{title}</h2>
@@ -11,7 +11,6 @@ const StoryRow = ({ title, stories, highlightProgress = false }) => {
                     <StoryCard
                         key={story.id}
                         story={story}
-                        highlightProgress={highlightProgress}
                     />
                 ))}
             </div>
