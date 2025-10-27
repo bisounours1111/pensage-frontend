@@ -21,6 +21,46 @@ export const webnovelsApi = {
     return data;
   },
 
+  // Récupérer les tendances (webnovels récents publiés)
+  getTrending: async (limit = 10) => {
+    const { data, error } = await supabase
+      .from("webnovels")
+      .select("*")
+      .eq("publish", true)
+      .order("id", { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Récupérer les recommandations basées sur les genres favoris
+  getRecommendations: async (favoriteGenres = [], limit = 10) => {
+    const { data, error } = await supabase
+      .from("webnovels")
+      .select("*")
+      .eq("publish", true);
+
+    if (error) throw error;
+
+    // Filtrer les webnovels par genres favoris
+    if (favoriteGenres.length > 0) {
+      return data
+        .filter((webnovel) => {
+          const storyGenre = webnovel.genre?.toLowerCase();
+          return favoriteGenres.some(
+            (genre) =>
+              genre.toLowerCase() === storyGenre ||
+              storyGenre?.includes(genre.toLowerCase()) ||
+              genre.toLowerCase().includes(storyGenre)
+          );
+        })
+        .slice(0, limit);
+    }
+
+    return data.slice(0, limit);
+  },
+
   // Récupérer les webnovels d'un utilisateur
   getByUser: async (userId) => {
     const { data, error } = await supabase
@@ -94,6 +134,18 @@ export const episodesApi = {
       .select("*")
       .eq("id_webnovels", webnovelId)
       .order("number", { ascending: true });
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Récupérer un épisode par ID
+  getById: async (episodeId) => {
+    const { data, error } = await supabase
+      .from("webnovels_episode")
+      .select("*")
+      .eq("id", episodeId)
+      .single();
 
     if (error) throw error;
     return data;
@@ -182,6 +234,46 @@ export const likesApi = {
     if (error) throw error;
     return count || 0;
   },
+
+  // Récupérer les utilisateurs qui ont liké un webnovel
+  getLikers: async (webnovelId) => {
+    const { data, error } = await supabase
+      .from("webnovels_likes")
+      .select(
+        `
+        *,
+        user_extend (*)
+      `
+      )
+      .eq("id_webnovels", webnovelId);
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Vérifier si un utilisateur a liké un webnovel
+  hasLiked: async (webnovelId, userId) => {
+    const { data, error } = await supabase
+      .from("webnovels_likes")
+      .select("id")
+      .eq("id_webnovels", webnovelId)
+      .eq("id_user", userId)
+      .single();
+
+    if (error && error.code !== "PGRST116") throw error;
+    return !!data;
+  },
+
+  // Compter les vues d'un webnovel (via l'historique)
+  countViews: async (webnovelId) => {
+    const { count, error } = await supabase
+      .from("webnovels_history")
+      .select("*", { count: "exact", head: true })
+      .eq("id_webnovels", webnovelId);
+
+    if (error) throw error;
+    return count || 0;
+  },
 };
 
 /**
@@ -189,13 +281,19 @@ export const likesApi = {
  */
 
 export const commentsApi = {
-  // Récupérer les commentaires d'un webnovel
+  // Récupérer les commentaires d'un webnovel avec les auteurs
   getByWebnovel: async (webnovelId) => {
     const { data, error } = await supabase
       .from("webnovels_comment")
-      .select("*")
+      .select(
+        `
+        *,
+        user_extend (*)
+      `
+      )
       .eq("id_webnovels", webnovelId)
-      .is("parent_comment_id", null);
+      .is("parent_comment_id", null)
+      .order("created_at", { ascending: false });
 
     if (error) throw error;
     return data;
@@ -206,8 +304,30 @@ export const commentsApi = {
     const { data, error } = await supabase
       .from("webnovels_comment")
       .insert(commentData)
-      .select()
+      .select(
+        `
+        *,
+        user_extend (*)
+      `
+      )
       .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Récupérer les réponses d'un commentaire
+  getReplies: async (commentId) => {
+    const { data, error } = await supabase
+      .from("webnovels_comment")
+      .select(
+        `
+        *,
+        user_extend (*)
+      `
+      )
+      .eq("parent_comment_id", commentId)
+      .order("created_at", { ascending: true });
 
     if (error) throw error;
     return data;
@@ -299,18 +419,130 @@ export const historyApi = {
   // Récupérer l'historique de lecture d'un utilisateur
   getReadingHistory: async (userId) => {
     const { data, error } = await supabase
-      .from("user_read_history")
+      .from("webnovels_history")
       .select(
         `
         *,
-        webnovels (*)
+        webnovels (*),
+        webnovels_episode (*)
       `
       )
       .eq("id_user", userId)
-      .order("last_read_date", { ascending: false });
+      .order("id", { ascending: false });
 
     if (error) throw error;
     return data;
+  },
+
+  // Récupérer l'historique pour un webnovel et utilisateur
+  getHistoryForWebnovel: async (userId, webnovelId) => {
+    const { data, error } = await supabase
+      .from("webnovels_history")
+      .select("*")
+      .eq("id_user", userId)
+      .eq("id_webnovels", webnovelId)
+      .single();
+
+    if (error && error.code !== "PGRST116") throw error;
+    return data;
+  },
+
+  // Ajouter ou mettre à jour l'historique de lecture
+  addToReadingHistory: async (
+    userId,
+    webnovelId,
+    episodeId,
+    currentEpisodeNumber
+  ) => {
+    // Vérifier si l'utilisateur a déjà une entrée pour cet épisode exact
+    const { data: existingEpisodeHistory } = await supabase
+      .from("webnovels_history")
+      .select("id")
+      .eq("id_user", userId)
+      .eq("id_webnovels", webnovelId)
+      .eq("id_webnovels_episode", episodeId)
+      .maybeSingle();
+
+    // Si l'utilisateur a déjà une entrée pour cet épisode, ne rien faire
+    if (existingEpisodeHistory) {
+      return existingEpisodeHistory;
+    }
+
+    // Récupérer l'épisode actuel pour obtenir son numéro
+    const { data: episode } = await supabase
+      .from("webnovels_episode")
+      .select("number")
+      .eq("id", episodeId)
+      .single();
+
+    const episodeNumber = episode?.number || currentEpisodeNumber;
+
+    // Vérifier si l'utilisateur a une entrée pour ce webnovel (n'importe quel épisode)
+    const existingWebnovelHistory = await historyApi.getHistoryForWebnovel(
+      userId,
+      webnovelId
+    );
+
+    // Récupérer tous les épisodes précédents
+    const { data: previousEpisodes } = await supabase
+      .from("webnovels_episode")
+      .select("id, number")
+      .eq("id_webnovels", webnovelId)
+      .lt("number", episodeNumber);
+
+    // Marquer tous les épisodes précédents comme terminés
+    if (previousEpisodes && previousEpisodes.length > 0) {
+      for (const prevEpisode of previousEpisodes) {
+        const { data: prevHistory } = await supabase
+          .from("webnovels_history")
+          .select("id")
+          .eq("id_user", userId)
+          .eq("id_webnovels", webnovelId)
+          .eq("id_webnovels_episode", prevEpisode.id)
+          .maybeSingle();
+
+        if (!prevHistory) {
+          // Créer une entrée pour l'épisode précédent marqué comme terminé
+          await supabase.from("webnovels_history").insert({
+            id_user: userId,
+            id_webnovels: webnovelId,
+            id_webnovels_episode: prevEpisode.id,
+            is_over: true,
+          });
+        }
+      }
+    }
+
+    if (existingWebnovelHistory) {
+      // Mettre à jour l'historique existant avec le nouvel épisode
+      const { data, error } = await supabase
+        .from("webnovels_history")
+        .update({
+          id_webnovels_episode: episodeId,
+          is_over: false,
+        })
+        .eq("id", existingWebnovelHistory.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } else {
+      // Créer une nouvelle entrée
+      const { data, error } = await supabase
+        .from("webnovels_history")
+        .insert({
+          id_user: userId,
+          id_webnovels: webnovelId,
+          id_webnovels_episode: episodeId,
+          is_over: false,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    }
   },
 };
 

@@ -199,6 +199,7 @@ const MyStoriesPage = () => {
                         <StoryRow
                             title="En cours d'écriture"
                             stories={inProgressStories}
+                            mode="manage"
                         />
                     )}
 
@@ -207,6 +208,7 @@ const MyStoriesPage = () => {
                         <StoryRow
                             title="Terminées"
                             stories={draftStories}
+                            mode="manage"
                         />
                     )}
 
@@ -215,6 +217,7 @@ const MyStoriesPage = () => {
                         <StoryRow
                             title="Publiées"
                             stories={publishedStories}
+                            mode="manage"
                         />
                     )}
 
