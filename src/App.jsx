@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import MyStoriesPage from './pages/stories/MyStoriesPage'
 import ShopPage from './pages/shop/ShopPage'
 import SignupPage from './pages/auth/SignupPage'
+import LoginPage from './pages/auth/LoginPage'
 import WelcomePage from './pages/auth/WelcomePage'
 import './App.css'
 import Header from "./components/common/header";
@@ -18,7 +19,7 @@ function App() {
           {/* Routes d'authentification */}
           <Route path="/" element={<WelcomePage />} />
           <Route path="/signup" element={<SignupPage />} />
-          <Route path="/login" element={<div>Login</div>} />
+          <Route path="/login" element={<LoginPage />} />
           
           {/* Routes principales */}
           <Route path="/home" element={<div>Home</div>} />
