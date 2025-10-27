@@ -2,11 +2,16 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import colors from '../../utils/constants/colors';
 
-const StoryCard = ({ story }) => {
+const StoryCard = ({ story, mode = 'read' }) => {
     const navigate = useNavigate();
 
     const handleClick = () => {
-        navigate(`/episodes/${story.id}`);
+        // mode='read' pour la lecture, mode='manage' pour la gestion
+        if (mode === 'read') {
+            navigate(`/read/${story.id}`);
+        } else {
+            navigate(`/episodes/${story.id}`);
+        }
     };
 
     return (

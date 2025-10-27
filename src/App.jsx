@@ -13,6 +13,8 @@ import EpisodesPage from "./pages/episodes/EpisodesPage";
 import PaymentSuccessPage from "./pages/payment/PaymentSuccessPage";
 import PaymentCancelPage from "./pages/payment/PaymentCancelPage";
 import ProfilePage from "./pages/profile/ProfilePage";
+import HomePage from "./pages/dashboard/HomePage";
+import ReadPage from "./pages/read/ReadPage";
 
 function AppContent() {
   const location = useLocation();
@@ -30,9 +32,10 @@ function AppContent() {
           <Route path="/login" element={<LoginPage />} />
           
           {/* Routes principales */}
-          <Route path="/home" element={<div>Home</div>} />
+          <Route path="/home" element={<HomePage />} />
           <Route path="/stories" element={<MyStoriesPage />} />
           <Route path="/create" element={<CreateStoryPage />} />
+          <Route path="/read/:id" element={<ReadPage />} />
           <Route path="/episodes/:id" element={<EpisodesPage />} />
           <Route path="/shop" element={<ShopPage />} /> 
           <Route path="/quests" element={<QuestsPage />} />
