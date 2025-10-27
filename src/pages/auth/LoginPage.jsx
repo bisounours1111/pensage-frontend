@@ -1,19 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import colors from '../../utils/constants/colors';
-import { signUp } from '../../lib/supabase';
+import { signIn } from '../../lib/supabase';
 import AuthForm from '../../components/auth/AuthForm';
 
-const SignupPage = () => {
+const LoginPage = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
-        username: '',
-        prenom: '',
-        nom: '',
-        age: '',
         email: '',
-        password: '',
-        confirmPassword: ''
+        password: ''
     });
 
     const [errors, setErrors] = useState({});
@@ -38,33 +33,13 @@ const SignupPage = () => {
     const validateForm = () => {
         const newErrors = {};
 
-        if (!formData.username || formData.username.length < 3) {
-            newErrors.username = 'Le nom d\'utilisateur doit contenir au moins 3 caractères';
-        }
-
-        if (!formData.prenom) {
-            newErrors.prenom = 'Le prénom est requis';
-        }
-
-        if (!formData.nom) {
-            newErrors.nom = 'Le nom est requis';
-        }
-
-        if (!formData.age || formData.age < 13) {
-            newErrors.age = 'Vous devez avoir au moins 13 ans';
-        }
-
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!formData.email || !emailRegex.test(formData.email)) {
             newErrors.email = 'Veuillez entrer une adresse email valide';
         }
 
-        if (!formData.password || formData.password.length < 6) {
-            newErrors.password = 'Le mot de passe doit contenir au moins 6 caractères';
-        }
-
-        if (formData.password !== formData.confirmPassword) {
-            newErrors.confirmPassword = 'Les mots de passe ne correspondent pas';
+        if (!formData.password || formData.password.length < 1) {
+            newErrors.password = 'Le mot de passe est requis';
         }
 
         setErrors(newErrors);
@@ -82,33 +57,26 @@ const SignupPage = () => {
         setErrors({});
 
         try {
-            const userData = {
-                username: formData.username,
-                name: formData.prenom,
-                lastname: formData.nom,
-                age: parseInt(formData.age)
-            };
-
-            const result = await signUp(formData.email, formData.password, userData);
+            const result = await signIn(formData.email, formData.password);
             
             if (result.user) {
-                // Inscription réussie
-                console.log('Inscription réussie:', result.user);
+                // Connexion réussie
+                console.log('Connexion réussie:', result.user);
                 // Rediriger vers la page d'accueil ou dashboard
                 navigate('/home');
             }
         } catch (error) {
-            console.error('Erreur lors de l\'inscription:', error);
+            console.error('Erreur lors de la connexion:', error);
             
             // Gérer les erreurs spécifiques de Supabase
-            if (error.message.includes('already registered')) {
-                setErrors({ general: 'Cet email est déjà utilisé' });
+            if (error.message.includes('Invalid login')) {
+                setErrors({ general: 'Email ou mot de passe incorrect' });
             } else if (error.message.includes('email')) {
                 setErrors({ general: 'Adresse email invalide' });
             } else if (error.message.includes('password')) {
-                setErrors({ general: 'Le mot de passe est trop faible' });
+                setErrors({ general: 'Mot de passe incorrect' });
             } else {
-                setErrors({ general: 'Erreur lors de l\'inscription. Veuillez réessayer.' });
+                setErrors({ general: 'Erreur lors de la connexion. Veuillez réessayer.' });
             }
         } finally {
             setIsLoading(false);
@@ -131,7 +99,7 @@ const SignupPage = () => {
             }}
         >
             <AuthForm
-                mode="signup"
+                mode="login"
                 formData={formData}
                 errors={errors}
                 showPassword={showPassword}
@@ -145,4 +113,5 @@ const SignupPage = () => {
     );
 };
 
-export default SignupPage;
+export default LoginPage;
+
