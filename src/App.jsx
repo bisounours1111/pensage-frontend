@@ -10,7 +10,7 @@ function App() {
     <Router>
       <Header />
 
-      <div className="min-h-screen bg-gray-50 pb-16">
+      <div className="min-h-screen bg-gray-50 pb-16 lg:pb-0">
         <Routes>
           <Route path="/signup" element={<div>Signup</div>} />
           <Route path="/login" element={<div>Login</div>} />

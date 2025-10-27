@@ -22,27 +22,28 @@ const EditableCharacterCard = ({ character, onUpdate, index }) => {
   if (isEditing) {
     return (
       <div
-        className="rounded-xl p-6 shadow-lg backdrop-blur-sm"
+        className="rounded-xl p-6 shadow-lg"
         style={{
-          backgroundColor: colors.white,
-          border: `3px solid ${colors.primary}`,
+          backgroundColor: colors.primaryVeryLight,
+          border: `4px solid ${colors.primary}`,
         }}
       >
-        <div className="space-y-4">
-          <div>
-            <label
-              className="block text-sm font-bold mb-2"
-              style={{ color: colors.primary }}
-            >
-              Nom
-            </label>
-            <input
-              type="text"
-              className="w-full px-3 py-2 rounded-lg border-2 focus:outline-none focus:ring-2"
-              style={{
-                borderColor: colors.primaryLight,
-                color: colors.text,
-              }}
+      <div className="space-y-4">
+        <div>
+          <label
+            className="block text-sm font-bold mb-2"
+            style={{ color: colors.primary }}
+          >
+            Nom
+          </label>
+          <input
+            type="text"
+            className="w-full px-3 py-2 rounded-lg border-2 focus:outline-none focus:ring-2"
+            style={{
+              borderColor: colors.primary,
+              backgroundColor: colors.white,
+              color: colors.text,
+            }}
               value={editedCharacter.nom || ""}
               onChange={(e) => handleChange("nom", e.target.value)}
             />
@@ -59,7 +60,8 @@ const EditableCharacterCard = ({ character, onUpdate, index }) => {
               type="text"
               className="w-full px-3 py-2 rounded-lg border-2 focus:outline-none focus:ring-2"
               style={{
-                borderColor: colors.primaryLight,
+                borderColor: colors.primary,
+                backgroundColor: colors.white,
                 color: colors.text,
               }}
               value={editedCharacter.âge || ""}
@@ -77,7 +79,8 @@ const EditableCharacterCard = ({ character, onUpdate, index }) => {
             <textarea
               className="w-full px-3 py-2 rounded-lg border-2 focus:outline-none focus:ring-2 resize-none"
               style={{
-                borderColor: colors.primaryLight,
+                borderColor: colors.primary,
+                backgroundColor: colors.white,
                 color: colors.text,
                 minHeight: "80px",
               }}
@@ -96,7 +99,8 @@ const EditableCharacterCard = ({ character, onUpdate, index }) => {
             <textarea
               className="w-full px-3 py-2 rounded-lg border-2 focus:outline-none focus:ring-2 resize-none"
               style={{
-                borderColor: colors.primaryLight,
+                borderColor: colors.primary,
+                backgroundColor: colors.white,
                 color: colors.text,
                 minHeight: "80px",
               }}
@@ -115,7 +119,8 @@ const EditableCharacterCard = ({ character, onUpdate, index }) => {
             <textarea
               className="w-full px-3 py-2 rounded-lg border-2 focus:outline-none focus:ring-2 resize-none"
               style={{
-                borderColor: colors.primaryLight,
+                borderColor: colors.primary,
+                backgroundColor: colors.white,
                 color: colors.text,
                 minHeight: "80px",
               }}
@@ -133,11 +138,11 @@ const EditableCharacterCard = ({ character, onUpdate, index }) => {
               Enregistrer
             </button>
             <button
-              className="px-4 py-2 rounded-lg font-semibold transition-all hover:scale-105"
+              className="px-4 py-2 rounded-lg font-semibold transition-all hover:scale-105 border-2"
               style={{
-                backgroundColor: colors.whiteTransparent,
-                color: colors.text,
-                border: `2px solid ${colors.primaryLight}`,
+                backgroundColor: colors.white,
+                color: colors.primary,
+                borderColor: colors.primary,
               }}
               onClick={handleCancel}
             >
@@ -151,10 +156,10 @@ const EditableCharacterCard = ({ character, onUpdate, index }) => {
 
   return (
     <div
-      className="rounded-xl p-6 shadow-lg transition-transform hover:scale-105 backdrop-blur-sm"
+      className="rounded-xl p-6 shadow-lg transition-transform hover:scale-105"
       style={{
-        backgroundColor: colors.whiteTransparent,
-        border: `2px solid ${colors.primaryLight}`,
+        backgroundColor: colors.white,
+        border: `4px solid ${colors.primaryLight}`,
       }}
     >
       <div className="flex items-center justify-between mb-4">
@@ -180,10 +185,11 @@ const EditableCharacterCard = ({ character, onUpdate, index }) => {
           </div>
         </div>
         <button
-          className="px-3 py-1 rounded-lg text-sm font-semibold transition-all hover:scale-105"
+          className="px-3 py-1 rounded-lg text-sm font-semibold transition-all hover:scale-105 border-2"
           style={{
-            backgroundColor: colors.primaryLight,
+            backgroundColor: colors.primary,
             color: colors.white,
+            borderColor: colors.primary,
           }}
           onClick={() => setIsEditing(true)}
         >

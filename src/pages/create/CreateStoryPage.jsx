@@ -366,7 +366,7 @@ const CreateStoryPage = () => {
                 className="p-10 rounded-2xl shadow-2xl"
                 style={{
                   backgroundColor: colors.white,
-                  border: `3px solid ${colors.primaryLight}`,
+                  border: `4px solid ${colors.primary}`,
                 }}
               >
                 <div className="text-center mb-8">
@@ -388,8 +388,8 @@ const CreateStoryPage = () => {
                 <textarea
                   className="w-full p-6 rounded-xl border-3 resize-none focus:outline-none focus:ring-4 text-lg"
                   style={{
-                    borderColor: colors.primaryLight,
-                    backgroundColor: colors.primaryVeryLight,
+                    borderColor: colors.primary,
+                    backgroundColor: colors.white,
                     color: colors.text,
                     minHeight: "180px",
                     borderWidth: "3px",
@@ -444,18 +444,19 @@ const CreateStoryPage = () => {
                   <div
                     className="p-6 rounded-xl border-3 text-center shadow-lg"
                     style={{
-                      backgroundColor: colors.primaryVeryLight,
+                      backgroundColor: colors.primary,
                       borderColor: colors.primary,
-                      borderWidth: "3px",
+                      borderWidth: "4px",
+                      color: colors.white,
                     }}
                   >
                     <p
                       className="font-bold text-2xl"
-                      style={{ color: colors.primary }}
+                      style={{ color: colors.white }}
                     >
                       {pitchOptions.length} pitchs générés avec succès
                     </p>
-                    <p className="mt-2 text-lg" style={{ color: colors.text }}>
+                    <p className="mt-2 text-lg" style={{ color: colors.white }}>
                       Sélectionnez votre préféré pour continuer
                     </p>
                   </div>
@@ -479,14 +480,15 @@ const CreateStoryPage = () => {
                         style={{
                           backgroundColor:
                             selectedPitch === pitch
-                              ? colors.primaryVeryLight
+                              ? colors.primary
                               : colors.white,
-                          border: `3px solid ${
+                          border: `4px solid ${
                             selectedPitch === pitch
                               ? colors.primary
                               : colors.primaryLight
                           }`,
                           ringColor: colors.primary,
+                          color: selectedPitch === pitch ? colors.white : colors.text,
                         }}
                         onClick={() => handleSelectPitch(pitch)}
                       >
@@ -494,11 +496,9 @@ const CreateStoryPage = () => {
                           <div
                             className="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-2xl shadow-lg"
                             style={{
-                              backgroundColor:
-                                selectedPitch === pitch
-                                  ? colors.primary
-                                  : colors.primaryLight,
-                              color: colors.white,
+                              backgroundColor: colors.white,
+                              color: colors.primary,
+                              border: `3px solid ${colors.white}`,
                             }}
                           >
                             {index + 1}
@@ -506,7 +506,6 @@ const CreateStoryPage = () => {
                           <div className="flex-1">
                             <p
                               className="text-lg leading-relaxed"
-                              style={{ color: colors.text }}
                             >
                               {pitch}
                             </p>
@@ -515,8 +514,8 @@ const CreateStoryPage = () => {
                                 <span
                                   className="font-bold text-sm px-3 py-1 rounded-full"
                                   style={{
-                                    color: colors.white,
-                                    backgroundColor: colors.primary,
+                                    color: colors.primary,
+                                    backgroundColor: colors.white,
                                   }}
                                 >
                                   SÉLECTIONNÉ
@@ -551,23 +550,27 @@ const CreateStoryPage = () => {
               <div
                 className="p-6 rounded-xl shadow-lg"
                 style={{
-                  backgroundColor: colors.primaryVeryLight,
-                  border: `2px solid ${colors.primary}`,
+                  backgroundColor: colors.primary,
+                  border: `4px solid ${colors.primary}`,
+                  color: colors.white,
                 }}
               >
                 <h3
                   className="text-lg font-bold mb-2"
-                  style={{ color: colors.primary }}
+                  style={{ color: colors.white }}
                 >
                   Pitch sélectionné
                 </h3>
-                <p style={{ color: colors.text }}>{selectedPitch}</p>
+                <p style={{ color: colors.white }}>{selectedPitch}</p>
               </div>
 
               {/* Synopsis */}
               <div
-                className="p-8 rounded-xl shadow-lg backdrop-blur-sm"
-                style={{ backgroundColor: colors.whiteTransparent }}
+                className="p-8 rounded-xl shadow-lg"
+                style={{ 
+                  backgroundColor: colors.white,
+                  border: `4px solid ${colors.primaryLight}`
+                }}
               >
                 <h2
                   className="text-3xl font-bold mb-4"
@@ -634,7 +637,7 @@ const CreateStoryPage = () => {
                   style={{
                     backgroundColor: colors.white,
                     color: colors.primary,
-                    border: `3px solid ${colors.primary}`,
+                    border: `4px solid ${colors.primary}`,
                   }}
                   onClick={handlePrevious}
                 >
@@ -642,7 +645,10 @@ const CreateStoryPage = () => {
                 </button>
                 <button
                   className="flex-1 px-8 py-4 rounded-xl font-bold text-lg text-white transition-all hover:scale-105 disabled:opacity-50 shadow-lg"
-                  style={{ backgroundColor: colors.primary }}
+                  style={{ 
+                    backgroundColor: colors.primary,
+                    border: `4px solid ${colors.primary}`
+                  }}
                   onClick={handleSynopsisNext}
                   disabled={!synopsis.trim() || loading}
                 >
@@ -660,19 +666,20 @@ const CreateStoryPage = () => {
                 <div
                   className="p-4 rounded-xl shadow-lg"
                   style={{
-                    backgroundColor: colors.primaryVeryLight,
-                    border: `2px solid ${colors.primaryLight}`,
+                    backgroundColor: colors.primary,
+                    border: `4px solid ${colors.primary}`,
+                    color: colors.white,
                   }}
                 >
                   <h3
                     className="text-sm font-bold mb-2"
-                    style={{ color: colors.primary }}
+                    style={{ color: colors.white }}
                   >
                     Pitch
                   </h3>
                   <p
                     className="text-sm line-clamp-2"
-                    style={{ color: colors.text }}
+                    style={{ color: colors.white }}
                   >
                     {selectedPitch}
                   </p>
@@ -680,19 +687,20 @@ const CreateStoryPage = () => {
                 <div
                   className="p-4 rounded-xl shadow-lg"
                   style={{
-                    backgroundColor: colors.primaryVeryLight,
-                    border: `2px solid ${colors.primaryLight}`,
+                    backgroundColor: colors.primary,
+                    border: `4px solid ${colors.primary}`,
+                    color: colors.white,
                   }}
                 >
                   <h3
                     className="text-sm font-bold mb-2"
-                    style={{ color: colors.primary }}
+                    style={{ color: colors.white }}
                   >
                     Synopsis
                   </h3>
                   <p
                     className="text-sm line-clamp-2"
-                    style={{ color: colors.text }}
+                    style={{ color: colors.white }}
                   >
                     {synopsis.substring(0, 100)}...
                   </p>
@@ -701,8 +709,11 @@ const CreateStoryPage = () => {
 
               {/* Personnages */}
               <div
-                className="p-8 rounded-xl shadow-lg backdrop-blur-sm"
-                style={{ backgroundColor: colors.whiteTransparent }}
+                className="p-8 rounded-xl shadow-lg"
+                style={{ 
+                  backgroundColor: colors.white,
+                  border: `4px solid ${colors.primaryLight}`
+                }}
               >
                 <h2
                   className="text-3xl font-bold mb-4"
@@ -795,7 +806,7 @@ const CreateStoryPage = () => {
                   style={{
                     backgroundColor: colors.white,
                     color: colors.primary,
-                    border: `3px solid ${colors.primary}`,
+                    border: `4px solid ${colors.primary}`,
                   }}
                   onClick={handlePrevious}
                 >
@@ -803,7 +814,10 @@ const CreateStoryPage = () => {
                 </button>
                 <button
                   className="flex-1 px-8 py-4 rounded-xl font-bold text-lg text-white transition-all hover:scale-105 disabled:opacity-50 shadow-lg"
-                  style={{ backgroundColor: colors.primary }}
+                  style={{ 
+                    backgroundColor: colors.primary,
+                    border: `4px solid ${colors.primary}`
+                  }}
                   onClick={handleCharactersNext}
                   disabled={characters.length === 0 || loading}
                 >
@@ -817,8 +831,11 @@ const CreateStoryPage = () => {
           {currentStep === 4 && (
             <div className="space-y-6">
               <div
-                className="p-8 rounded-xl shadow-lg backdrop-blur-sm text-center"
-                style={{ backgroundColor: colors.whiteTransparent }}
+                className="p-8 rounded-xl shadow-lg text-center"
+                style={{ 
+                  backgroundColor: colors.white,
+                  border: `4px solid ${colors.primary}`
+                }}
               >
                 <div className="mb-6">
                   <div
@@ -844,47 +861,59 @@ const CreateStoryPage = () => {
                 {/* Récapitulatif */}
                 <div className="text-left space-y-6 mb-8">
                   <div
-                    className="p-6 rounded-lg"
-                    style={{ backgroundColor: colors.white }}
+                    className="p-6 rounded-lg border-4"
+                    style={{ 
+                      backgroundColor: colors.primary,
+                      borderColor: colors.primary,
+                      color: colors.white
+                    }}
                   >
                     <h3
                       className="font-bold text-lg mb-2"
-                      style={{ color: colors.primary }}
+                      style={{ color: colors.white }}
                     >
                       Pitch
                     </h3>
-                    <p style={{ color: colors.text }}>{selectedPitch}</p>
+                    <p style={{ color: colors.white }}>{selectedPitch}</p>
                   </div>
 
                   <div
-                    className="p-6 rounded-lg"
-                    style={{ backgroundColor: colors.white }}
+                    className="p-6 rounded-lg border-4"
+                    style={{ 
+                      backgroundColor: colors.primary,
+                      borderColor: colors.primary,
+                      color: colors.white
+                    }}
                   >
                     <h3
                       className="font-bold text-lg mb-2"
-                      style={{ color: colors.primary }}
+                      style={{ color: colors.white }}
                     >
                       Synopsis
                     </h3>
                     <p
                       className="whitespace-pre-wrap"
-                      style={{ color: colors.text }}
+                      style={{ color: colors.white }}
                     >
                       {synopsis.substring(0, 200)}...
                     </p>
                   </div>
 
                   <div
-                    className="p-6 rounded-lg"
-                    style={{ backgroundColor: colors.white }}
+                    className="p-6 rounded-lg border-4"
+                    style={{ 
+                      backgroundColor: colors.primary,
+                      borderColor: colors.primary,
+                      color: colors.white
+                    }}
                   >
                     <h3
                       className="font-bold text-lg mb-2"
-                      style={{ color: colors.primary }}
+                      style={{ color: colors.white }}
                     >
                       Personnages
                     </h3>
-                    <p style={{ color: colors.text }}>
+                    <p style={{ color: colors.white }}>
                       {characters.length} personnage
                       {characters.length > 1 ? "s" : ""} créé
                       {characters.length > 1 ? "s" : ""}
@@ -895,19 +924,22 @@ const CreateStoryPage = () => {
                 {/* Boutons */}
                 <div className="flex gap-4">
                   <button
-                    className="px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105"
+                    className="px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105 border-4"
                     style={{
-                      backgroundColor: colors.whiteTransparent,
-                      color: colors.text,
-                      border: `2px solid ${colors.primaryLight}`,
+                      backgroundColor: colors.white,
+                      color: colors.primary,
+                      borderColor: colors.primary,
                     }}
                     onClick={handlePrevious}
                   >
                     ← Retour
                   </button>
                   <button
-                    className="flex-1 px-8 py-4 rounded-lg font-bold text-white text-lg transition-all hover:scale-105"
-                    style={{ backgroundColor: colors.primary }}
+                    className="flex-1 px-8 py-4 rounded-lg font-bold text-white text-lg transition-all hover:scale-105 border-4"
+                    style={{ 
+                      backgroundColor: colors.primary,
+                      borderColor: colors.primary
+                    }}
                     onClick={handleFinalize}
                   >
                     Créer mes épisodes

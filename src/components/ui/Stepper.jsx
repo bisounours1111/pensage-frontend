@@ -14,7 +14,9 @@ const Stepper = ({ steps, currentStep }) => {
             className="h-full transition-all duration-500"
             style={{
               backgroundColor: colors.primary,
-              width: `${((currentStep - 1) / (steps.length - 1)) * 100}%`,
+              width: currentStep === steps.length 
+                ? '100%' 
+                : `${((currentStep - 0.5) / steps.length) * 100}%`,
             }}
           />
         </div>
