@@ -44,7 +44,7 @@ export const getCurrentUser = async () => {
 export const getUserExtend = async (userId) => {
   const { data, error } = await supabase
     .from('user_extend')
-    .select('*')
+    .select('*, first_connexion')
     .eq('id', userId)
     .single();
   
@@ -94,26 +94,27 @@ export const signUp = async (email, password, userData) => {
     throw authError;
   }
 
-  // Créer l'entrée dans user_extend
-  if (authData.user) {
-    // Préparer les préférences avec les genres
-    const preferences = {
-      favoriteGenres: userData.favoriteGenres || []
-    };
+    // Créer l'entrée dans user_extend
+    if (authData.user) {
+      // Préparer les préférences avec les genres
+      const preferences = {
+        favoriteGenres: userData.favoriteGenres || []
+      };
 
-    const { error: userExtendError } = await supabase
-      .from('user_extend')
-      .insert({
-        id: authData.user.id,
-        username: userData.username,
-        name: userData.name,
-        lastname: userData.lastname,
-        preferences: preferences,
-        token: 0,
-        age: userData.age,
-        has_subscription: false,
-        xp: 0
-      });
+      const { error: userExtendError } = await supabase
+        .from('user_extend')
+        .insert({
+          id: authData.user.id,
+          username: userData.username,
+          name: userData.name,
+          lastname: userData.lastname,
+          preferences: preferences,
+          token: 0,
+          age: userData.age,
+          has_subscription: false,
+          xp: 0,
+          first_connexion: true
+        });
 
     if (userExtendError) {
       console.error('Erreur lors de la création de user_extend:', userExtendError);

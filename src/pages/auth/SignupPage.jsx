@@ -121,8 +121,8 @@ const SignupPage = () => {
             if (result.user) {
                 // Inscription réussie
                 console.log('Inscription réussie:', result.user);
-                // Rediriger vers la page d'accueil ou dashboard
-                navigate('/home');
+                // Rediriger vers onboarding car first_connexion est à true par défaut
+                navigate('/onboarding');
             }
         } catch (error) {
             console.error('Erreur lors de l\'inscription:', error);

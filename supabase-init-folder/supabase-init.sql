@@ -20,7 +20,8 @@ CREATE TABLE IF NOT EXISTS user_extend (
     token INTEGER DEFAULT 0,
     age INTEGER,
     has_subscription BOOLEAN DEFAULT FALSE,
-    xp INTEGER DEFAULT 0
+    xp INTEGER DEFAULT 0,
+    first_connexion BOOLEAN DEFAULT TRUE
 );
 
 COMMENT ON TABLE user_extend IS 'Extension de la table auth.users native de Supabase';
@@ -33,6 +34,7 @@ COMMENT ON COLUMN user_extend.token IS 'Nombre de tokens/pièces virtuelles';
 COMMENT ON COLUMN user_extend.age IS 'Âge de l''utilisateur';
 COMMENT ON COLUMN user_extend.has_subscription IS 'Abonnement actif';
 COMMENT ON COLUMN user_extend.xp IS 'Points d''expérience';
+COMMENT ON COLUMN user_extend.first_connexion IS 'Première connexion - onboarding à compléter';
 
 -- ========================================
 -- TABLE QUEST
@@ -254,6 +256,107 @@ CREATE INDEX IF NOT EXISTS idx_notification_read ON user_notification(is_read);
 CREATE INDEX IF NOT EXISTS idx_transaction_user ON transaction(id_user);
 
 -- ========================================
+-- TRIGGER POUR L'ONBOARDING
+-- ========================================
+
+-- Fonction qui vérifie si une première histoire est créée
+CREATE OR REPLACE FUNCTION check_first_story_quest()
+RETURNS TRIGGER AS $$
+DECLARE
+    quest_id INTEGER;
+    is_first_story BOOLEAN;
+    story_count INTEGER;
+    user_xp INTEGER;
+    quest_xp INTEGER;
+BEGIN
+    -- Trouver la quête "Première histoire" via key_target
+    SELECT id INTO quest_id 
+    FROM quest 
+    WHERE key_target = 'webnovels' 
+    AND amount_target = 1;
+    
+    -- Si la quête existe
+    IF quest_id IS NOT NULL THEN
+        -- Vérifier si c'est la première histoire de cet utilisateur
+        SELECT COUNT(*) INTO story_count
+        FROM webnovels
+        WHERE id_author = NEW.id_author;
+        
+        -- C'est la première histoire si le count = 1 (celle qui vient d'être créée)
+        is_first_story := (story_count = 1);
+        
+        IF is_first_story THEN
+            -- Mettre à jour quest_progress
+            -- Vérifier si la progression existe déjà
+            IF NOT EXISTS (
+                SELECT 1 FROM quest_progress 
+                WHERE id_user = NEW.id_author AND id_quest = quest_id
+            ) THEN
+                -- Insérer une nouvelle progression
+                INSERT INTO quest_progress (id_user, id_quest, progression, valided)
+                VALUES (NEW.id_author, quest_id, 100, TRUE);
+            ELSE
+                -- Mettre à jour la progression existante
+                UPDATE quest_progress 
+                SET progression = 100, valided = TRUE
+                WHERE id_user = NEW.id_author AND id_quest = quest_id;
+            END IF;
+            
+            -- Récupérer l'XP de la quête
+            SELECT xp INTO quest_xp FROM quest WHERE id = quest_id;
+            
+            -- Récupérer l'XP actuel de l'utilisateur
+            SELECT xp INTO user_xp FROM user_extend WHERE id = NEW.id_author;
+            
+            -- Ajouter l'XP de la quête à l'utilisateur
+            UPDATE user_extend 
+            SET xp = COALESCE(user_xp, 0) + COALESCE(quest_xp, 0)
+            WHERE id = NEW.id_author;
+            
+            -- Mettre first_connexion à false pour cet utilisateur
+            UPDATE user_extend 
+            SET first_connexion = FALSE 
+            WHERE id = NEW.id_author;
+            
+            RAISE NOTICE '✓ Première histoire créée pour l''utilisateur % - Quête validée, XP ajouté, onboarding terminé', NEW.id_author;
+        END IF;
+    END IF;
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger sur webnovels pour vérifier quand une première histoire est créée
+CREATE TRIGGER trigger_check_first_story
+AFTER INSERT ON webnovels
+FOR EACH ROW
+EXECUTE FUNCTION check_first_story_quest();
+
+COMMENT ON FUNCTION check_first_story_quest() IS 'Vérifie si une première histoire est créée et complète l''onboarding automatiquement';
+COMMENT ON TRIGGER trigger_check_first_story ON webnovels IS 'Déclenche la vérification de l''onboarding lors de la création d''une histoire';
+
+-- ========================================
+-- DONNÉES INITIALES
+-- ========================================
+
+-- Créer la quête "Première histoire" si elle n'existe pas déjà
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM quest 
+        WHERE key_target = 'webnovels' 
+        AND amount_target = 1
+    ) THEN
+        INSERT INTO quest (title, description, amount_target, key_target, xp)
+        VALUES ('Première histoire', 'Créer ma première histoire', 1, 'webnovels', 200);
+        
+        RAISE NOTICE '✓ Quête "Première histoire" créée';
+    ELSE
+        RAISE NOTICE 'Quête "Première histoire" existe déjà';
+    END IF;
+END $$;
+
+-- ========================================
 -- FONCTION FINALE
 -- ========================================
 
@@ -263,5 +366,7 @@ BEGIN
     RAISE NOTICE '✓ Initialisation de la base de données Pensaga terminée avec succès !';
     RAISE NOTICE '✓ Tables créées : 12';
     RAISE NOTICE '✓ Index créés : 16';
+    RAISE NOTICE '✓ Trigger d''onboarding créé';
+    RAISE NOTICE '✓ Quête "Première histoire" créée';
     RAISE NOTICE '✓ Utilise la table native auth.users de Supabase';
 END $$;

@@ -11,10 +11,15 @@ import LoginPage from "./pages/auth/LoginPage";
 import CreateStoryPage from "./pages/create/CreateStoryPage";
 import EpisodesPage from "./pages/episodes/EpisodesPage";
 import ProfilePage from "./pages/profile/ProfilePage";
+import OnboardingPage from "./pages/auth/OnboardingPage";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 function AppContent() {
   const location = useLocation();
-  const isAuthPage = location.pathname === '/' || location.pathname === '/signup' || location.pathname === '/login';
+  const isAuthPage = location.pathname === '/' || 
+                     location.pathname === '/signup' || 
+                     location.pathname === '/login' || 
+                     location.pathname === '/onboarding';
 
   return (
     <>
@@ -26,17 +31,18 @@ function AppContent() {
           <Route path="/" element={<WelcomePage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/onboarding" element={<ProtectedRoute><OnboardingPage /></ProtectedRoute>} />
           
-          {/* Routes principales */}
-          <Route path="/home" element={<div>Home</div>} />
-          <Route path="/stories" element={<MyStoriesPage />} />
-          <Route path="/create" element={<CreateStoryPage />} />
-          <Route path="/episodes/:id" element={<EpisodesPage />} />
-          <Route path="/shop" element={<ShopPage />} /> 
-          <Route path="/quests" element={<QuestsPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/community" element={<div>Communauté</div>} />
-          <Route path="/publish" element={<div>Publication</div>} />
+          {/* Routes principales protégées */}
+          <Route path="/home" element={<ProtectedRoute><div>Home</div></ProtectedRoute>} />
+          <Route path="/stories" element={<ProtectedRoute><MyStoriesPage /></ProtectedRoute>} />
+          <Route path="/create" element={<ProtectedRoute><CreateStoryPage /></ProtectedRoute>} />
+          <Route path="/episodes/:id" element={<ProtectedRoute><EpisodesPage /></ProtectedRoute>} />
+          <Route path="/shop" element={<ProtectedRoute><ShopPage /></ProtectedRoute>} /> 
+          <Route path="/quests" element={<ProtectedRoute><QuestsPage /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+          <Route path="/community" element={<ProtectedRoute><div>Communauté</div></ProtectedRoute>} />
+          <Route path="/publish" element={<ProtectedRoute><div>Publication</div></ProtectedRoute>} />
         </Routes>
       </div>
       {!isAuthPage && <Navbar />}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import colors from '../../utils/constants/colors';
-import { signIn } from '../../lib/supabase';
+import { signIn, supabase } from '../../lib/supabase';
 import AuthForm from '../../components/auth/AuthForm';
 
 const LoginPage = () => {
@@ -62,8 +62,19 @@ const LoginPage = () => {
             if (result.user) {
                 // Connexion réussie
                 console.log('Connexion réussie:', result.user);
-                // Rediriger vers la page d'accueil ou dashboard
-                navigate('/home');
+                // Vérifier si c'est la première connexion
+                const { data: userData } = await supabase
+                    .from('user_extend')
+                    .select('first_connexion')
+                    .eq('id', result.user.id)
+                    .single();
+                
+                // Rediriger vers onboarding si first_connexion est true
+                if (userData && userData.first_connexion) {
+                    navigate('/onboarding');
+                } else {
+                    navigate('/home');
+                }
             }
         } catch (error) {
             console.error('Erreur lors de la connexion:', error);
