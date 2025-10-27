@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getCurrentUser, getUserExtend } from '../../lib/supabase';
 import { userExtendApi, historyApi } from '../../lib/supabaseApi';
 import colors from '../../utils/constants/colors';
+import { genresByCategory, genresList } from '../../utils/constants/genres';
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
@@ -16,10 +17,7 @@ const ProfilePage = () => {
     preferences: {}
   });
 
-  const availableGenres = [
-    'Romance', 'Fantasy', 'Science Fiction', 'Action', 'Aventure', 
-    'Drame', 'Mystère', 'Horreur', 'Comédie', 'Historique'
-  ];
+  const maxGenreSelection = 5;
 
   useEffect(() => {
     loadProfileData();
@@ -42,6 +40,18 @@ const ProfilePage = () => {
       const liked = await historyApi.getLikedWebnovels(currentUser.id);
       setLikedWebnovels(liked);
 
+      // Convertir les anciens noms de genres en IDs si nécessaire
+      let genres = extendData?.preferences?.genres || [];
+      genres = genres.map(genre => {
+        // Si c'est déjà un ID valide, le garder
+        const genreById = genresList.find(g => g.id === genre);
+        if (genreById) return genre;
+        
+        // Sinon, essayer de trouver par nom (rétrocompatibilité)
+        const genreByName = genresList.find(g => g.name === genre || g.name.toLowerCase() === genre.toLowerCase());
+        return genreByName ? genreByName.id : genre;
+      });
+
       // Initialiser le formulaire d'édition
       setEditForm({
         name: extendData?.name || '',
@@ -49,7 +59,7 @@ const ProfilePage = () => {
         age: extendData?.age || '',
         preferences: {
           ...extendData?.preferences,
-          genres: extendData?.preferences?.genres || []
+          genres: genres
         }
       });
     } catch (error) {
@@ -92,16 +102,26 @@ const ProfilePage = () => {
     }
   };
 
-  const handleGenreToggle = (genre) => {
+  const handleGenreToggle = (genreId) => {
     const currentGenres = editForm.preferences.genres || [];
-    const newGenres = currentGenres.includes(genre)
-      ? currentGenres.filter(g => g !== genre)
-      : [...currentGenres, genre];
-    
-    setEditForm({
-      ...editForm,
-      preferences: { ...editForm.preferences, genres: newGenres }
-    });
+    const isSelected = currentGenres.includes(genreId);
+    const canSelectMore = currentGenres.length < maxGenreSelection;
+
+    // Si déjà sélectionné, on désélectionne
+    if (isSelected) {
+      const newGenres = currentGenres.filter(g => g !== genreId);
+      setEditForm({
+        ...editForm,
+        preferences: { ...editForm.preferences, genres: newGenres }
+      });
+    } 
+    // Sinon, on sélectionne si on n'a pas atteint la limite
+    else if (canSelectMore) {
+      setEditForm({
+        ...editForm,
+        preferences: { ...editForm.preferences, genres: [...currentGenres, genreId] }
+      });
+    }
   };
 
   const getFullName = () => {
@@ -119,7 +139,12 @@ const ProfilePage = () => {
     if (userExtend?.preferences?.genres) {
       const genres = userExtend.preferences.genres;
       if (Array.isArray(genres) && genres.length > 0) {
-        return genres.join(', ');
+        // Convertir les IDs en noms
+        const genreNames = genres.map(genreId => {
+          const genre = genresList.find(g => g.id === genreId);
+          return genre ? genre.name : genreId;
+        });
+        return genreNames.join(', ');
       }
     }
     return 'Aucun genre favori';
@@ -240,41 +265,74 @@ const ProfilePage = () => {
                 />
               </div>
               <div>
-                <label className="block mb-2 font-semibold" style={{ color: colors.text }}>Genres favoris</label>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                  {availableGenres.map((genre) => (
-                    <button
-                      key={genre}
-                      type="button"
-                      onClick={() => handleGenreToggle(genre)}
-                      className={`px-4 py-2 rounded-lg transition text-sm font-semibold ${
-                        editForm.preferences.genres?.includes(genre)
-                          ? 'text-white'
-                          : ''
-                      }`}
-                      style={{
-                        backgroundColor: editForm.preferences.genres?.includes(genre)
-                          ? colors.primary
-                          : colors.whiteTransparent,
-                        color: editForm.preferences.genres?.includes(genre)
-                          ? colors.white
-                          : colors.text
-                      }}
-                      onMouseEnter={(e) => {
-                        if (!editForm.preferences.genres?.includes(genre)) {
-                          e.target.style.backgroundColor = colors.whiteTransparentLight;
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (!editForm.preferences.genres?.includes(genre)) {
-                          e.target.style.backgroundColor = colors.whiteTransparent;
-                        }
-                      }}
-                    >
-                      {genre}
-                    </button>
+                <label className="block mb-2 font-semibold" style={{ color: colors.text }}>
+                  Genres favoris
+                </label>
+                <p className="text-xs mb-3" style={{ color: colors.text, opacity: 0.7 }}>
+                  Choisissez jusqu'à {maxGenreSelection} genres que vous aimez lire
+                </p>
+                {editForm.preferences.genres?.length > 0 && (
+                  <p className="text-xs mb-3" style={{ color: colors.primary }}>
+                    {editForm.preferences.genres.length}/{maxGenreSelection} sélectionnés
+                  </p>
+                )}
+                <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
+                  {Object.entries(genresByCategory).map(([category, genres]) => (
+                    <div key={category} className="space-y-2">
+                      <h3 
+                        className="text-sm font-bold uppercase tracking-wide"
+                        style={{ color: colors.primary }}
+                      >
+                        {category}
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {genres.map((genre) => {
+                          const selected = editForm.preferences.genres?.includes(genre.id);
+                          const canSelectMore = (editForm.preferences.genres?.length || 0) < maxGenreSelection;
+                          const selectable = !selected && canSelectMore;
+                          
+                          return (
+                            <button
+                              key={genre.id}
+                              type="button"
+                              onClick={() => handleGenreToggle(genre.id)}
+                              disabled={!selectable && !selected}
+                              className={`
+                                px-4 py-2 rounded-full text-sm font-medium
+                                transition-all duration-200
+                                ${selected 
+                                  ? 'shadow-lg scale-105' 
+                                  : selectable 
+                                    ? 'hover:scale-105 hover:shadow-md' 
+                                    : 'opacity-50 cursor-not-allowed'
+                                }
+                              `}
+                              style={{
+                                backgroundColor: selected 
+                                  ? colors.primary 
+                                  : colors.whiteTransparent,
+                                color: selected 
+                                  ? colors.white 
+                                  : colors.text,
+                                border: `2px solid ${selected ? colors.primary : 'rgba(255,255,255,0.3)'}`,
+                              }}
+                            >
+                              {genre.name}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
                   ))}
                 </div>
+                {(!editForm.preferences.genres?.length || editForm.preferences.genres?.length === maxGenreSelection) && (
+                  <div className="text-center mt-4 text-sm" style={{ color: colors.primary }}>
+                    {editForm.preferences.genres?.length === maxGenreSelection 
+                      ? '✓ Maximum atteint ! Désélectionnez un genre pour en choisir un autre.'
+                      : 'Sélectionnez vos genres préférés'
+                    }
+                  </div>
+                )}
               </div>
               <button
                 onClick={handleSaveEdit}
