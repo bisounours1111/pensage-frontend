@@ -96,6 +96,11 @@ export const signUp = async (email, password, userData) => {
 
   // Créer l'entrée dans user_extend
   if (authData.user) {
+    // Préparer les préférences avec les genres
+    const preferences = {
+      favoriteGenres: userData.favoriteGenres || []
+    };
+
     const { error: userExtendError } = await supabase
       .from('user_extend')
       .insert({
@@ -103,7 +108,7 @@ export const signUp = async (email, password, userData) => {
         username: userData.username,
         name: userData.name,
         lastname: userData.lastname,
-        preferences: userData.preferences || {},
+        preferences: preferences,
         token: 0,
         age: userData.age,
         has_subscription: false,
@@ -112,6 +117,7 @@ export const signUp = async (email, password, userData) => {
 
     if (userExtendError) {
       console.error('Erreur lors de la création de user_extend:', userExtendError);
+      throw userExtendError;
     }
   }
 

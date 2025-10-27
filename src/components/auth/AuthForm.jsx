@@ -10,7 +10,9 @@ const AuthForm = ({
     onShowPasswordToggle,
     onSubmit,
     onNavigate,
-    isLoading = false
+    isLoading = false,
+    hideLinks = false, // Pour masquer les liens de navigation
+    buttonText = null // Pour personnaliser le texte du bouton
 }) => {
     const isSignup = mode === 'signup';
 
@@ -20,27 +22,31 @@ const AuthForm = ({
             <div 
                 className="bg-white/50 backdrop-blur-lg rounded-xl shadow-xl p-4 md:p-8 border border-white/40 relative"
             >
-                {/* Bouton retour */}
-                <button 
-                    onClick={() => onNavigate && onNavigate('/')}
-                    className="absolute mb-4 md:mb-6 text-xl md:text-2xl hover:opacity-70 transition"
-                    style={{ color: colors.text }}
-                >
-                    ←
-                </button>
+                {/* Bouton retour - uniquement si hideLinks est false */}
+                {!hideLinks && (
+                    <button 
+                        onClick={() => onNavigate && onNavigate('/')}
+                        className="absolute mb-4 md:mb-6 text-xl md:text-2xl hover:opacity-70 transition"
+                        style={{ color: colors.text }}
+                    >
+                        ←
+                    </button>
+                )}
 
-                {/* Titre dans le formulaire */}
-                <div className="text-center mb-4 md:mb-6">
-                    <h1 className="text-xl md:text-2xl font-bold mb-1 md:mb-2" style={{ color: colors.text }}>
-                        {isSignup ? 'Créer un compte' : 'Se connecter'}
-                    </h1>
-                    <p className="text-xs md:text-sm hidden md:block" style={{ color: colors.text, opacity: 0.8 }}>
-                        {isSignup 
-                            ? "Commencez votre aventure d'écriture dès aujourd'hui"
-                            : "Retrouvez votre espace d'écriture"
-                        }
-                    </p>
-                </div>
+                {/* Titre dans le formulaire - masqué si hideLinks */}
+                {!hideLinks && (
+                    <div className="text-center mb-4 md:mb-6">
+                        <h1 className="text-xl md:text-2xl font-bold mb-1 md:mb-2" style={{ color: colors.text }}>
+                            {isSignup ? 'Créer un compte' : 'Se connecter'}
+                        </h1>
+                        <p className="text-xs md:text-sm hidden md:block" style={{ color: colors.text, opacity: 0.8 }}>
+                            {isSignup 
+                                ? "Commencez votre aventure d'écriture dès aujourd'hui"
+                                : "Retrouvez votre espace d'écriture"
+                            }
+                        </p>
+                    </div>
+                )}
 
                 <form onSubmit={onSubmit} className="space-y-3 md:space-y-4">
                     {/* Nom d'utilisateur (uniquement pour inscription) */}
@@ -284,23 +290,25 @@ const AuthForm = ({
                                 }
                             }}
                         >
-                            {isLoading ? 'Chargement...' : (isSignup ? 'Créer mon compte' : 'Se connecter')}
+{buttonText || (isLoading ? 'Chargement...' : (isSignup ? 'Créer mon compte' : 'Se connecter'))}
                         </button>
                     </div>
 
                     {/* Lien de navigation */}
-                    <div className="text-center text-xs pt-1 md:pt-2">
-                        <p style={{ color: colors.text, opacity: 0.8 }}>
-                            {isSignup ? 'Déjà un compte ?' : "Pas encore de compte ?"}{' '}
-                            <a 
-                                href={isSignup ? "/login" : "/signup"}
-                                className="font-semibold underline hover:opacity-80 transition"
-                                style={{ color: colors.primary }}
-                            >
-                                {isSignup ? 'Se connecter' : "S'inscrire"}
-                            </a>
-                        </p>
-                    </div>
+                    {!hideLinks && (
+                        <div className="text-center text-xs pt-1 md:pt-2">
+                            <p style={{ color: colors.text, opacity: 0.8 }}>
+                                {isSignup ? 'Déjà un compte ?' : "Pas encore de compte ?"}{' '}
+                                <a 
+                                    href={isSignup ? "/login" : "/signup"}
+                                    className="font-semibold underline hover:opacity-80 transition"
+                                    style={{ color: colors.primary }}
+                                >
+                                    {isSignup ? 'Se connecter' : "S'inscrire"}
+                                </a>
+                            </p>
+                        </div>
+                    )}
                 </form>
             </div>
         </div>
