@@ -14,8 +14,12 @@ function App() {
 
       <div className="min-h-screen bg-gray-50 pb-16 lg:pb-0">
         <Routes>
-          <Route path="/signup" element={<div>Signup</div>} />
-          <Route path="/login" element={<div>Login</div>} />
+          {/* Routes d'authentification */}
+          <Route path="/" element={<WelcomePage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          
+          {/* Routes principales */}
           <Route path="/home" element={<div>Home</div>} />
           <Route path="/stories" element={<MyStoriesPage />} />
           <Route path="/create" element={<div>Éditeur</div>} />
@@ -24,7 +28,6 @@ function App() {
           <Route path="/profile" element={<div>Profil</div>} />
           <Route path="/community" element={<div>Communauté</div>} />
           <Route path="/publish" element={<div>Publication</div>} />
-          <Route path="/" element={<div>Accueil</div>} />
         </Routes>
       </div>
       <Navbar />
