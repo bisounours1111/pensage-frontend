@@ -18,7 +18,7 @@ export default function ShopPage() {
         background: "linear-gradient(to bottom, #f7e7eb, #f4d5de, #f2c3d1)",
       }}
     >
-      {/* HEADER */}
+
       <header className="p-6 md:p-12">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
           <h1 className="text-4xl md:text-6xl font-bold text-[#7a4252]">
@@ -26,11 +26,9 @@ export default function ShopPage() {
           </h1>
         </div>
 
-        {/* 1) ✅ Solde de points */}
         <PointsBalanceCard points={points} onWeekly={handleWeekly} onAd={handleAd} />
       </header>
 
-      {/* 2) ✅ Pack Premium */}
       <section className="px-6 md:px-12 mb-10">
         <SectionTitle>Premium</SectionTitle>
 
@@ -75,7 +73,6 @@ export default function ShopPage() {
         </div>
       </section>
 
-      {/* 3) ✅ Packs de points */}
       <section className="px-6 md:px-12 mb-10">
         <SectionTitle>Packs de points</SectionTitle>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
