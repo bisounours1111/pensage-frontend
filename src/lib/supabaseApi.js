@@ -34,8 +34,8 @@ export const webnovelsApi = {
     return data;
   },
 
-  // Récupérer les recommandations basées sur les genres favoris
-  getRecommendations: async (favoriteGenres = [], limit = 10) => {
+  // Récupérer les recommandations basées sur le champ unifié "genre"
+  getRecommendations: async (genres = [], limit = 10) => {
     const { data, error } = await supabase
       .from("webnovels")
       .select("*")
@@ -43,12 +43,12 @@ export const webnovelsApi = {
 
     if (error) throw error;
 
-    // Filtrer les webnovels par genres favoris
-    if (favoriteGenres.length > 0) {
+    // Filtrer les webnovels par genres préférés
+    if (genres.length > 0) {
       return data
         .filter((webnovel) => {
           const storyGenre = webnovel.genre?.toLowerCase();
-          return favoriteGenres.some(
+          return genres.some(
             (genre) =>
               genre.toLowerCase() === storyGenre ||
               storyGenre?.includes(genre.toLowerCase()) ||
@@ -299,6 +299,40 @@ export const commentsApi = {
     return data;
   },
 
+  // Liste des commentateurs (auteurs des commentaires racines)
+  getCommenters: async (webnovelId) => {
+    const { data, error } = await supabase
+      .from("webnovels_comment")
+      .select(
+        `
+        id,
+        id_user,
+        user_extend (*)
+      `
+      )
+      .eq("id_webnovels", webnovelId)
+      .is("parent_comment_id", null);
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Compter les commentaires d'un webnovel (racines uniquement ou tous)
+  countByWebnovel: async (webnovelId, { rootOnly = false } = {}) => {
+    const query = supabase
+      .from("webnovels_comment")
+      .select("*", { count: "exact", head: true })
+      .eq("id_webnovels", webnovelId);
+
+    if (rootOnly) {
+      query.is("parent_comment_id", null);
+    }
+
+    const { count, error } = await query;
+    if (error) throw error;
+    return count || 0;
+  },
+
   // Créer un commentaire
   create: async (commentData) => {
     const { data, error } = await supabase
@@ -365,6 +399,48 @@ export const userExtendApi = {
   },
 };
 
+// ==================== POINTS / TOKENS ====================
+export const pointsApi = {
+  // Récupérer le solde actuel
+  getBalance: async (userId) => {
+    const { data, error } = await supabase
+      .from("user_extend")
+      .select("token")
+      .eq("id", userId)
+      .single();
+
+    if (error) throw error;
+    return data?.token ?? 0;
+  },
+
+  // Débiter des points (ne descend pas sous 0)
+  debit: async (userId, amount) => {
+    if (amount <= 0) return await pointsApi.getBalance(userId);
+
+    const { data: current, error: getError } = await supabase
+      .from("user_extend")
+      .select("token")
+      .eq("id", userId)
+      .single();
+    if (getError) throw getError;
+
+    const currentToken = current?.token ?? 0;
+    if (currentToken < amount) {
+      const err = new Error("Solde insuffisant");
+      err.code = "INSUFFICIENT_FUNDS";
+      throw err;
+    }
+
+    const newBalance = currentToken - amount;
+    const { error: updateError } = await supabase
+      .from("user_extend")
+      .update({ token: newBalance })
+      .eq("id", userId);
+    if (updateError) throw updateError;
+    return newBalance;
+  },
+};
+
 /**
  * QUEST API
  */
@@ -400,6 +476,45 @@ export const questApi = {
  */
 
 export const historyApi = {
+  // Compter les vues d'un webnovel
+  countViews: async (webnovelId) => {
+    // Compte unique des utilisateurs (une vue par user)
+    const { data, error } = await supabase
+      .from("webnovels_history")
+      .select("id_user")
+      .eq("id_webnovels", webnovelId);
+
+    if (error) throw error;
+    const unique = new Set((data || []).map((r) => r.id_user));
+    return unique.size;
+  },
+
+  // Liste des viewers uniques (une entrée par utilisateur)
+  getViewers: async (webnovelId) => {
+    const { data, error } = await supabase
+      .from("webnovels_history")
+      .select(
+        `
+        id,
+        id_user,
+        user_extend (*)
+      `
+      )
+      .eq("id_webnovels", webnovelId);
+
+    if (error) throw error;
+    const byUser = new Map();
+    for (const row of data || []) {
+      if (!byUser.has(row.id_user)) {
+        byUser.set(row.id_user, row.user_extend || null);
+      }
+    }
+    return Array.from(byUser.entries()).map(([id, user]) => ({
+      id_user: id,
+      user_extend: user,
+    }));
+  },
+
   // Récupérer les webnovels likés par un utilisateur
   getLikedWebnovels: async (userId) => {
     const { data, error } = await supabase

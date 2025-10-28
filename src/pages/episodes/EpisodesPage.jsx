@@ -1,4 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
+import {
+  MdArrowBack,
+  MdCheck,
+  MdPublic,
+  MdEdit,
+  MdLock,
+  MdAdd,
+} from "react-icons/md";
 import { useParams, useNavigate } from "react-router-dom";
 import colors from "../../utils/constants/colors";
 import { webnovelsApi, episodesApi } from "../../lib/supabaseApi";
@@ -59,12 +67,16 @@ const EpisodesPage = () => {
       if (editingEpisode) {
         // Mise à jour d'un épisode existant
         await episodesApi.update(editingEpisode.id, episodeData);
-        setEpisodes(episodes.map(ep => ep.id === editingEpisode.id ? { ...ep, ...episodeData } : ep));
+        setEpisodes(
+          episodes.map((ep) =>
+            ep.id === editingEpisode.id ? { ...ep, ...episodeData } : ep
+          )
+        );
       } else {
         // Création d'un nouvel épisode
         const newEpisode = await episodesApi.create({
           ...episodeData,
-          id_webnovels: id
+          id_webnovels: id,
         });
         setEpisodes([...episodes, newEpisode]);
       }
@@ -92,7 +104,7 @@ const EpisodesPage = () => {
     try {
       setLoading(true);
       await episodesApi.delete(episodeId);
-      setEpisodes(episodes.filter(ep => ep.id !== episodeId));
+      setEpisodes(episodes.filter((ep) => ep.id !== episodeId));
     } catch (err) {
       console.error("Erreur lors de la suppression:", err);
       setError(err.message || "Erreur lors de la suppression de l'épisode");
@@ -268,7 +280,7 @@ const EpisodesPage = () => {
               className="text-2xl hover:scale-110 transition-transform"
               style={{ color: colors.text }}
             >
-              ←
+              <MdArrowBack />
             </button>
             <h1
               className="text-4xl md:text-5xl font-bold flex-1"
@@ -387,7 +399,7 @@ const EpisodesPage = () => {
             <p className="text-lg" style={{ color: colors.textSecondary }}>
               Gérez les épisodes de votre webnovel
             </p>
-            
+
             {/* Badges de statut */}
             <div className="flex gap-3">
               {webnovel?.is_over && (
@@ -398,7 +410,9 @@ const EpisodesPage = () => {
                     color: colors.text,
                   }}
                 >
-                  ✓ Terminé
+                  <span className="inline-flex items-center gap-1">
+                    <MdCheck /> Terminé
+                  </span>
                 </span>
               )}
               {webnovel?.publish && (
@@ -409,7 +423,9 @@ const EpisodesPage = () => {
                     color: colors.white,
                   }}
                 >
-                  🌐 Publié
+                  <span className="inline-flex items-center gap-1">
+                    <MdPublic /> Publié
+                  </span>
                 </span>
               )}
             </div>
@@ -423,33 +439,51 @@ const EpisodesPage = () => {
                 onClick={handleToggleIsOver}
                 className="px-6 py-3 rounded-lg font-semibold text-white transition shadow-lg hover:scale-105"
                 style={{ backgroundColor: colors.primary }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = colors.primaryLight}
-                onMouseLeave={(e) => e.target.style.backgroundColor = colors.primary}
+                onMouseEnter={(e) =>
+                  (e.target.style.backgroundColor = colors.primaryLight)
+                }
+                onMouseLeave={(e) =>
+                  (e.target.style.backgroundColor = colors.primary)
+                }
               >
-                ✓ Marquer comme terminé
+                <span className="inline-flex items-center gap-2">
+                  <MdCheck /> Marquer comme terminé
+                </span>
               </button>
             ) : (
               <button
                 onClick={handleToggleIsOver}
                 className="px-6 py-3 rounded-lg font-semibold text-white transition shadow-lg hover:scale-105"
                 style={{ backgroundColor: colors.primaryLight }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = colors.primary}
-                onMouseLeave={(e) => e.target.style.backgroundColor = colors.primaryLight}
+                onMouseEnter={(e) =>
+                  (e.target.style.backgroundColor = colors.primary)
+                }
+                onMouseLeave={(e) =>
+                  (e.target.style.backgroundColor = colors.primaryLight)
+                }
               >
-                ✏️ Reprendre l'écriture
+                <span className="inline-flex items-center gap-2">
+                  <MdEdit /> Reprendre l'écriture
+                </span>
               </button>
             )}
-            
+
             {/* Bouton Publier / Dépublier */}
             {!webnovel?.publish ? (
               <button
                 onClick={handleTogglePublish}
                 className="px-6 py-3 rounded-lg font-semibold text-white transition shadow-lg hover:scale-105"
                 style={{ backgroundColor: colors.published }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = "#059669"}
-                onMouseLeave={(e) => e.target.style.backgroundColor = colors.published}
+                onMouseEnter={(e) =>
+                  (e.target.style.backgroundColor = "#059669")
+                }
+                onMouseLeave={(e) =>
+                  (e.target.style.backgroundColor = colors.published)
+                }
               >
-                🌐 Publier
+                <span className="inline-flex items-center gap-2">
+                  <MdPublic /> Publier
+                </span>
               </button>
             ) : (
               <button
@@ -459,10 +493,16 @@ const EpisodesPage = () => {
                   backgroundColor: "#FEE2E2",
                   color: "#991B1B",
                 }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = "#FECACA"}
-                onMouseLeave={(e) => e.target.style.backgroundColor = "#FEE2E2"}
+                onMouseEnter={(e) =>
+                  (e.target.style.backgroundColor = "#FECACA")
+                }
+                onMouseLeave={(e) =>
+                  (e.target.style.backgroundColor = "#FEE2E2")
+                }
               >
-                🔒 Dépublier
+                <span className="inline-flex items-center gap-2">
+                  <MdLock /> Dépublier
+                </span>
               </button>
             )}
           </div>
@@ -499,11 +539,17 @@ const EpisodesPage = () => {
               <button
                 className="px-6 py-3 rounded-lg font-semibold text-white transition shadow-lg hover:scale-105"
                 style={{ backgroundColor: colors.primary }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = colors.primaryLight}
-                onMouseLeave={(e) => e.target.style.backgroundColor = colors.primary}
+                onMouseEnter={(e) =>
+                  (e.target.style.backgroundColor = colors.primaryLight)
+                }
+                onMouseLeave={(e) =>
+                  (e.target.style.backgroundColor = colors.primary)
+                }
                 onClick={handleCreateNewEpisode}
               >
-                + Nouvel Épisode
+                <span className="inline-flex items-center gap-2">
+                  <MdAdd /> Nouvel Épisode
+                </span>
               </button>
             </div>
 

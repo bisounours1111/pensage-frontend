@@ -1,7 +1,21 @@
 import React from "react";
+import {
+  MdArrowBack,
+  MdArrowForward,
+  MdAutoAwesome,
+  MdHourglassTop,
+} from "react-icons/md";
 import colors from "../../utils/constants/colors";
 
-const SynopsisStep = ({ pitch, synopsis, setSynopsis, loading, onGenerateSynopsis, onNext, onPrevious }) => {
+const SynopsisStep = ({
+  pitch,
+  synopsis,
+  setSynopsis,
+  loading,
+  onGenerateSynopsis,
+  onNext,
+  onPrevious,
+}) => {
   const [error, setError] = React.useState(null);
 
   const handleGenerate = async () => {
@@ -32,10 +46,7 @@ const SynopsisStep = ({ pitch, synopsis, setSynopsis, loading, onGenerateSynopsi
           color: colors.white,
         }}
       >
-        <h3
-          className="text-lg font-bold mb-2"
-          style={{ color: colors.white }}
-        >
+        <h3 className="text-lg font-bold mb-2" style={{ color: colors.white }}>
           Mon pitch
         </h3>
         <p style={{ color: colors.white }}>{pitch}</p>
@@ -56,22 +67,17 @@ const SynopsisStep = ({ pitch, synopsis, setSynopsis, loading, onGenerateSynopsi
 
       <div
         className="p-8 rounded-xl shadow-lg"
-        style={{ 
+        style={{
           backgroundColor: colors.white,
-          border: `4px solid ${colors.primaryLight}`
+          border: `4px solid ${colors.primaryLight}`,
         }}
       >
-        <h2
-          className="text-3xl font-bold mb-4"
-          style={{ color: colors.text }}
-        >
+        <h2 className="text-3xl font-bold mb-4" style={{ color: colors.text }}>
           Synopsis de votre histoire
         </h2>
-        <p
-          className="mb-6 text-lg"
-          style={{ color: colors.textSecondary }}
-        >
+        <p className="mb-6 text-lg" style={{ color: colors.textSecondary }}>
           Écrivez votre synopsis détaillé ou laissez l'IA le générer pour vous
+          (5 tokens)
         </p>
 
         <textarea
@@ -96,7 +102,15 @@ const SynopsisStep = ({ pitch, synopsis, setSynopsis, loading, onGenerateSynopsi
             onClick={handleGenerate}
             disabled={loading}
           >
-            {loading ? "⏳ Génération..." : "✨ Générer avec l'IA"}
+            {loading ? (
+              <span className="inline-flex items-center gap-2">
+                <MdHourglassTop /> Génération...
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-2">
+                <MdAutoAwesome /> Générer avec l'IA (5 tokens)
+              </span>
+            )}
           </button>
         </div>
 
@@ -129,18 +143,22 @@ const SynopsisStep = ({ pitch, synopsis, setSynopsis, loading, onGenerateSynopsi
           }}
           onClick={onPrevious}
         >
-          ← Retour
+          <span className="inline-flex items-center gap-2">
+            <MdArrowBack /> Retour
+          </span>
         </button>
         <button
           className="flex-1 px-8 py-4 rounded-xl font-bold text-lg text-white transition-all hover:scale-105 disabled:opacity-50 shadow-lg"
-          style={{ 
+          style={{
             backgroundColor: colors.primary,
-            border: `4px solid ${colors.primary}`
+            border: `4px solid ${colors.primary}`,
           }}
           onClick={handleNext}
           disabled={!synopsis.trim() || loading}
         >
-          Continuer vers les personnages →
+          <span className="inline-flex items-center gap-2">
+            Continuer vers les personnages <MdArrowForward />
+          </span>
         </button>
       </div>
     </div>
@@ -148,4 +166,3 @@ const SynopsisStep = ({ pitch, synopsis, setSynopsis, loading, onGenerateSynopsi
 };
 
 export default SynopsisStep;
-
