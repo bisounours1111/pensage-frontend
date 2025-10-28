@@ -198,6 +198,14 @@ const StoryCard = ({ story, mode = "read" }) => {
       >
         {story.title}
       </h3>
+      {story.authorName && (
+        <p
+          className="text-xs opacity-80 truncate"
+          style={{ color: colors.text }}
+        >
+          par {story.authorName}
+        </p>
+      )}
 
       {modal.open && (
         <div

@@ -388,6 +388,20 @@ const ReadPage = () => {
               >
                 {webnovel.genre || "Genre non spécifié"}
               </p>
+              {webnovel.author && (
+                <p className="text-sm mb-3" style={{ color: colors.text }}>
+                  Auteur:{" "}
+                  <span
+                    className="underline cursor-pointer"
+                    onClick={() => navigate(`/u/${webnovel.author.id}`)}
+                  >
+                    {webnovel.author.username ||
+                      webnovel.author.name ||
+                      webnovel.author.lastname ||
+                      webnovel.author.id}
+                  </span>
+                </p>
+              )}
               {webnovel.synopsis && (
                 <p
                   className="text-sm mb-4"
