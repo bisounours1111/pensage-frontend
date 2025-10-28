@@ -118,6 +118,8 @@ export default function ShopPage() {
         setUserExtend(extendData);
 
         alert("Abonnement Premium activé (mode développement) !");
+
+        alert("Abonnement Premium activé (mode développement) !");
       } else {
         // Stripe est configuré - rediriger vers Stripe Checkout
         await redirectToStripeSubscription(sub, user.id);

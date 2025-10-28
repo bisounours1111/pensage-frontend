@@ -238,7 +238,7 @@ const ProfilePage = () => {
               </p>
             </div>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-6 overflow-hidden">
+          <div className="w-full bg-white-200 rounded-full h-6 overflow-hidden">
             <div
               className="h-full transition-all duration-300 rounded-full flex items-center justify-center text-white text-xs font-semibold"
               style={{

@@ -52,7 +52,7 @@ function AppContent() {
     <>
       {!isAuthPage && <Header />}
 
-      <div className="min-h-screen bg-gray-50 pb-16 lg:pb-0">
+      <div className="min-h-screen bg-white pb-16 lg:pb-0">
         <Routes>
           {/* Routes d'authentification */}
           <Route path="/" element={<WelcomePage />} />
