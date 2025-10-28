@@ -1,10 +1,14 @@
 import React from "react";
+import { MdEdit, MdDelete, MdArticle } from "react-icons/md";
 import colors from "../../utils/constants/colors";
 
 const EpisodeList = ({ episodes, onEdit, onDelete, loading }) => {
   const countWords = (text) => {
     if (!text) return 0;
-    return text.trim().split(/\s+/).filter(word => word.length > 0).length;
+    return text
+      .trim()
+      .split(/\s+/)
+      .filter((word) => word.length > 0).length;
   };
 
   if (loading) {
@@ -53,10 +57,7 @@ const EpisodeList = ({ episodes, onEdit, onDelete, loading }) => {
 
   return (
     <div className="space-y-6">
-      <h2
-        className="text-3xl font-bold mb-6"
-        style={{ color: colors.text }}
-      >
+      <h2 className="text-3xl font-bold mb-6" style={{ color: colors.text }}>
         Épisodes ({episodes.length})
       </h2>
 
@@ -95,9 +96,12 @@ const EpisodeList = ({ episodes, onEdit, onDelete, loading }) => {
                 >
                   {getContentPreview(episode.content)}
                 </p>
-                <div className="flex gap-4 text-sm" style={{ color: colors.textSecondary }}>
-                  <span>
-                    📝 {countWords(episode.content)} mots
+                <div
+                  className="flex gap-4 text-sm"
+                  style={{ color: colors.textSecondary }}
+                >
+                  <span className="inline-flex items-center gap-1">
+                    <MdArticle /> {countWords(episode.content)} mots
                   </span>
                 </div>
               </div>
@@ -114,7 +118,9 @@ const EpisodeList = ({ episodes, onEdit, onDelete, loading }) => {
                     onEdit(episode);
                   }}
                 >
-                  ✏️ Modifier
+                  <span className="inline-flex items-center gap-2">
+                    <MdEdit /> Modifier
+                  </span>
                 </button>
                 <button
                   className="px-4 py-2 rounded-lg font-semibold transition-all hover:scale-105"
@@ -127,7 +133,9 @@ const EpisodeList = ({ episodes, onEdit, onDelete, loading }) => {
                     onDelete(episode.id);
                   }}
                 >
-                  🗑️ Supprimer
+                  <span className="inline-flex items-center gap-2">
+                    <MdDelete /> Supprimer
+                  </span>
                 </button>
               </div>
             </div>
@@ -139,4 +147,3 @@ const EpisodeList = ({ episodes, onEdit, onDelete, loading }) => {
 };
 
 export default EpisodeList;
-

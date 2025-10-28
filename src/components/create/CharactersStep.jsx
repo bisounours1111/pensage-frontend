@@ -1,4 +1,5 @@
 import React from "react";
+import { MdArrowBack, MdArrowForward } from "react-icons/md";
 import EditableCharacterCard from "../ui/EditableCharacterCard";
 import colors from "../../utils/constants/colors";
 
@@ -181,7 +182,9 @@ const CharactersStep = ({
           }}
           onClick={onPrevious}
         >
-          ← Retour
+          <span className="inline-flex items-center gap-2">
+            <MdArrowBack /> Retour
+          </span>
         </button>
         <button
           className="flex-1 px-8 py-4 rounded-xl font-bold text-lg text-white transition-all hover:scale-105 disabled:opacity-50 shadow-lg"
@@ -192,7 +195,9 @@ const CharactersStep = ({
           onClick={handleNext}
           disabled={characters.length === 0 || loading}
         >
-          Finaliser →
+          <span className="inline-flex items-center gap-2">
+            Finaliser <MdArrowForward />
+          </span>
         </button>
       </div>
     </div>
