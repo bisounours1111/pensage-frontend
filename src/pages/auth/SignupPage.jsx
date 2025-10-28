@@ -116,7 +116,7 @@ const SignupPage = () => {
         name: formData.prenom,
         lastname: formData.nom,
         age: parseInt(formData.age),
-        favoriteGenres: selectedGenres,
+        genre: selectedGenres,
       };
 
       const result = await signUp(formData.email, formData.password, userData);
