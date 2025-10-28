@@ -115,10 +115,11 @@ export const signUp = async (email, password, userData) => {
         name: userData.name,
         lastname: userData.lastname,
         preferences: preferences,
-        token: 0,
+        token: 100, // Bonus de bienvenue : 100 tokens offerts à l'inscription
         age: userData.age,
         has_subscription: false,
         xp: 0,
+        first_connexion: true,
       });
 
     if (userExtendError) {
