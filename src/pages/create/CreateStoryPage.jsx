@@ -38,7 +38,7 @@ const CreateStoryPage = () => {
     { title: "Pitch" },
     { title: "Synopsis" },
     { title: "Personnages" },
-    { title: "Titre & Genre" },
+    { title: "Bio" },
     { title: "Finalisation" },
   ];
 
