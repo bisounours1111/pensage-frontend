@@ -35,7 +35,7 @@ const MyStoriesPage = () => {
         const baseStories = userStories.map((story) => ({
           id: story.id,
           title: story.title || "Sans titre",
-          cover: "https://via.placeholder.com/300x450",
+          cover: story.image_url || "https://via.placeholder.com/300x450",
           category: story.genre || "Non spécifié",
           progress: 0,
           status: story.publish

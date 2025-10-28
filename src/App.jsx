@@ -16,6 +16,8 @@ import Navbar from "./components/common/navbar";
 import WelcomePage from "./pages/auth/WelcomePage";
 import SignupPage from "./pages/auth/SignupPage";
 import LoginPage from "./pages/auth/LoginPage";
+import OnboardingPage from "./pages/onboarding/OnboardingPage";
+import OnboardingGuard from "./components/auth/OnboardingGuard";
 import CreateStoryPage from "./pages/create/CreateStoryPage";
 import EpisodesPage from "./pages/episodes/EpisodesPage";
 import PaymentSuccessPage from "./pages/payment/PaymentSuccessPage";
@@ -30,7 +32,8 @@ function AppContent() {
   const isAuthPage =
     location.pathname === "/" ||
     location.pathname === "/signup" ||
-    location.pathname === "/login";
+    location.pathname === "/login" ||
+    location.pathname === "/onboarding";
 
   const [authChecked, setAuthChecked] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -46,7 +49,13 @@ function AppContent() {
 
   const Protected = ({ children }) => {
     if (!authChecked) return null; // ou loader
-    return isAuthenticated ? children : <Navigate to="/" replace />;
+    return isAuthenticated ? (
+      <OnboardingGuard>
+        {children}
+      </OnboardingGuard>
+    ) : (
+      <Navigate to="/" replace />
+    );
   };
 
   return (
@@ -59,6 +68,7 @@ function AppContent() {
           <Route path="/" element={<WelcomePage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/onboarding" element={<OnboardingPage />} />
 
           {/* Routes principales protégées */}
           <Route
