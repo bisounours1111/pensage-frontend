@@ -23,6 +23,7 @@ import PaymentCancelPage from "./pages/payment/PaymentCancelPage";
 import ProfilePage from "./pages/profile/ProfilePage";
 import HomePage from "./pages/dashboard/HomePage";
 import ReadPage from "./pages/read/ReadPage";
+import NotificationsPage from "./pages/profile/NotificationsPage";
 
 function AppContent() {
   const location = useLocation();
@@ -89,6 +90,22 @@ function AppContent() {
             element={
               <Protected>
                 <ReadPage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/u/:id"
+            element={
+              <Protected>
+                <ProfilePage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/notifications"
+            element={
+              <Protected>
+                <NotificationsPage />
               </Protected>
             }
           />
