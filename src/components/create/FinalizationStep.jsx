@@ -1,63 +1,16 @@
-import React, { useState, useRef } from "react";
+import React from "react";
 import { MdArrowBack, MdCheckCircle } from "react-icons/md";
 import colors from "../../utils/constants/colors";
-import { storageApi } from "../../lib/storage";
 
 const FinalizationStep = ({
   pitch,
   synopsis,
   characters,
   storyTitle,
-  selectedGenre, imageUrl, setImageUrl,
+  selectedGenre,
   onPrevious,
-  onFinalize, loading,
+  onFinalize,
 }) => {
-  const [uploading, setUploading] = useState(false);
-  const [uploadError, setUploadError] = useState(null);
-  const fileInputRef = useRef(null);
-
-  // Gérer le changement de fichier
-  const handleFileChange = async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    // Vérifier le type de fichier
-    if (!file.type.startsWith('image/')) {
-      setUploadError('Veuillez sélectionner un fichier image');
-      return;
-    }
-
-    // Vérifier la taille (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      setUploadError('L\'image est trop volumineuse (max 5MB)');
-      return;
-    }
-
-    try {
-      setUploading(true);
-      setUploadError(null);
-
-      // Upload de l'image
-      const url = await storageApi.uploadImage(file);
-      setImageUrl(url);
-    } catch (err) {
-      console.error('Erreur lors de l\'upload:', err);
-      setUploadError('Erreur lors de l\'upload de l\'image');
-    } finally {
-      setUploading(false);
-      // Réinitialiser l'input file
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-    }
-  };
-
-  // Supprimer l'image
-  const handleRemoveImage = () => {
-    setImageUrl(null);
-    setUploadError(null);
-  };
-
   return (
     <div className="space-y-6">
       <div
@@ -86,112 +39,6 @@ const FinalizationStep = ({
         </div>
 
         <div className="text-left space-y-6 mb-8">
-          {/* Image de couverture - Style card */}
-          {imageUrl && (
-            <div className="mb-6 flex flex-col items-center">
-              <div 
-                className="relative group cursor-pointer hover:scale-105 transition-transform duration-300"
-                onClick={() => fileInputRef.current?.click()}
-                title="Cliquer pour changer l'image"
-              >
-                <div className="relative overflow-hidden rounded-lg bg-white/30 backdrop-blur-sm shadow-lg aspect-[2/3] w-48 md:w-56 border border-white/40">
-                  <img 
-                    src={imageUrl} 
-                    alt="Couverture"
-                    className="w-full h-full object-cover pointer-events-none"
-                  />
-                  
-                  {/* Overlay au survol */}
-                  <div
-                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none"
-                    style={{ backgroundColor: colors.overlay }}
-                  >
-                    <div className="text-white text-center p-4">
-                      <p className="text-sm font-semibold mb-1">Cliquer pour changer</p>
-                      <span className="text-xs text-white/90">l'image de couverture</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Bouton de suppression en dessous */}
-              <button
-                type="button"
-                onClick={handleRemoveImage}
-                disabled={uploading || loading}
-                className="mt-3 px-3 py-1 text-xs rounded-full font-semibold shadow-md transition-all duration-200 hover:scale-105 cursor-pointer"
-                style={{ 
-                  backgroundColor: "#FEE2E2", 
-                  color: "#991B1B",
-                  border: "1px solid #FCA5A5"
-                }}
-                title="Supprimer l'image"
-              >
-                ✕ Supprimer l'image
-              </button>
-              
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="hidden"
-              />
-            </div>
-          )}
-
-          {!imageUrl && (
-            <div className="mb-6 flex justify-center">
-              <div className="relative group">
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={uploading || loading}
-                  className="relative overflow-hidden rounded-lg bg-white/30 backdrop-blur-sm shadow-lg aspect-[2/3] w-48 md:w-56 border border-white/40 border-dashed flex flex-col items-center justify-center transition-all duration-200 hover:scale-105 cursor-pointer"
-                >
-                  {uploading ? (
-                    <div className="text-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-2 mx-auto mb-2" style={{ borderColor: colors.primaryLight, borderTopColor: colors.primary }} />
-                      <p className="text-sm font-semibold" style={{ color: colors.text }}>Upload en cours...</p>
-                    </div>
-                  ) : (
-                    <div className="text-center">
-                      <div className="text-4xl mb-2">📷</div>
-                      <p className="text-sm font-semibold mb-1" style={{ color: colors.text }}>Ajouter une image</p>
-                      <span className="text-xs" style={{ color: colors.textSecondary }}>de couverture</span>
-                      <p className="text-xs mt-1" style={{ color: colors.textSecondary }}>Ratio 2:3 recommandé</p>
-                    </div>
-                  )}
-                </button>
-                
-                {/* Overlay au survol */}
-                {!uploading && (
-                  <div
-                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center rounded-lg pointer-events-none"
-                    style={{ backgroundColor: colors.overlay }}
-                  >
-                    <div className="text-white text-center p-4">
-                      <p className="text-sm font-semibold mb-1">Cliquer pour ajouter</p>
-                      <span className="text-xs text-white/90">une image de couverture</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="hidden"
-              />
-            </div>
-          )}
-
-          {uploadError && (
-            <div className="mb-4 p-3 rounded-lg text-sm text-center" style={{ backgroundColor: "#FEE2E2", color: "#991B1B" }}>
-              {uploadError}
-            </div>
-          )}
-
           <div
             className="p-6 rounded-lg border-4"
             style={{

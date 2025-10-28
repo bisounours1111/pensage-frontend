@@ -86,26 +86,32 @@ const PitchStep = ({ pitch, setPitch, loading, onGeneratePitch, onNext }) => {
           disabled={loading}
         />
 
-        <div className="mt-4 flex items-center justify-between gap-4">
+        <div className="mt-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 lg:gap-4">
           <p
-            className="text-sm inline-flex items-center gap-2"
+            className="text-sm lg:text-base inline-flex items-center gap-2 text-center lg:text-left"
             style={{ color: colors.textSecondary }}
           >
-            <MdLightbulb /> Besoin d'aide ? Laissez l'IA générer des suggestions
+            <MdLightbulb className="flex-shrink-0 w-5 h-5" />
+            <span className="hidden sm:inline">Besoin d'aide ? Laissez l'IA générer des suggestions</span>
+            <span className="sm:hidden">Besoin d'aide ?</span>
           </p>
           <button
-            className="px-6 py-3 rounded-xl font-semibold text-white transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+            className="px-4 lg:px-6 py-3 lg:py-3 rounded-xl font-semibold text-white transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg text-sm lg:text-base w-full lg:w-auto"
             style={{ backgroundColor: colors.primaryLight }}
             onClick={handleGeneratePitchOptions}
             disabled={loading || !pitch.trim()}
           >
             {loading ? (
-              <span className="inline-flex items-center gap-2">
-                <MdHourglassTop /> Génération...
+              <span className="inline-flex items-center gap-2 justify-center">
+                <MdHourglassTop className="w-4 h-4 lg:w-5 lg:h-5" />
+                <span className="hidden sm:inline">Génération...</span>
+                <span className="sm:hidden">Génération</span>
               </span>
             ) : (
-              <span className="inline-flex items-center gap-2">
-                <MdAutoAwesome /> Suggestions IA (5 tokens)
+              <span className="inline-flex items-center gap-2 justify-center">
+                <MdAutoAwesome className="w-4 h-4 lg:w-5 lg:h-5" />
+                <span className="hidden sm:inline">Suggestions IA (5 tokens)</span>
+                <span className="sm:hidden">IA (5 tokens)</span>
               </span>
             )}
           </button>
@@ -208,7 +214,7 @@ const PitchStep = ({ pitch, setPitch, loading, onGeneratePitch, onNext }) => {
           </div>
 
           <button
-            className="w-full px-8 py-6 rounded-xl font-bold text-xl text-white transition-all hover:scale-105 disabled:opacity-50 shadow-xl"
+            className="w-full px-6 lg:px-8 py-4 lg:py-6 rounded-xl font-bold text-lg lg:text-xl text-white transition-all hover:scale-105 disabled:opacity-50 shadow-xl"
             style={{ backgroundColor: colors.primaryLight }}
             onClick={() => {
               setShowAIOptions(false);
@@ -222,13 +228,15 @@ const PitchStep = ({ pitch, setPitch, loading, onGeneratePitch, onNext }) => {
 
       <div className="mt-8">
         <button
-          className="w-full px-8 py-6 rounded-xl font-bold text-xl text-white transition-all hover:scale-105 disabled:opacity-50 shadow-xl"
+          className="w-full px-6 lg:px-8 py-4 lg:py-6 rounded-xl font-bold text-lg lg:text-xl text-white transition-all hover:scale-105 disabled:opacity-50 shadow-xl"
           style={{ backgroundColor: colors.primary }}
           onClick={handleNext}
           disabled={!pitch.trim() || loading}
         >
-          <span className="inline-flex items-center gap-2">
-            Continuer vers le synopsis <MdArrowForward />
+          <span className="inline-flex items-center gap-2 justify-center">
+            <span className="hidden sm:inline">Continuer vers le synopsis</span>
+            <span className="sm:hidden">Continuer</span>
+            <MdArrowForward className="w-5 h-5 lg:w-6 lg:h-6" />
           </span>
         </button>
       </div>

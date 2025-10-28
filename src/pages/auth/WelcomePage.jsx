@@ -7,10 +7,10 @@ const WelcomePage = () => {
     const navigate = useNavigate();
 
     return (
-        <div
+        <div 
             className="min-h-screen flex flex-col items-center justify-center p-6"
-            style={{
-                background: `linear-gradient(to bottom, ${colors.bgGradientFrom}, ${colors.bgGradientVia}, ${colors.bgGradientTo})`
+            style={{ 
+                background: `linear-gradient(to bottom, ${colors.bgGradientFrom}, ${colors.bgGradientVia}, ${colors.bgGradientTo})` 
             }}
         >
             {/* Logo et titre */}
@@ -41,7 +41,7 @@ const WelcomePage = () => {
                 <button
                     onClick={() => navigate('/login')}
                     className="flex-1 px-8 py-4 rounded-lg font-bold transition-all shadow-lg hover:shadow-xl transform hover:scale-105 backdrop-blur-sm border-2"
-                    style={{
+                    style={{ 
                         backgroundColor: 'transparent',
                         borderColor: colors.text,
                         color: colors.text

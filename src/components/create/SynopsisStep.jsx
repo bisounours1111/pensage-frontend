@@ -39,17 +39,17 @@ const SynopsisStep = ({
   return (
     <div className="space-y-6">
       <div
-        className="p-6 rounded-xl shadow-lg"
+        className="p-4 lg:p-6 rounded-xl shadow-lg"
         style={{
           backgroundColor: colors.primary,
           border: `4px solid ${colors.primary}`,
           color: colors.white,
         }}
       >
-        <h3 className="text-lg font-bold mb-2" style={{ color: colors.white }}>
+        <h3 className="text-base lg:text-lg font-bold mb-2" style={{ color: colors.white }}>
           Mon pitch
         </h3>
-        <p style={{ color: colors.white }}>{pitch}</p>
+        <p className="text-sm lg:text-base" style={{ color: colors.white }}>{pitch}</p>
       </div>
 
       {error && (
@@ -72,21 +72,21 @@ const SynopsisStep = ({
           border: `4px solid ${colors.primaryLight}`,
         }}
       >
-        <h2 className="text-3xl font-bold mb-4" style={{ color: colors.text }}>
+        <h2 className="text-2xl lg:text-3xl font-bold mb-4" style={{ color: colors.text }}>
           Synopsis de votre histoire
         </h2>
-        <p className="mb-6 text-lg" style={{ color: colors.textSecondary }}>
+        <p className="mb-6 text-base lg:text-lg" style={{ color: colors.textSecondary }}>
           Écrivez votre synopsis détaillé ou laissez l'IA le générer pour vous
           (5 tokens)
         </p>
 
         <textarea
-          className="w-full p-6 rounded-xl border-3 resize-none text-lg outline-none"
+          className="w-full p-4 lg:p-6 rounded-xl border-3 resize-none text-base lg:text-lg outline-none"
           style={{
             borderColor: colors.primary,
             backgroundColor: colors.white,
             color: colors.text,
-            minHeight: "250px",
+            minHeight: "200px",
             borderWidth: "3px",
           }}
           placeholder="Écrivez ici le synopsis détaillé de votre histoire..."
@@ -95,20 +95,24 @@ const SynopsisStep = ({
           disabled={loading}
         />
 
-        <div className="mt-4 flex items-center justify-end gap-4">
+        <div className="mt-4 flex justify-center lg:justify-end">
           <button
-            className="px-6 py-3 rounded-xl font-semibold text-white transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+            className="px-4 lg:px-6 py-3 rounded-xl font-semibold text-white transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg text-sm lg:text-base w-full lg:w-auto"
             style={{ backgroundColor: colors.primaryLight }}
             onClick={handleGenerate}
             disabled={loading}
           >
             {loading ? (
-              <span className="inline-flex items-center gap-2">
-                <MdHourglassTop /> Génération...
+              <span className="inline-flex items-center gap-2 justify-center">
+                <MdHourglassTop className="w-4 h-4 lg:w-5 lg:h-5" />
+                <span className="hidden sm:inline">Génération...</span>
+                <span className="sm:hidden">Génération</span>
               </span>
             ) : (
-              <span className="inline-flex items-center gap-2">
-                <MdAutoAwesome /> Générer avec l'IA (5 tokens)
+              <span className="inline-flex items-center gap-2 justify-center">
+                <MdAutoAwesome className="w-4 h-4 lg:w-5 lg:h-5" />
+                <span className="hidden sm:inline">Générer avec l'IA (5 tokens)</span>
+                <span className="sm:hidden">IA (5 tokens)</span>
               </span>
             )}
           </button>
@@ -133,9 +137,9 @@ const SynopsisStep = ({
         )}
       </div>
 
-      <div className="flex gap-4">
+      <div className="flex flex-col lg:flex-row gap-4">
         <button
-          className="px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 shadow-lg"
+          className="px-6 lg:px-8 py-4 lg:py-4 rounded-xl font-bold text-lg lg:text-lg transition-all hover:scale-105 shadow-lg"
           style={{
             backgroundColor: colors.white,
             color: colors.primary,
@@ -143,12 +147,14 @@ const SynopsisStep = ({
           }}
           onClick={onPrevious}
         >
-          <span className="inline-flex items-center gap-2">
-            <MdArrowBack /> Retour
+          <span className="inline-flex items-center gap-2 justify-center">
+            <MdArrowBack className="w-5 h-5 lg:w-6 lg:h-6" />
+            <span className="hidden sm:inline">Retour</span>
+            <span className="sm:hidden">Retour</span>
           </span>
         </button>
         <button
-          className="flex-1 px-8 py-4 rounded-xl font-bold text-lg text-white transition-all hover:scale-105 disabled:opacity-50 shadow-lg"
+          className="flex-1 px-6 lg:px-8 py-4 lg:py-4 rounded-xl font-bold text-lg lg:text-lg text-white transition-all hover:scale-105 disabled:opacity-50 shadow-lg"
           style={{
             backgroundColor: colors.primary,
             border: `4px solid ${colors.primary}`,
@@ -156,8 +162,10 @@ const SynopsisStep = ({
           onClick={handleNext}
           disabled={!synopsis.trim() || loading}
         >
-          <span className="inline-flex items-center gap-2">
-            Continuer vers les personnages <MdArrowForward />
+          <span className="inline-flex items-center gap-2 justify-center">
+            <span className="hidden sm:inline">Continuer vers les personnages</span>
+            <span className="sm:hidden">Continuer</span>
+            <MdArrowForward className="w-5 h-5 lg:w-6 lg:h-6" />
           </span>
         </button>
       </div>

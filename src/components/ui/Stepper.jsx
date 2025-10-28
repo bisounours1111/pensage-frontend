@@ -37,18 +37,16 @@ const Stepper = ({ steps, currentStep }) => {
             >
               {/* Cercle de l'étape */}
               <div
-                className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all duration-300 ${
-                  isActive ? "scale-110" : ""
-                }`}
+                className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all duration-300 ${isActive ? "scale-110" : ""
+                  }`}
                 style={{
                   backgroundColor:
                     isActive || isCompleted ? colors.primary : colors.white,
                   color: isActive || isCompleted ? colors.white : colors.text,
-                  border: `3px solid ${
-                    isActive || isCompleted
-                      ? colors.primary
-                      : colors.primaryLight
-                  }`,
+                  border: `3px solid ${isActive || isCompleted
+                    ? colors.primary
+                    : colors.primaryLight
+                    }`,
                   boxShadow: isActive ? `0 0 20px ${colors.primary}` : "none",
                 }}
               >
