@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { MdArrowBack, MdArrowForward, MdClose } from "react-icons/md";
+import {
+  MdArrowBack,
+  MdArrowForward,
+  MdClose,
+  MdExpandMore,
+  MdExpandLess,
+} from "react-icons/md";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   webnovelsApi,
@@ -33,6 +39,7 @@ const ReadPage = () => {
   const [comments, setComments] = useState([]);
   const [showComments, setShowComments] = useState(false);
   const [showLikers, setShowLikers] = useState(false);
+  const [showCharacters, setShowCharacters] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [commentLoading, setCommentLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
@@ -436,6 +443,121 @@ const ReadPage = () => {
             </button>
           </div>
         </div>
+
+        {/* Personnages */}
+        {Array.isArray(webnovel.characters) &&
+          webnovel.characters.length > 0 && (
+            <div
+              className="bg-white rounded-lg shadow-lg p-6 mb-6"
+              style={{ backgroundColor: colors.whiteTransparent }}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3
+                  className="text-xl font-semibold"
+                  style={{ color: colors.text }}
+                >
+                  Personnages
+                </h3>
+                <button
+                  onClick={() => setShowCharacters(!showCharacters)}
+                  className="px-3 py-1 rounded-lg font-semibold transition hover:scale-105"
+                  style={{
+                    backgroundColor: colors.white,
+                    color: colors.text,
+                    border: `1px solid ${colors.text}`,
+                  }}
+                >
+                  <span className="inline-flex items-center gap-1">
+                    {showCharacters ? <MdExpandLess /> : <MdExpandMore />}
+                    {showCharacters ? "Réduire" : "Afficher"}
+                  </span>
+                </button>
+              </div>
+
+              {showCharacters && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {webnovel.characters.map((ch, idx) => (
+                    <div
+                      key={idx}
+                      className="rounded-lg p-4 border"
+                      style={{
+                        borderColor: colors.white,
+                        backgroundColor: "rgba(255,255,255,0.6)",
+                      }}
+                    >
+                      <div className="flex items-center gap-3 mb-2">
+                        <div
+                          className="w-10 h-10 rounded-full flex items-center justify-center font-bold"
+                          style={{
+                            backgroundColor: colors.primary,
+                            color: "white",
+                          }}
+                        >
+                          {(ch?.nom || `P${idx + 1}`)
+                            ?.toString()
+                            .charAt(0)
+                            .toUpperCase()}
+                        </div>
+                        <div>
+                          <div
+                            className="font-bold"
+                            style={{ color: colors.text }}
+                          >
+                            {ch?.nom || `Personnage ${idx + 1}`}
+                          </div>
+                          {ch?.âge && (
+                            <div
+                              className="text-sm opacity-80"
+                              style={{ color: colors.text }}
+                            >
+                              {ch.âge}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      {ch?.rôle && (
+                        <div className="mb-1">
+                          <span
+                            className="font-semibold"
+                            style={{ color: colors.primary }}
+                          >
+                            Rôle:{" "}
+                          </span>
+                          <span style={{ color: colors.text }}>{ch.rôle}</span>
+                        </div>
+                      )}
+                      {ch?.personnalité && (
+                        <div className="mb-1">
+                          <span
+                            className="font-semibold"
+                            style={{ color: colors.primary }}
+                          >
+                            Personnalité:{" "}
+                          </span>
+                          <span style={{ color: colors.text }}>
+                            {ch.personnalité}
+                          </span>
+                        </div>
+                      )}
+                      {ch?.apparence && (
+                        <div>
+                          <span
+                            className="font-semibold"
+                            style={{ color: colors.primary }}
+                          >
+                            Apparence:{" "}
+                          </span>
+                          <span style={{ color: colors.text }}>
+                            {ch.apparence}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
         {/* Sélection d'épisode */}
         {episodes.length > 0 && (
