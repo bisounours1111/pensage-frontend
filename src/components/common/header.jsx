@@ -31,7 +31,7 @@ export default function Header() {
 
   return (
     <header
-      className="flex items-center justify-between px-8 w-full h-16 shadow-lg sticky top-0 z-50"
+      className="flex items-center justify-between px-4 md:px-8 w-full h-16 shadow-lg sticky top-0 z-50 overflow-hidden"
       style={{
         background: `linear-gradient(to right, ${colors.primarySoft}, ${colors.primaryLight})`,
         borderBottom: `3px solid ${colors.primary}`,
@@ -39,14 +39,14 @@ export default function Header() {
     >
       {/* Logo à gauche */}
       <Link
-        to="/"
-        className="flex items-center hover:scale-105 transition-transform"
+        to="/home"
+        className="flex items-center hover:scale-105 transition-transform flex-shrink-0"
       >
-        <img src={logo} alt="Pensaga" className="h-10 w-auto object-contain" />
+        <img src={logo} alt="Pensaga" className="h-8 md:h-10 w-auto object-contain" />
       </Link>
 
       {/* Navigation - responsive */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 md:gap-4 overflow-hidden">
         {/* Navigation principale - Desktop uniquement */}
         <div className="hidden lg:flex items-center gap-6">
           <Link
@@ -77,15 +77,15 @@ export default function Header() {
 
         {/* Icônes principales - Compte, Notifications, Quests (toujours visibles) */}
         <div
-          className="flex items-center gap-2 sm:gap-4 border-l pl-4"
+          className="flex items-center gap-1 sm:gap-2 md:gap-4 border-l pl-2 md:pl-4"
           style={{ borderColor: "rgba(255,255,255,0.3)" }}
         >
           <Link
             to="/profile"
-            className="p-3 rounded-lg hover:bg-white/20 transition-all flex items-center gap-2 group"
+            className="p-2 md:p-3 rounded-lg hover:bg-white/20 transition-all flex items-center gap-1 md:gap-2 group flex-shrink-0"
             style={{ color: colors.white }}
           >
-            <MdAccountCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
+            <MdAccountCircle className="w-5 h-5 md:w-6 md:h-6 group-hover:scale-110 transition-transform" />
             <span className="font-medium hidden sm:inline">Compte</span>
           </Link>
           <div className="relative">
@@ -109,15 +109,15 @@ export default function Header() {
           </div>
           <Link
             to="/quests"
-            className="p-3 rounded-lg hover:bg-white/20 transition-all flex items-center gap-2 group relative"
+            className="p-2 md:p-3 rounded-lg hover:bg-white/20 transition-all flex items-center gap-1 md:gap-2 group relative flex-shrink-0"
             style={{ color: colors.white }}
           >
-            <MdChecklist className="w-6 h-6 group-hover:scale-110 transition-transform" />
+            <MdChecklist className="w-5 h-5 md:w-6 md:h-6 group-hover:scale-110 transition-transform" />
             <span className="font-medium hidden sm:inline">Quests</span>
           </Link>
           <button
             onClick={handleLogout}
-            className="px-2 sm:px-3 py-2 rounded-lg transition-all flex items-center gap-2 shadow-sm hover:shadow-md hover:scale-[1.02] whitespace-nowrap"
+            className="px-2 py-2 rounded-lg transition-all flex items-center gap-1 md:gap-2 shadow-sm hover:shadow-md hover:scale-[1.02] flex-shrink-0"
             style={{
               color: colors.white,
               backgroundColor: "rgba(255,255,255,0.12)",
@@ -125,7 +125,7 @@ export default function Header() {
             }}
             title="Se déconnecter"
           >
-            <MdLogout className="w-5 h-5" />
+            <MdLogout className="w-4 h-4 md:w-5 md:h-5" />
             <span className="hidden md:inline font-medium">Se déconnecter</span>
           </button>
         </div>
