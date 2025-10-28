@@ -671,7 +671,7 @@ const ProfilePage = () => {
               </p>
             </div>
           ) : (
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-4 justify-center">
               {formatLikedWebnovels().map((webnovel) => (
                 <div
                   key={webnovel.id}

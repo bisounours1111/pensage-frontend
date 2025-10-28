@@ -60,7 +60,7 @@ const HomePage = () => {
           id: entry.webnovel.id,
           historyId: entry.historyId,
           title: entry.webnovel.title || "Sans titre",
-          cover: "https://via.placeholder.com/300x450",
+          cover: entry.webnovel.image_url || "https://via.placeholder.com/300x450",
           category: entry.webnovel.genre || "Non spécifié",
           progress: 0,
           status: entry.webnovel.publish ? "published" : "draft",
@@ -78,7 +78,7 @@ const HomePage = () => {
       const formattedTrending = trendingData.map((story) => ({
         id: story.id,
         title: story.title || "Sans titre",
-        cover: "https://via.placeholder.com/300x450",
+        cover: story.image_url || "https://via.placeholder.com/300x450",
         category: story.genre || "Non spécifié",
         progress: 0,
         status: story.publish ? "published" : "draft",
@@ -95,7 +95,7 @@ const HomePage = () => {
       const formattedRecommendations = recommendationsData.map((story) => ({
         id: story.id,
         title: story.title || "Sans titre",
-        cover: "https://via.placeholder.com/300x450",
+        cover: story.image_url || "https://via.placeholder.com/300x450",
         category: story.genre || "Non spécifié",
         progress: 0,
         status: story.publish ? "published" : "draft",

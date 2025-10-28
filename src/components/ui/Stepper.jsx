@@ -5,11 +5,11 @@ import colors from "../../utils/constants/colors";
 const Stepper = ({ steps, currentStep }) => {
   return (
     <div className="w-full py-8">
-      <div className="flex items-center justify-between relative">
+      <div className="flex items-center justify-between relative py-6">
         {/* Ligne de progression */}
         <div
-          className="absolute top-1/2 left-0 w-full h-1 -translate-y-1/2"
-          style={{ backgroundColor: colors.primaryVeryLight }}
+          className="absolute top-0 left-0 w-full h-1"
+          style={{ backgroundColor: colors.primaryVeryLight, top: '48px' }}
         >
           <div
             className="h-full transition-all duration-500"
@@ -48,6 +48,7 @@ const Stepper = ({ steps, currentStep }) => {
                     : colors.primaryLight
                     }`,
                   boxShadow: isActive ? `0 0 20px ${colors.primary}` : "none",
+                  zIndex: 20,
                 }}
               >
                 {isCompleted ? <MdCheck /> : stepNumber}
