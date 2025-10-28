@@ -82,11 +82,6 @@ const HomePage = () => {
         category: story.genre || "Non spécifié",
         progress: 0,
         status: story.publish ? "published" : "draft",
-        authorName:
-          story.author?.username ||
-          story.author?.name ||
-          story.author?.lastname ||
-          "Auteur inconnu",
         ...story,
       }));
       setTrending(formattedTrending);
@@ -104,11 +99,6 @@ const HomePage = () => {
         category: story.genre || "Non spécifié",
         progress: 0,
         status: story.publish ? "published" : "draft",
-        authorName:
-          story.author?.username ||
-          story.author?.name ||
-          story.author?.lastname ||
-          "Auteur inconnu",
         ...story,
       }));
       setRecommendations(formattedRecommendations);
@@ -127,11 +117,11 @@ const HomePage = () => {
       <div
         className="min-h-screen bg-gradient-to-b"
         style={{
-          background: `linear-gradient(to bottom, var(--color-bg-gradient-from), var(--color-bg-gradient-via), var(--color-bg-gradient-to))`,
+          background: `linear-gradient(to bottom, ${colors.bgGradientFrom}, ${colors.bgGradientVia}, ${colors.bgGradientTo})`,
         }}
       >
         <div className="flex justify-center items-center h-screen">
-          <div className="text-xl" style={{ color: "var(--color-text)" }}>
+          <div className="text-xl" style={{ color: colors.text }}>
             Chargement...
           </div>
         </div>
@@ -144,7 +134,7 @@ const HomePage = () => {
       <div
         className="min-h-screen bg-gradient-to-b"
         style={{
-          background: `linear-gradient(to bottom, var(--color-bg-gradient-from), var(--color-bg-gradient-via), var(--color-bg-gradient-to))`,
+          background: `linear-gradient(to bottom, ${colors.bgGradientFrom}, ${colors.bgGradientVia}, ${colors.bgGradientTo})`,
         }}
       >
         <div className="p-6 md:p-12">
@@ -160,21 +150,21 @@ const HomePage = () => {
     <div
       className="min-h-screen bg-gradient-to-b pb-16"
       style={{
-        background: `linear-gradient(to bottom, var(--color-bg-gradient-from), var(--color-bg-gradient-via), var(--color-bg-gradient-to))`,
+        background: `linear-gradient(to bottom, ${colors.bgGradientFrom}, ${colors.bgGradientVia}, ${colors.bgGradientTo})`,
       }}
     >
       {/* Header */}
       <header className="p-6 md:p-12">
         <h1
           className="text-4xl md:text-6xl font-bold mb-4"
-          style={{ color: "var(--color-text)" }}
+          style={{ color: colors.text }}
         >
           Bienvenue{" "}
           {userExtend?.name || user?.email?.split("@")[0] || "Utilisateur"} !
         </h1>
         <p
           className="text-lg md:text-xl opacity-80"
-          style={{ color: "var(--color-text)" }}
+          style={{ color: colors.text }}
         >
           Découvrez de nouvelles histoires passionnantes
         </p>
@@ -210,16 +200,10 @@ const HomePage = () => {
           trending.length === 0 &&
           recommendations.length === 0 && (
             <div className="flex flex-col items-center justify-center py-12">
-              <p
-                className="text-xl mb-4"
-                style={{ color: "var(--color-text)" }}
-              >
+              <p className="text-xl mb-4" style={{ color: colors.text }}>
                 Aucune histoire disponible pour le moment
               </p>
-              <p
-                className="text-md opacity-75"
-                style={{ color: "var(--color-text)" }}
-              >
+              <p className="text-md opacity-75" style={{ color: colors.text }}>
                 Revenez bientôt pour découvrir de nouvelles histoires !
               </p>
             </div>

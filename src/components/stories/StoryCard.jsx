@@ -143,17 +143,11 @@ const StoryCard = ({ story, mode = "read" }) => {
     >
       <div className="relative overflow-hidden rounded-lg bg-white/30 backdrop-blur-sm shadow-lg aspect-[2/3] mb-2 border border-white/40">
         {/* Image de couverture */}
-                {story.image_url ? (
-            <img
-              src={story.image_url}
-              alt={story.title}
-              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-            />
-                ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-400 via-pink-500 to-red-500">
-                        <span className="text-white text-4xl">📚</span>
-                    </div>
-                )}
+        <img
+          src={story.cover}
+          alt={story.title}
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+        />
 
         {/* Overlay au survol */}
         <div
@@ -198,14 +192,6 @@ const StoryCard = ({ story, mode = "read" }) => {
       >
         {story.title}
       </h3>
-      {story.authorName && (
-        <p
-          className="text-xs opacity-80 truncate"
-          style={{ color: colors.text }}
-        >
-          par {story.authorName}
-        </p>
-      )}
 
       {modal.open && (
         <div

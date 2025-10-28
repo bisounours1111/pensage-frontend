@@ -34,9 +34,6 @@ const CreateStoryPage = () => {
   const [storyTitle, setStoryTitle] = useState("");
   const [selectedGenre, setSelectedGenre] = useState("");
 
-  // État pour l'image de couverture
-  const [imageUrl, setImageUrl] = useState(null);
-
   const steps = [
     { title: "Pitch" },
     { title: "Synopsis" },
@@ -224,7 +221,6 @@ const CreateStoryPage = () => {
         synopsis: synopsis,
         characters: characters,
         genre: selectedGenre,
-        image_url: imageUrl,
         publish: false,
         is_over: false,
       };
@@ -348,11 +344,8 @@ const CreateStoryPage = () => {
               characters={characters}
               storyTitle={storyTitle}
               selectedGenre={selectedGenre}
-              imageUrl={imageUrl}
-              setImageUrl={setImageUrl}
               onPrevious={handlePrevious}
               onFinalize={handleFinalize}
-              loading={loading}
             />
           )}
         </div>

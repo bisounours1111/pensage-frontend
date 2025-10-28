@@ -118,8 +118,6 @@ export default function ShopPage() {
         setUserExtend(extendData);
 
         alert("Abonnement Premium activé (mode développement) !");
-
-        alert("Abonnement Premium activé (mode développement) !");
       } else {
         // Stripe est configuré - rediriger vers Stripe Checkout
         await redirectToStripeSubscription(sub, user.id);
@@ -207,12 +205,10 @@ export default function ShopPage() {
 
       const isPremium = extendData?.has_subscription || false;
       alert(
-        `${
-          isPremium
-            ? "Récompense Premium récupérée !"
-            : "Récompense hebdomadaire récupérée !"
-        }\n\n+${rewardAmount} points ont été ajoutés à votre compte.\nNouveau solde : ${
-          extendData?.token || 0
+        `${isPremium
+          ? "Récompense Premium récupérée !"
+          : "Récompense hebdomadaire récupérée !"
+        }\n\n+${rewardAmount} points ont été ajoutés à votre compte.\nNouveau solde : ${extendData?.token || 0
         } points`
       );
     } catch (error) {
