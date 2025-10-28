@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { getCurrentUser, getUserExtend } from '../../lib/supabase';
-import { webnovelsApi, historyApi } from '../../lib/supabaseApi';
-import StoryRow from '../../components/stories/StoryRow';
+import React, { useState, useEffect } from "react";
+import { getCurrentUser, getUserExtend } from "../../lib/supabase";
+import { webnovelsApi, historyApi } from "../../lib/supabaseApi";
+import StoryRow from "../../components/stories/StoryRow";
+import colors from "../../utils/constants/colors";
 
 const HomePage = () => {
   const [loading, setLoading] = useState(true);
@@ -22,7 +23,7 @@ const HomePage = () => {
       const currentUser = await getCurrentUser();
 
       if (!currentUser) {
-        setError('Vous devez être connecté');
+        setError("Vous devez être connecté");
         setLoading(false);
         return;
       }
@@ -38,7 +39,7 @@ const HomePage = () => {
 
       // Grouper par webnovel pour ne garder que le dernier épisode lu
       const historyMap = new Map();
-      history.forEach(entry => {
+      history.forEach((entry) => {
         const webnovelId = entry.webnovels?.id;
         if (webnovelId) {
           const existing = historyMap.get(webnovelId);
@@ -48,25 +49,25 @@ const HomePage = () => {
               webnovel: entry.webnovels,
               episode: entry.webnovels_episode,
               isOver: entry.is_over || false,
-              episodeId: entry.id_webnovels_episode
+              episodeId: entry.id_webnovels_episode,
             });
           }
         }
       });
 
       const formattedHistory = Array.from(historyMap.values())
-        .map(entry => ({
+        .map((entry) => ({
           id: entry.webnovel.id,
           historyId: entry.historyId,
-          title: entry.webnovel.title || 'Sans titre',
+          title: entry.webnovel.title || "Sans titre",
           cover: "https://via.placeholder.com/300x450",
-          category: entry.webnovel.genre || 'Non spécifié',
+          category: entry.webnovel.genre || "Non spécifié",
           progress: 0,
-          status: entry.webnovel.publish ? 'published' : 'draft',
+          status: entry.webnovel.publish ? "published" : "draft",
           isOver: entry.isOver,
           episodeNumber: entry.episode?.number || 1,
           episodeId: entry.episodeId,
-          ...entry.webnovel
+          ...entry.webnovel,
         }))
         .sort((a, b) => b.historyId - a.historyId);
 
@@ -74,35 +75,38 @@ const HomePage = () => {
 
       // Charger les tendances
       const trendingData = await webnovelsApi.getTrending(10);
-      const formattedTrending = trendingData.map(story => ({
+      const formattedTrending = trendingData.map((story) => ({
         id: story.id,
-        title: story.title || 'Sans titre',
+        title: story.title || "Sans titre",
         cover: "https://via.placeholder.com/300x450",
-        category: story.genre || 'Non spécifié',
+        category: story.genre || "Non spécifié",
         progress: 0,
-        status: story.publish ? 'published' : 'draft',
-        ...story
+        status: story.publish ? "published" : "draft",
+        ...story,
       }));
       setTrending(formattedTrending);
 
-      // Charger les recommandations basées sur les genres favoris
-      const favoriteGenres = extendData?.preferences?.genres || [];
-      const recommendationsData = await webnovelsApi.getRecommendations(favoriteGenres, 10);
-      const formattedRecommendations = recommendationsData.map(story => ({
+      // Charger les recommandations basées sur les genres préférés (champ unifié "genre")
+      const genres = extendData?.preferences?.genre || [];
+      const recommendationsData = await webnovelsApi.getRecommendations(
+        genres,
+        10
+      );
+      const formattedRecommendations = recommendationsData.map((story) => ({
         id: story.id,
-        title: story.title || 'Sans titre',
+        title: story.title || "Sans titre",
         cover: "https://via.placeholder.com/300x450",
-        category: story.genre || 'Non spécifié',
+        category: story.genre || "Non spécifié",
         progress: 0,
-        status: story.publish ? 'published' : 'draft',
-        ...story
+        status: story.publish ? "published" : "draft",
+        ...story,
       }));
       setRecommendations(formattedRecommendations);
 
       setError(null);
     } catch (err) {
-      console.error('Erreur lors du chargement de la page home:', err);
-      setError(err.message || 'Erreur lors du chargement');
+      console.error("Erreur lors du chargement de la page home:", err);
+      setError(err.message || "Erreur lors du chargement");
     } finally {
       setLoading(false);
     }
@@ -110,9 +114,16 @@ const HomePage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b" style={{ background: `linear-gradient(to bottom, var(--color-bg-gradient-from), var(--color-bg-gradient-via), var(--color-bg-gradient-to))` }}>
+      <div
+        className="min-h-screen bg-gradient-to-b"
+        style={{
+          background: `linear-gradient(to bottom, var(--color-bg-gradient-from), var(--color-bg-gradient-via), var(--color-bg-gradient-to))`,
+        }}
+      >
         <div className="flex justify-center items-center h-screen">
-          <div className="text-xl" style={{ color: 'var(--color-text)' }}>Chargement...</div>
+          <div className="text-xl" style={{ color: "var(--color-text)" }}>
+            Chargement...
+          </div>
         </div>
       </div>
     );
@@ -120,7 +131,12 @@ const HomePage = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-b" style={{ background: `linear-gradient(to bottom, var(--color-bg-gradient-from), var(--color-bg-gradient-via), var(--color-bg-gradient-to))` }}>
+      <div
+        className="min-h-screen bg-gradient-to-b"
+        style={{
+          background: `linear-gradient(to bottom, var(--color-bg-gradient-from), var(--color-bg-gradient-via), var(--color-bg-gradient-to))`,
+        }}
+      >
         <div className="p-6 md:p-12">
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
             {error}
@@ -131,13 +147,25 @@ const HomePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b pb-16" style={{ background: `linear-gradient(to bottom, var(--color-bg-gradient-from), var(--color-bg-gradient-via), var(--color-bg-gradient-to))` }}>
+    <div
+      className="min-h-screen bg-gradient-to-b pb-16"
+      style={{
+        background: `linear-gradient(to bottom, var(--color-bg-gradient-from), var(--color-bg-gradient-via), var(--color-bg-gradient-to))`,
+      }}
+    >
       {/* Header */}
       <header className="p-6 md:p-12">
-        <h1 className="text-4xl md:text-6xl font-bold mb-4" style={{ color: 'var(--color-text)' }}>
-          Bienvenue {userExtend?.name || user?.email?.split('@')[0] || 'Utilisateur'} !
+        <h1
+          className="text-4xl md:text-6xl font-bold mb-4"
+          style={{ color: "var(--color-text)" }}
+        >
+          Bienvenue{" "}
+          {userExtend?.name || user?.email?.split("@")[0] || "Utilisateur"} !
         </h1>
-        <p className="text-lg md:text-xl opacity-80" style={{ color: 'var(--color-text)' }}>
+        <p
+          className="text-lg md:text-xl opacity-80"
+          style={{ color: "var(--color-text)" }}
+        >
           Découvrez de nouvelles histoires passionnantes
         </p>
       </header>
@@ -154,43 +182,41 @@ const HomePage = () => {
 
         {/* Tendances */}
         {trending.length > 0 && (
-          <StoryRow
-            title="Tendances"
-            stories={trending}
-          />
+          <StoryRow title="Tendances" stories={trending} />
         )}
 
         {/* Recommandations */}
         {recommendations.length > 0 ? (
-          <StoryRow
-            title="Pour vous"
-            stories={recommendations}
-          />
+          <StoryRow title="Pour vous" stories={recommendations} />
         ) : (
           // Si aucune recommandation, afficher toutes les histoires publiées
           trending.length > 0 && (
-            <StoryRow
-              title="Toutes les histoires"
-              stories={trending}
-            />
+            <StoryRow title="Toutes les histoires" stories={trending} />
           )
         )}
 
         {/* Message si aucune histoire n'est disponible */}
-        {readingHistory.length === 0 && trending.length === 0 && recommendations.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-12">
-            <p className="text-xl mb-4" style={{ color: 'var(--color-text)' }}>
-              Aucune histoire disponible pour le moment
-            </p>
-            <p className="text-md opacity-75" style={{ color: 'var(--color-text)' }}>
-              Revenez bientôt pour découvrir de nouvelles histoires !
-            </p>
-          </div>
-        )}
+        {readingHistory.length === 0 &&
+          trending.length === 0 &&
+          recommendations.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-12">
+              <p
+                className="text-xl mb-4"
+                style={{ color: "var(--color-text)" }}
+              >
+                Aucune histoire disponible pour le moment
+              </p>
+              <p
+                className="text-md opacity-75"
+                style={{ color: "var(--color-text)" }}
+              >
+                Revenez bientôt pour découvrir de nouvelles histoires !
+              </p>
+            </div>
+          )}
       </div>
     </div>
   );
 };
 
 export default HomePage;
-

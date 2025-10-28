@@ -1,12 +1,22 @@
 import React from "react";
+import { MdArrowBack, MdArrowForward } from "react-icons/md";
 import colors from "../../utils/constants/colors";
 import { genresList } from "../../utils/constants/genres";
 
-const TitleGenreStep = ({ pitch, synopsis, storyTitle, setStoryTitle, selectedGenre, setSelectedGenre, onNext, onPrevious }) => {
+const TitleGenreStep = ({
+  pitch,
+  synopsis,
+  storyTitle,
+  setStoryTitle,
+  selectedGenre,
+  setSelectedGenre,
+  onNext,
+  onPrevious,
+}) => {
   const [error, setError] = React.useState(null);
-  
+
   // Obtenir la liste des noms de genres uniques
-  const genres = [...new Set(genresList.map(g => g.name))];
+  const genres = [...new Set(genresList.map((g) => g.name))];
 
   const handleNext = () => {
     if (!storyTitle.trim()) {
@@ -38,10 +48,7 @@ const TitleGenreStep = ({ pitch, synopsis, storyTitle, setStoryTitle, selectedGe
           >
             Pitch
           </h3>
-          <p
-            className="text-sm line-clamp-2"
-            style={{ color: colors.white }}
-          >
+          <p className="text-sm line-clamp-2" style={{ color: colors.white }}>
             {pitch}
           </p>
         </div>
@@ -59,10 +66,7 @@ const TitleGenreStep = ({ pitch, synopsis, storyTitle, setStoryTitle, selectedGe
           >
             Synopsis
           </h3>
-          <p
-            className="text-sm line-clamp-2"
-            style={{ color: colors.white }}
-          >
+          <p className="text-sm line-clamp-2" style={{ color: colors.white }}>
             {synopsis.substring(0, 100)}...
           </p>
         </div>
@@ -83,21 +87,15 @@ const TitleGenreStep = ({ pitch, synopsis, storyTitle, setStoryTitle, selectedGe
 
       <div
         className="p-8 rounded-xl shadow-lg"
-        style={{ 
+        style={{
           backgroundColor: colors.white,
-          border: `4px solid ${colors.primaryLight}`
+          border: `4px solid ${colors.primaryLight}`,
         }}
       >
-        <h2
-          className="text-3xl font-bold mb-4"
-          style={{ color: colors.text }}
-        >
+        <h2 className="text-3xl font-bold mb-4" style={{ color: colors.text }}>
           Titre de votre histoire
         </h2>
-        <p
-          className="mb-6 text-lg"
-          style={{ color: colors.textSecondary }}
-        >
+        <p className="mb-6 text-lg" style={{ color: colors.textSecondary }}>
           Choisissez un titre accrocheur pour votre histoire
         </p>
 
@@ -118,21 +116,15 @@ const TitleGenreStep = ({ pitch, synopsis, storyTitle, setStoryTitle, selectedGe
 
       <div
         className="p-8 rounded-xl shadow-lg"
-        style={{ 
+        style={{
           backgroundColor: colors.white,
-          border: `4px solid ${colors.primaryLight}`
+          border: `4px solid ${colors.primaryLight}`,
         }}
       >
-        <h2
-          className="text-3xl font-bold mb-4"
-          style={{ color: colors.text }}
-        >
+        <h2 className="text-3xl font-bold mb-4" style={{ color: colors.text }}>
           Choisissez le genre de votre histoire
         </h2>
-        <p
-          className="mb-6 text-lg"
-          style={{ color: colors.textSecondary }}
-        >
+        <p className="mb-6 text-lg" style={{ color: colors.textSecondary }}>
           Sélectionnez le genre principal de votre histoire
         </p>
 
@@ -142,10 +134,11 @@ const TitleGenreStep = ({ pitch, synopsis, storyTitle, setStoryTitle, selectedGe
               key={genre}
               onClick={() => setSelectedGenre(genre)}
               className={`p-4 rounded-xl font-semibold transition-all hover:scale-105 border-4 ${
-                selectedGenre === genre ? 'shadow-lg' : 'shadow-md'
+                selectedGenre === genre ? "shadow-lg" : "shadow-md"
               }`}
               style={{
-                backgroundColor: selectedGenre === genre ? colors.primary : colors.white,
+                backgroundColor:
+                  selectedGenre === genre ? colors.primary : colors.white,
                 color: selectedGenre === genre ? colors.white : colors.text,
                 borderColor: colors.primary,
               }}
@@ -166,18 +159,22 @@ const TitleGenreStep = ({ pitch, synopsis, storyTitle, setStoryTitle, selectedGe
           }}
           onClick={onPrevious}
         >
-          ← Retour
+          <span className="inline-flex items-center gap-2">
+            <MdArrowBack /> Retour
+          </span>
         </button>
         <button
           className="flex-1 px-8 py-4 rounded-xl font-bold text-lg text-white transition-all hover:scale-105 disabled:opacity-50 shadow-lg"
-          style={{ 
+          style={{
             backgroundColor: colors.primary,
-            border: `4px solid ${colors.primary}`
+            border: `4px solid ${colors.primary}`,
           }}
           onClick={handleNext}
           disabled={!storyTitle.trim() || !selectedGenre}
         >
-          Finaliser →
+          <span className="inline-flex items-center gap-2">
+            Finaliser <MdArrowForward />
+          </span>
         </button>
       </div>
     </div>
@@ -185,4 +182,3 @@ const TitleGenreStep = ({ pitch, synopsis, storyTitle, setStoryTitle, selectedGe
 };
 
 export default TitleGenreStep;
-

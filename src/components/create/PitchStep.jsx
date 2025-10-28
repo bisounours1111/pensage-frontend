@@ -1,4 +1,10 @@
 import React, { useState } from "react";
+import {
+  MdAutoAwesome,
+  MdHourglassTop,
+  MdArrowForward,
+  MdLightbulb,
+} from "react-icons/md";
 import colors from "../../utils/constants/colors";
 
 const PitchStep = ({ pitch, setPitch, loading, onGeneratePitch, onNext }) => {
@@ -59,11 +65,9 @@ const PitchStep = ({ pitch, setPitch, loading, onGeneratePitch, onNext }) => {
           >
             Créez votre pitch
           </h2>
-          <p
-            className="text-xl"
-            style={{ color: colors.textSecondary }}
-          >
-            Écrivez votre pitch ou inspirez-vous de suggestions générées par l'IA
+          <p className="text-xl" style={{ color: colors.textSecondary }}>
+            Écrivez votre pitch ou inspirez-vous de suggestions générées par
+            l'IA
           </p>
         </div>
 
@@ -83,8 +87,11 @@ const PitchStep = ({ pitch, setPitch, loading, onGeneratePitch, onNext }) => {
         />
 
         <div className="mt-4 flex items-center justify-between gap-4">
-          <p className="text-sm" style={{ color: colors.textSecondary }}>
-            💡 Besoin d'aide ? Laissez l'IA générer des suggestions
+          <p
+            className="text-sm inline-flex items-center gap-2"
+            style={{ color: colors.textSecondary }}
+          >
+            <MdLightbulb /> Besoin d'aide ? Laissez l'IA générer des suggestions
           </p>
           <button
             className="px-6 py-3 rounded-xl font-semibold text-white transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
@@ -92,7 +99,15 @@ const PitchStep = ({ pitch, setPitch, loading, onGeneratePitch, onNext }) => {
             onClick={handleGeneratePitchOptions}
             disabled={loading || !pitch.trim()}
           >
-            {loading ? "⏳ Génération..." : "✨ Suggestions IA"}
+            {loading ? (
+              <span className="inline-flex items-center gap-2">
+                <MdHourglassTop /> Génération...
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-2">
+                <MdAutoAwesome /> Suggestions IA (5 tokens)
+              </span>
+            )}
           </button>
         </div>
 
@@ -111,10 +126,7 @@ const PitchStep = ({ pitch, setPitch, loading, onGeneratePitch, onNext }) => {
             >
               L'IA génère vos pitchs...
             </p>
-            <p
-              className="text-sm mt-2"
-              style={{ color: colors.textSecondary }}
-            >
+            <p className="text-sm mt-2" style={{ color: colors.textSecondary }}>
               Cela peut prendre quelques secondes
             </p>
           </div>
@@ -145,10 +157,7 @@ const PitchStep = ({ pitch, setPitch, loading, onGeneratePitch, onNext }) => {
               color: colors.white,
             }}
           >
-            <p
-              className="font-bold text-2xl"
-              style={{ color: colors.white }}
-            >
+            <p className="font-bold text-2xl" style={{ color: colors.white }}>
               {pitchOptions.length} pitchs générés avec succès
             </p>
             <p className="mt-2 text-lg" style={{ color: colors.white }}>
@@ -201,7 +210,10 @@ const PitchStep = ({ pitch, setPitch, loading, onGeneratePitch, onNext }) => {
           <button
             className="w-full px-8 py-6 rounded-xl font-bold text-xl text-white transition-all hover:scale-105 disabled:opacity-50 shadow-xl"
             style={{ backgroundColor: colors.primaryLight }}
-            onClick={() => { setShowAIOptions(false); setPitchOptions([]); }}
+            onClick={() => {
+              setShowAIOptions(false);
+              setPitchOptions([]);
+            }}
           >
             Annuler les suggestions
           </button>
@@ -215,7 +227,9 @@ const PitchStep = ({ pitch, setPitch, loading, onGeneratePitch, onNext }) => {
           onClick={handleNext}
           disabled={!pitch.trim() || loading}
         >
-          Continuer vers le synopsis →
+          <span className="inline-flex items-center gap-2">
+            Continuer vers le synopsis <MdArrowForward />
+          </span>
         </button>
       </div>
     </div>
@@ -223,4 +237,3 @@ const PitchStep = ({ pitch, setPitch, loading, onGeneratePitch, onNext }) => {
 };
 
 export default PitchStep;
-

@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { MdAutoAwesome, MdHourglassTop, MdLightbulb } from "react-icons/md";
 import colors from "../../utils/constants/colors";
 import TextEditor from "../ui/TextEditor";
 import storyApi from "../../utils/api/storyApi";
+import { getCurrentUser } from "../../lib/supabase";
+import { pointsApi } from "../../lib/supabaseApi";
 
 const CreateEpisodeForm = ({
   webnovel,
@@ -15,8 +18,8 @@ const CreateEpisodeForm = ({
   const [content, setContent] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [selectionMode, setSelectionMode] = useState(false);
-  const [selectedText, setSelectedText] = useState("");
+  const [userId, setUserId] = useState(null);
+  const [points, setPoints] = useState(null);
 
   useEffect(() => {
     if (editingEpisode) {
@@ -25,13 +28,29 @@ const CreateEpisodeForm = ({
       setContent(editingEpisode.content || "");
     } else {
       // Mode création - calculer le prochain numéro d'épisode
-      const nextNumber = episodes.length > 0 
-        ? Math.max(...episodes.map(ep => ep.number)) + 1 
-        : 1;
+      const nextNumber =
+        episodes.length > 0
+          ? Math.max(...episodes.map((ep) => ep.number)) + 1
+          : 1;
       setEpisodeNumber(nextNumber);
       setContent("");
     }
   }, [editingEpisode, episodes]);
+
+  useEffect(() => {
+    (async () => {
+      const user = await getCurrentUser();
+      if (user) {
+        setUserId(user.id);
+        try {
+          const balance = await pointsApi.getBalance(user.id);
+          setPoints(balance);
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    })();
+  }, []);
 
   const handleGenerateEpisode = async () => {
     if (!webnovel) return;
@@ -44,13 +63,13 @@ const CreateEpisodeForm = ({
       const pitch = webnovel.pitch || "";
       const synopsis = webnovel.synopsis || "";
       const personnages = JSON.stringify(webnovel.characters || []);
-      
+
       // Récupérer le contenu des 3 derniers épisodes pour le contexte
       const recentEpisodes = episodes
         .sort((a, b) => b.number - a.number)
         .slice(0, 3)
-        .map(ep => ep.content)
-        .filter(c => c && c.trim());
+        .map((ep) => ep.content)
+        .filter((c) => c && c.trim());
 
       // Générer le nouvel épisode avec l'IA
       const result = await storyApi.generateEpisode(
@@ -62,6 +81,20 @@ const CreateEpisodeForm = ({
       );
 
       setContent(result.episode_content);
+
+      // Débit 15 points par génération d'épisode
+      if (userId) {
+        try {
+          const newBalance = await pointsApi.debit(userId, 15);
+          setPoints(newBalance);
+        } catch (e) {
+          if (e?.code === "INSUFFICIENT_FUNDS") {
+            alert("Solde insuffisant (15 tokens requis)");
+          } else {
+            console.error(e);
+          }
+        }
+      }
     } catch (err) {
       console.error("Erreur lors de la génération:", err);
       setError(err.message || "Erreur lors de la génération de l'épisode");
@@ -82,18 +115,6 @@ const CreateEpisodeForm = ({
     });
   };
 
-  const handleTextSelection = () => {
-    const selection = window.getSelection();
-    const selected = selection.toString().trim();
-
-    if (selected.length > 0) {
-      setSelectedText(selected);
-      setSelectionMode(true);
-    } else {
-      setSelectionMode(false);
-    }
-  };
-
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -104,15 +125,12 @@ const CreateEpisodeForm = ({
           border: `4px solid ${colors.primary}`,
         }}
       >
-        <h2
-          className="text-3xl font-bold mb-4"
-          style={{ color: colors.text }}
-        >
+        <h2 className="text-3xl font-bold mb-4" style={{ color: colors.text }}>
           {editingEpisode ? "Modifier l'Épisode" : "Créer un Nouvel Épisode"}
         </h2>
         <p style={{ color: colors.textSecondary }}>
-          {editingEpisode 
-            ? "Modifiez le contenu de l'épisode avec l'aide de l'IA" 
+          {editingEpisode
+            ? "Modifiez le contenu de l'épisode avec l'aide de l'IA"
             : "Remplissez manuellement ou laissez l'IA générer le contenu"}
         </p>
       </div>
@@ -146,9 +164,16 @@ const CreateEpisodeForm = ({
           >
             Contexte
           </h3>
-          <div className="space-y-2 text-sm" style={{ color: colors.textSecondary }}>
-            <p><strong>Pitch:</strong> {webnovel.pitch}</p>
-            <p><strong>Synopsis:</strong> {webnovel.synopsis}</p>
+          <div
+            className="space-y-2 text-sm"
+            style={{ color: colors.textSecondary }}
+          >
+            <p>
+              <strong>Pitch:</strong> {webnovel.pitch}
+            </p>
+            <p>
+              <strong>Synopsis:</strong> {webnovel.synopsis}
+            </p>
           </div>
         </div>
       )}
@@ -198,6 +223,17 @@ const CreateEpisodeForm = ({
           >
             Contenu de l'épisode
           </label>
+          {points !== null && (
+            <span
+              className="px-3 py-1 rounded-lg font-semibold text-sm"
+              style={{
+                backgroundColor: colors.whiteTransparent,
+                color: colors.text,
+              }}
+            >
+              {points} tokens
+            </span>
+          )}
           {!editingEpisode && (
             <button
               className="px-4 py-2 rounded-lg font-semibold text-white transition-all hover:scale-105 disabled:opacity-50"
@@ -205,7 +241,15 @@ const CreateEpisodeForm = ({
               onClick={handleGenerateEpisode}
               disabled={aiLoading}
             >
-              {aiLoading ? "⏳ Génération..." : "✨ Générer avec l'IA"}
+              {aiLoading ? (
+                <span className="inline-flex items-center gap-2">
+                  <MdHourglassTop /> Génération...
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-2">
+                  <MdAutoAwesome /> Générer avec l'IA (15 tokens)
+                </span>
+              )}
             </button>
           )}
         </div>
@@ -225,10 +269,7 @@ const CreateEpisodeForm = ({
             >
               Génération de l'épisode en cours...
             </p>
-            <p
-              className="text-sm mt-2"
-              style={{ color: colors.textSecondary }}
-            >
+            <p className="text-sm mt-2" style={{ color: colors.textSecondary }}>
               Cela peut prendre 1-2 minutes
             </p>
           </div>
@@ -240,8 +281,12 @@ const CreateEpisodeForm = ({
           placeholder="Écrivez ou générez le contenu de l'épisode ici. Vous pouvez surligner du texte pour le corriger ou le reformuler."
         />
 
-        <p className="mt-3 text-sm" style={{ color: colors.textSecondary }}>
-          💡 Astuce : Surlignez une partie du texte pour la corriger ou la reformuler avec l'IA
+        <p
+          className="mt-3 text-sm inline-flex items-center gap-2"
+          style={{ color: colors.textSecondary }}
+        >
+          <MdLightbulb /> Astuce : Surlignez une partie du texte pour la
+          corriger ou la reformuler avec l'IA
         </p>
       </div>
 
@@ -272,4 +317,3 @@ const CreateEpisodeForm = ({
 };
 
 export default CreateEpisodeForm;
-

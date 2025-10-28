@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { MdWarning, MdCelebration, MdAutoAwesome } from "react-icons/md";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import colors from "../../utils/constants/colors";
 import { getCurrentUser } from "../../lib/supabase";
@@ -22,23 +23,25 @@ export default function PaymentSuccessPage() {
 
       try {
         // Vérifier le statut du paiement côté serveur
-        const response = await fetch(`${STRIPE_CONFIG.backendUrl}/stripe/verify-session/${sessionId}`);
-        
+        const response = await fetch(
+          `${STRIPE_CONFIG.backendUrl}/stripe/verify-session/${sessionId}`
+        );
+
         if (!response.ok) {
-          throw new Error('Erreur lors de la vérification du paiement');
+          throw new Error("Erreur lors de la vérification du paiement");
         }
 
         const data = await response.json();
-        
+
         // Vérifier que le paiement est validé
         if (!data.paid) {
-          throw new Error('Paiement non validé');
+          throw new Error("Paiement non validé");
         }
 
         // Mettre à jour les données utilisateur
         const user = await getCurrentUser();
         if (!user) {
-          throw new Error('Utilisateur non connecté');
+          throw new Error("Utilisateur non connecté");
         }
 
         if (data.metadata) {
@@ -46,30 +49,30 @@ export default function PaymentSuccessPage() {
           setPaymentType(type);
 
           // Importer l'API Supabase pour activer l'abonnement/ajouter les tokens
-          const { userExtendApi } = await import('../../lib/supabaseApi');
-          
-          if (type === 'subscription') {
+          const { userExtendApi } = await import("../../lib/supabaseApi");
+
+          if (type === "subscription") {
             // Activer l'abonnement Premium
             await userExtendApi.update(user.id, {
-              has_subscription: true
+              has_subscription: true,
             });
-            console.log('✅ Abonnement Premium activé');
-          } else if (type === 'token_pack') {
+            console.log("✅ Abonnement Premium activé");
+          } else if (type === "token_pack") {
             // Ajouter les tokens
             const token_amount = parseInt(data.metadata.token_amount || 0);
             if (token_amount > 0) {
               const currentData = await userExtendApi.get(user.id);
               const newTokenAmount = (currentData.token || 0) + token_amount;
-              
+
               await userExtendApi.update(user.id, {
-                token: newTokenAmount
+                token: newTokenAmount,
               });
               console.log(`✅ ${token_amount} tokens ajoutés`);
             }
           }
         }
       } catch (err) {
-        console.error('Erreur lors de la vérification:', err);
+        console.error("Erreur lors de la vérification:", err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -117,8 +120,13 @@ export default function PaymentSuccessPage() {
             border: `4px solid ${colors.primary}`,
           }}
         >
-          <div className="mb-6 text-6xl">⚠️</div>
-          <h1 className="text-3xl font-bold mb-4" style={{ color: colors.text }}>
+          <div className="mb-6 text-6xl">
+            <MdWarning />
+          </div>
+          <h1
+            className="text-3xl font-bold mb-4"
+            style={{ color: colors.text }}
+          >
             Erreur
           </h1>
           <p className="text-lg mb-6" style={{ color: colors.textSecondary }}>
@@ -151,16 +159,19 @@ export default function PaymentSuccessPage() {
         }}
       >
         <div className="mb-6 text-6xl">
-          {paymentType === 'subscription' ? '✨' : '🎉'}
+          {paymentType === "subscription" ? (
+            <MdAutoAwesome />
+          ) : (
+            <MdCelebration />
+          )}
         </div>
-        <h1
-          className="text-3xl font-bold mb-4"
-          style={{ color: colors.text }}
-        >
-          {paymentType === 'subscription' ? 'Abonnement Premium activé !' : 'Paiement réussi !'}
+        <h1 className="text-3xl font-bold mb-4" style={{ color: colors.text }}>
+          {paymentType === "subscription"
+            ? "Abonnement Premium activé !"
+            : "Paiement réussi !"}
         </h1>
         <p className="text-lg mb-6" style={{ color: colors.textSecondary }}>
-          {paymentType === 'subscription' ? (
+          {paymentType === "subscription" ? (
             <>
               Votre abonnement Premium a été activé avec succès.
               <br />
