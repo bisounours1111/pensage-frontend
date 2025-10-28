@@ -525,11 +525,17 @@ const ProfilePage = () => {
                   }
                 >
                   <div className="relative overflow-hidden rounded-lg bg-white/30 backdrop-blur-sm shadow-lg aspect-[2/3] mb-2 border border-white/40">
-                    <img
-                      src={webnovel.cover}
-                      alt={webnovel.title}
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                    />
+                    {webnovel.image_url ? (
+                      <img
+                        src={webnovel.image_url}
+                        alt={webnovel.title}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-400 via-pink-500 to-red-500">
+                        <span className="text-white text-4xl">📚</span>
+                      </div>
+                    )}
                     <div
                       className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"
                       style={{ backgroundColor: colors.overlay }}
