@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { MdClose } from "react-icons/md";
 import colors from "../../utils/constants/colors";
 import storyApi from "../../utils/api/storyApi";
 import { getCurrentUser } from "../../lib/supabase";
@@ -226,7 +227,7 @@ const TextEditor = ({
               window.getSelection().removeAllRanges();
             }}
           >
-            ×
+            <MdClose size={16} />
           </button>
         </div>
       )}

@@ -1,4 +1,10 @@
 import React from "react";
+import {
+  MdAutoAwesome,
+  MdLockOpen,
+  MdAccessTime,
+  MdCardGiftcard,
+} from "react-icons/md";
 import colors from "../../utils/constants/colors";
 
 export default function PointsBalanceCard({
@@ -33,8 +39,16 @@ export default function PointsBalanceCard({
             style={{ color: colors.text }}
           >
             Votre statut :{" "}
-            <span className="font-bold">
-              {isPremium ? "Compte Premium ✨" : "Compte Gratuit 🔓"}
+            <span className="font-bold inline-flex items-center gap-2">
+              {isPremium ? (
+                <>
+                  <MdAutoAwesome /> Compte Premium
+                </>
+              ) : (
+                <>
+                  <MdLockOpen /> Compte Gratuit
+                </>
+              )}
             </span>
           </p>
 
@@ -68,9 +82,13 @@ export default function PointsBalanceCard({
             }}
           >
             {canClaimWeekly ? (
-              <>🎁 +{weeklyRewardAmount} tokens hebdo</>
+              <span className="inline-flex items-center gap-2">
+                <MdCardGiftcard /> +{weeklyRewardAmount} tokens hebdo
+              </span>
             ) : (
-              <>⏰ +{weeklyRewardAmount} tokens (déjà utilisé)</>
+              <span className="inline-flex items-center gap-2">
+                <MdAccessTime /> +{weeklyRewardAmount} tokens (déjà utilisé)
+              </span>
             )}
           </button>
           <button

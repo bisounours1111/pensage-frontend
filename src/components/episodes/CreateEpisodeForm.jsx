@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { MdAutoAwesome, MdHourglassTop, MdLightbulb } from "react-icons/md";
 import colors from "../../utils/constants/colors";
 import TextEditor from "../ui/TextEditor";
 import storyApi from "../../utils/api/storyApi";
@@ -240,9 +241,15 @@ const CreateEpisodeForm = ({
               onClick={handleGenerateEpisode}
               disabled={aiLoading}
             >
-              {aiLoading
-                ? "⏳ Génération..."
-                : "✨ Générer avec l'IA (15 tokens)"}
+              {aiLoading ? (
+                <span className="inline-flex items-center gap-2">
+                  <MdHourglassTop /> Génération...
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-2">
+                  <MdAutoAwesome /> Générer avec l'IA (15 tokens)
+                </span>
+              )}
             </button>
           )}
         </div>
@@ -274,9 +281,12 @@ const CreateEpisodeForm = ({
           placeholder="Écrivez ou générez le contenu de l'épisode ici. Vous pouvez surligner du texte pour le corriger ou le reformuler."
         />
 
-        <p className="mt-3 text-sm" style={{ color: colors.textSecondary }}>
-          💡 Astuce : Surlignez une partie du texte pour la corriger ou la
-          reformuler avec l'IA
+        <p
+          className="mt-3 text-sm inline-flex items-center gap-2"
+          style={{ color: colors.textSecondary }}
+        >
+          <MdLightbulb /> Astuce : Surlignez une partie du texte pour la
+          corriger ou la reformuler avec l'IA
         </p>
       </div>
 

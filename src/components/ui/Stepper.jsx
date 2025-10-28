@@ -1,4 +1,5 @@
 import React from "react";
+import { MdCheck } from "react-icons/md";
 import colors from "../../utils/constants/colors";
 
 const Stepper = ({ steps, currentStep }) => {
@@ -14,9 +15,10 @@ const Stepper = ({ steps, currentStep }) => {
             className="h-full transition-all duration-500"
             style={{
               backgroundColor: colors.primary,
-              width: currentStep === steps.length 
-                ? '100%' 
-                : `${((currentStep - 0.5) / steps.length) * 100}%`,
+              width:
+                currentStep === steps.length
+                  ? "100%"
+                  : `${((currentStep - 0.5) / steps.length) * 100}%`,
             }}
           />
         </div>
@@ -50,7 +52,7 @@ const Stepper = ({ steps, currentStep }) => {
                   boxShadow: isActive ? `0 0 20px ${colors.primary}` : "none",
                 }}
               >
-                {isCompleted ? "✓" : stepNumber}
+                {isCompleted ? <MdCheck /> : stepNumber}
               </div>
 
               {/* Nom de l'étape */}

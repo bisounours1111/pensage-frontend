@@ -1,4 +1,10 @@
 import React from "react";
+import {
+  MdArrowBack,
+  MdArrowForward,
+  MdAutoAwesome,
+  MdHourglassTop,
+} from "react-icons/md";
 import colors from "../../utils/constants/colors";
 
 const SynopsisStep = ({
@@ -96,7 +102,15 @@ const SynopsisStep = ({
             onClick={handleGenerate}
             disabled={loading}
           >
-            {loading ? "⏳ Génération..." : "✨ Générer avec l'IA (5 tokens)"}
+            {loading ? (
+              <span className="inline-flex items-center gap-2">
+                <MdHourglassTop /> Génération...
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-2">
+                <MdAutoAwesome /> Générer avec l'IA (5 tokens)
+              </span>
+            )}
           </button>
         </div>
 
@@ -129,7 +143,9 @@ const SynopsisStep = ({
           }}
           onClick={onPrevious}
         >
-          ← Retour
+          <span className="inline-flex items-center gap-2">
+            <MdArrowBack /> Retour
+          </span>
         </button>
         <button
           className="flex-1 px-8 py-4 rounded-xl font-bold text-lg text-white transition-all hover:scale-105 disabled:opacity-50 shadow-lg"
@@ -140,7 +156,9 @@ const SynopsisStep = ({
           onClick={handleNext}
           disabled={!synopsis.trim() || loading}
         >
-          Continuer vers les personnages →
+          <span className="inline-flex items-center gap-2">
+            Continuer vers les personnages <MdArrowForward />
+          </span>
         </button>
       </div>
     </div>
