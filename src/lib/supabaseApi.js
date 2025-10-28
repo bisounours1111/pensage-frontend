@@ -34,8 +34,8 @@ export const webnovelsApi = {
     return data;
   },
 
-  // Récupérer les recommandations basées sur les genres favoris
-  getRecommendations: async (favoriteGenres = [], limit = 10) => {
+  // Récupérer les recommandations basées sur le champ unifié "genre"
+  getRecommendations: async (genres = [], limit = 10) => {
     const { data, error } = await supabase
       .from("webnovels")
       .select("*")
@@ -43,12 +43,12 @@ export const webnovelsApi = {
 
     if (error) throw error;
 
-    // Filtrer les webnovels par genres favoris
-    if (favoriteGenres.length > 0) {
+    // Filtrer les webnovels par genres préférés
+    if (genres.length > 0) {
       return data
         .filter((webnovel) => {
           const storyGenre = webnovel.genre?.toLowerCase();
-          return favoriteGenres.some(
+          return genres.some(
             (genre) =>
               genre.toLowerCase() === storyGenre ||
               storyGenre?.includes(genre.toLowerCase()) ||

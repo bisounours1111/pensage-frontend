@@ -42,7 +42,8 @@ const ProfilePage = () => {
       setLikedWebnovels(liked);
 
       // Convertir les anciens noms de genres en IDs si nécessaire
-      let genres = extendData?.preferences?.genres || [];
+      let genres =
+        extendData?.preferences?.genre || extendData?.preferences?.genres || [];
       genres = genres.map((genre) => {
         // Si c'est déjà un ID valide, le garder
         const genreById = genresList.find((g) => g.id === genre);
@@ -63,7 +64,7 @@ const ProfilePage = () => {
         age: extendData?.age || "",
         preferences: {
           ...extendData?.preferences,
-          genres: genres,
+          genre: genres,
         },
       });
     } catch (error) {
@@ -107,7 +108,7 @@ const ProfilePage = () => {
   };
 
   const handleGenreToggle = (genreId) => {
-    const currentGenres = editForm.preferences.genres || [];
+    const currentGenres = editForm.preferences.genre || [];
     const isSelected = currentGenres.includes(genreId);
     const canSelectMore = currentGenres.length < maxGenreSelection;
 
@@ -116,7 +117,7 @@ const ProfilePage = () => {
       const newGenres = currentGenres.filter((g) => g !== genreId);
       setEditForm({
         ...editForm,
-        preferences: { ...editForm.preferences, genres: newGenres },
+        preferences: { ...editForm.preferences, genre: newGenres },
       });
     }
     // Sinon, on sélectionne si on n'a pas atteint la limite
@@ -125,7 +126,7 @@ const ProfilePage = () => {
         ...editForm,
         preferences: {
           ...editForm.preferences,
-          genres: [...currentGenres, genreId],
+          genre: [...currentGenres, genreId],
         },
       });
     }
@@ -143,8 +144,10 @@ const ProfilePage = () => {
   };
 
   const getFavoritesGenres = () => {
-    if (userExtend?.preferences?.genres) {
-      const genres = userExtend.preferences.genres;
+    const prefGenres =
+      userExtend?.preferences?.genre || userExtend?.preferences?.genres;
+    if (prefGenres) {
+      const genres = prefGenres;
       if (Array.isArray(genres) && genres.length > 0) {
         // Convertir les IDs en noms
         const genreNames = genres.map((genreId) => {
@@ -342,9 +345,9 @@ const ProfilePage = () => {
                   Choisissez jusqu'à {maxGenreSelection} genres que vous aimez
                   lire
                 </p>
-                {editForm.preferences.genres?.length > 0 && (
+                {editForm.preferences.genre?.length > 0 && (
                   <p className="text-xs mb-3" style={{ color: colors.primary }}>
-                    {editForm.preferences.genres.length}/{maxGenreSelection}{" "}
+                    {editForm.preferences.genre.length}/{maxGenreSelection}{" "}
                     sélectionnés
                   </p>
                 )}
@@ -361,9 +364,9 @@ const ProfilePage = () => {
                         <div className="flex flex-wrap gap-2">
                           {genres.map((genre) => {
                             const selected =
-                              editForm.preferences.genres?.includes(genre.id);
+                              editForm.preferences.genre?.includes(genre.id);
                             const canSelectMore =
-                              (editForm.preferences.genres?.length || 0) <
+                              (editForm.preferences.genre?.length || 0) <
                               maxGenreSelection;
                             const selectable = !selected && canSelectMore;
 
@@ -405,14 +408,13 @@ const ProfilePage = () => {
                     )
                   )}
                 </div>
-                {(!editForm.preferences.genres?.length ||
-                  editForm.preferences.genres?.length ===
-                    maxGenreSelection) && (
+                {(!editForm.preferences.genre?.length ||
+                  editForm.preferences.genre?.length === maxGenreSelection) && (
                   <div
                     className="text-center mt-4 text-sm"
                     style={{ color: colors.primary }}
                   >
-                    {editForm.preferences.genres?.length ===
+                    {editForm.preferences.genre?.length ===
                     maxGenreSelection ? (
                       <span className="inline-flex items-center gap-1">
                         <MdCheck /> Maximum atteint ! Désélectionnez un genre

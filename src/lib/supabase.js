@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 
 // Variables d'environnement
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -7,7 +7,7 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 // Vérification des variables d'environnement
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error(
-    'Variables d\'environnement Supabase manquantes. Vérifiez votre fichier .env'
+    "Variables d'environnement Supabase manquantes. Vérifiez votre fichier .env"
   );
 }
 
@@ -16,8 +16,8 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: true
-  }
+    detectSessionInUrl: true,
+  },
 });
 
 // ========================================
@@ -28,13 +28,16 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
  * Récupère l'utilisateur connecté
  */
 export const getCurrentUser = async () => {
-  const { data: { user }, error } = await supabase.auth.getUser();
-  
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
   if (error) {
-    console.error('Erreur lors de la récupération de l\'utilisateur:', error);
+    console.error("Erreur lors de la récupération de l'utilisateur:", error);
     return null;
   }
-  
+
   return user;
 };
 
@@ -43,16 +46,19 @@ export const getCurrentUser = async () => {
  */
 export const getUserExtend = async (userId) => {
   const { data, error } = await supabase
-    .from('user_extend')
-    .select('*')
-    .eq('id', userId)
+    .from("user_extend")
+    .select("*")
+    .eq("id", userId)
     .single();
-  
+
   if (error) {
-    console.error('Erreur lors de la récupération des données utilisateur:', error);
+    console.error(
+      "Erreur lors de la récupération des données utilisateur:",
+      error
+    );
     return null;
   }
-  
+
   return data;
 };
 
@@ -61,16 +67,16 @@ export const getUserExtend = async (userId) => {
  */
 export const getFullUser = async () => {
   const user = await getCurrentUser();
-  
+
   if (!user) {
     return null;
   }
-  
+
   const userExtend = await getUserExtend(user.id);
-  
+
   return {
     ...user,
-    ...userExtend
+    ...userExtend,
   };
 };
 
@@ -85,9 +91,9 @@ export const signUp = async (email, password, userData) => {
       data: {
         username: userData.username,
         name: userData.name,
-        lastname: userData.lastname
-      }
-    }
+        lastname: userData.lastname,
+      },
+    },
   });
 
   if (authError) {
@@ -96,13 +102,13 @@ export const signUp = async (email, password, userData) => {
 
   // Créer l'entrée dans user_extend
   if (authData.user) {
-    // Préparer les préférences avec les genres
+    // Préparer les préférences avec le champ unifié "genre"
     const preferences = {
-      favoriteGenres: userData.favoriteGenres || []
+      genre: userData.genre || [],
     };
 
     const { error: userExtendError } = await supabase
-      .from('user_extend')
+      .from("user_extend")
       .insert({
         id: authData.user.id,
         username: userData.username,
@@ -112,11 +118,14 @@ export const signUp = async (email, password, userData) => {
         token: 0,
         age: userData.age,
         has_subscription: false,
-        xp: 0
+        xp: 0,
       });
 
     if (userExtendError) {
-      console.error('Erreur lors de la création de user_extend:', userExtendError);
+      console.error(
+        "Erreur lors de la création de user_extend:",
+        userExtendError
+      );
       throw userExtendError;
     }
   }
@@ -130,7 +139,7 @@ export const signUp = async (email, password, userData) => {
 export const signIn = async (email, password) => {
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
-    password
+    password,
   });
 
   if (error) {
@@ -145,11 +154,11 @@ export const signIn = async (email, password) => {
  */
 export const signOut = async () => {
   const { error } = await supabase.auth.signOut();
-  
+
   if (error) {
     throw error;
   }
-  
+
   return true;
 };
 
@@ -161,4 +170,3 @@ export const onAuthStateChange = (callback) => {
 };
 
 export default supabase;
-
