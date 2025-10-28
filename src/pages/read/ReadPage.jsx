@@ -130,15 +130,15 @@ const ReadPage = () => {
     setCurrentPage(0);
 
     // Remonter en haut quand on change d'épisode
-    setTimeout(() => {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }, 100);
+    // setTimeout(() => {
+    //   window.scrollTo({ top: 0, behavior: "smooth" });
+    // }, 100);
   }, [selectedEpisode]);
 
   // Remonter en haut de la page quand on change de page
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [currentPage]);
+  // useEffect(() => {
+  //   window.scrollTo({ top: 0, behavior: "smooth" });
+  // }, [currentPage]);
 
   const loadData = async () => {
     try {
@@ -241,7 +241,7 @@ const ReadPage = () => {
 
   const handleEpisodeChange = async (episode) => {
     // Remonter en haut immédiatement
-    window.scrollTo({ top: 0, behavior: "instant" });
+    // window.scrollTo({ top: 0, behavior: "instant" });
 
     setSelectedEpisode(episode);
 
@@ -260,9 +260,9 @@ const ReadPage = () => {
     }
 
     // Remonter en haut après un court délai
-    setTimeout(() => {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }, 50);
+    // setTimeout(() => {
+    //   window.scrollTo({ top: 0, behavior: "smooth" });
+    // }, 50);
   };
 
   if (loading) {
@@ -370,11 +370,17 @@ const ReadPage = () => {
           style={{ backgroundColor: colors.whiteTransparent }}
         >
           <div className="flex items-start gap-4 mb-4">
-            <img
-              src="https://via.placeholder.com/200x300"
-              alt={webnovel.title}
-              className="w-32 h-48 object-cover rounded-lg"
-            />
+            {webnovel.image_url ? (
+              <img
+                src={webnovel.image_url}
+                alt={webnovel.title}
+                className="w-32 h-48 object-cover rounded-lg shadow-lg"
+              />
+            ) : (
+              <div className="w-32 h-48 bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 rounded-lg shadow-lg flex items-center justify-center">
+                <span className="text-white text-4xl">📚</span>
+              </div>
+            )}
             <div className="flex-1">
               <h2
                 className="text-2xl font-bold mb-2"
@@ -453,7 +459,7 @@ const ReadPage = () => {
                 color: colors.text,
               }}
             >
-              Voir les likers
+              Voir les likes
             </button>
           </div>
         </div>
@@ -619,80 +625,6 @@ const ReadPage = () => {
         {/* Contenu de l'épisode */}
         {selectedEpisode && (
           <>
-            {/* Navigation épisodes - Top */}
-            <div className="flex items-center justify-between mb-4 gap-2">
-              <button
-                onClick={() => {
-                  const currentIndex = episodes.findIndex(
-                    (ep) => ep.id === selectedEpisode.id
-                  );
-                  if (currentIndex > 0) {
-                    handleEpisodeChange(episodes[currentIndex - 1]);
-                  }
-                }}
-                disabled={
-                  episodes.findIndex((ep) => ep.id === selectedEpisode.id) === 0
-                }
-                className="flex items-center gap-1 px-3 py-2 rounded-lg font-semibold text-sm transition disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{
-                  backgroundColor:
-                    episodes.findIndex((ep) => ep.id === selectedEpisode.id) ===
-                    0
-                      ? "transparent"
-                      : colors.primary,
-                  color:
-                    episodes.findIndex((ep) => ep.id === selectedEpisode.id) ===
-                    0
-                      ? colors.text
-                      : "white",
-                }}
-              >
-                <span className="inline-flex items-center gap-1">
-                  <MdArrowBack /> Précédent
-                </span>
-              </button>
-
-              <div className="text-center px-2">
-                <div
-                  className="text-xs font-semibold"
-                  style={{ color: colors.text }}
-                >
-                  {selectedEpisode.number} / {episodes.length}
-                </div>
-              </div>
-
-              <button
-                onClick={() => {
-                  const currentIndex = episodes.findIndex(
-                    (ep) => ep.id === selectedEpisode.id
-                  );
-                  if (currentIndex < episodes.length - 1) {
-                    handleEpisodeChange(episodes[currentIndex + 1]);
-                  }
-                }}
-                disabled={
-                  episodes.findIndex((ep) => ep.id === selectedEpisode.id) ===
-                  episodes.length - 1
-                }
-                className="flex items-center gap-1 px-3 py-2 rounded-lg font-semibold text-sm transition disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{
-                  backgroundColor:
-                    episodes.findIndex((ep) => ep.id === selectedEpisode.id) ===
-                    episodes.length - 1
-                      ? "transparent"
-                      : colors.primary,
-                  color:
-                    episodes.findIndex((ep) => ep.id === selectedEpisode.id) ===
-                    episodes.length - 1
-                      ? colors.text
-                      : "white",
-                }}
-              >
-                <span className="inline-flex items-center gap-1">
-                  Suivant <MdArrowForward />
-                </span>
-              </button>
-            </div>
 
             <div
               className="bg-white rounded-lg shadow-lg p-6 mb-6"
@@ -771,7 +703,7 @@ const ReadPage = () => {
                   wordSpacing: "0.08em",
                   textAlign: "left",
                   padding: "1rem",
-                  maxHeight: "70vh",
+                  maxHeight: "50vh",
                   overflow: "auto",
                 }}
                 dangerouslySetInnerHTML={{

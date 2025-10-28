@@ -71,8 +71,8 @@ const EpisodeList = ({ episodes, onEdit, onDelete, loading }) => {
               border: `3px solid ${colors.primaryLight}`,
             }}
           >
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+              <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3 mb-3">
                   <div
                     className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl"
@@ -106,9 +106,9 @@ const EpisodeList = ({ episodes, onEdit, onDelete, loading }) => {
                 </div>
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2 flex-shrink-0">
                 <button
-                  className="px-4 py-2 rounded-lg font-semibold transition-all hover:scale-105"
+                  className="px-3 py-2 rounded-lg font-semibold transition-all hover:scale-105 cursor-pointer text-sm sm:text-base"
                   style={{
                     backgroundColor: colors.primaryLight,
                     color: colors.white,
@@ -118,12 +118,12 @@ const EpisodeList = ({ episodes, onEdit, onDelete, loading }) => {
                     onEdit(episode);
                   }}
                 >
-                  <span className="inline-flex items-center gap-2">
-                    <MdEdit /> Modifier
+                  <span className="inline-flex items-center gap-1 sm:gap-2">
+                    <MdEdit /> <span className="hidden sm:inline">Modifier</span>
                   </span>
                 </button>
                 <button
-                  className="px-4 py-2 rounded-lg font-semibold transition-all hover:scale-105"
+                  className="px-3 py-2 rounded-lg font-semibold transition-all hover:scale-105 cursor-pointer text-sm sm:text-base"
                   style={{
                     backgroundColor: "#FEE2E2",
                     color: "#991B1B",
@@ -133,8 +133,8 @@ const EpisodeList = ({ episodes, onEdit, onDelete, loading }) => {
                     onDelete(episode.id);
                   }}
                 >
-                  <span className="inline-flex items-center gap-2">
-                    <MdDelete /> Supprimer
+                  <span className="inline-flex items-center gap-1 sm:gap-2">
+                    <MdDelete /> <span className="hidden sm:inline">Supprimer</span>
                   </span>
                 </button>
               </div>
