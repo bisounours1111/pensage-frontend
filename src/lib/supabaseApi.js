@@ -399,6 +399,48 @@ export const userExtendApi = {
   },
 };
 
+// ==================== POINTS / TOKENS ====================
+export const pointsApi = {
+  // Récupérer le solde actuel
+  getBalance: async (userId) => {
+    const { data, error } = await supabase
+      .from("user_extend")
+      .select("token")
+      .eq("id", userId)
+      .single();
+
+    if (error) throw error;
+    return data?.token ?? 0;
+  },
+
+  // Débiter des points (ne descend pas sous 0)
+  debit: async (userId, amount) => {
+    if (amount <= 0) return await pointsApi.getBalance(userId);
+
+    const { data: current, error: getError } = await supabase
+      .from("user_extend")
+      .select("token")
+      .eq("id", userId)
+      .single();
+    if (getError) throw getError;
+
+    const currentToken = current?.token ?? 0;
+    if (currentToken < amount) {
+      const err = new Error("Solde insuffisant");
+      err.code = "INSUFFICIENT_FUNDS";
+      throw err;
+    }
+
+    const newBalance = currentToken - amount;
+    const { error: updateError } = await supabase
+      .from("user_extend")
+      .update({ token: newBalance })
+      .eq("id", userId);
+    if (updateError) throw updateError;
+    return newBalance;
+  },
+};
+
 /**
  * QUEST API
  */

@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Stepper from "../../components/ui/Stepper";
 import colors from "../../utils/constants/colors";
 import storyApi from "../../utils/api/storyApi";
-import { webnovelsApi } from "../../lib/supabaseApi";
+import { webnovelsApi, pointsApi } from "../../lib/supabaseApi";
 import { getCurrentUser } from "../../lib/supabase";
 
 // Import des composants d'étapes
@@ -18,6 +18,8 @@ const CreateStoryPage = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [userId, setUserId] = useState(null);
+  const [points, setPoints] = useState(null);
 
   // État pour l'étape 1 : Pitch
   const [pitch, setPitch] = useState("");
@@ -40,6 +42,21 @@ const CreateStoryPage = () => {
     { title: "Finalisation" },
   ];
 
+  useEffect(() => {
+    (async () => {
+      const user = await getCurrentUser();
+      if (user) {
+        setUserId(user.id);
+        try {
+          const balance = await pointsApi.getBalance(user.id);
+          setPoints(balance);
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    })();
+  }, []);
+
   // ==================== GESTION DES PITCHS ====================
   const handleGeneratePitch = async (userRequest) => {
     setLoading(true);
@@ -48,10 +65,24 @@ const CreateStoryPage = () => {
     try {
       const result = await storyApi.generatePitch(userRequest);
       const pitchText = result.pitchs;
-      
+
       // Parser les pitchs depuis la réponse
       const pitchArray = parsePitchOptions(pitchText);
-      
+
+      // Débiter 5 points
+      if (userId) {
+        try {
+          const newBalance = await pointsApi.debit(userId, 5);
+          setPoints(newBalance);
+        } catch (e) {
+          if (e?.code === "INSUFFICIENT_FUNDS") {
+            alert("Solde insuffisant (5 tokens requis)");
+          } else {
+            console.error(e);
+          }
+        }
+      }
+
       return pitchArray;
     } finally {
       setLoading(false);
@@ -108,6 +139,18 @@ const CreateStoryPage = () => {
     try {
       const result = await storyApi.generateSynopsis(pitchText);
       setSynopsis(result.synopsis);
+      if (userId) {
+        try {
+          const newBalance = await pointsApi.debit(userId, 5);
+          setPoints(newBalance);
+        } catch (e) {
+          if (e?.code === "INSUFFICIENT_FUNDS") {
+            alert("Solde insuffisant (5 tokens requis)");
+          } else {
+            console.error(e);
+          }
+        }
+      }
     } finally {
       setLoading(false);
     }
@@ -121,13 +164,25 @@ const CreateStoryPage = () => {
     try {
       const result = await storyApi.generateCharacters(pitchText, synopsisText);
       const charactersList = result.characters || [];
-      
+
       const charactersWithIds = charactersList.map((character, index) => ({
         ...character,
-        id: index + 1
+        id: index + 1,
       }));
-      
+
       setCharacters(charactersWithIds);
+      if (userId) {
+        try {
+          const newBalance = await pointsApi.debit(userId, 5);
+          setPoints(newBalance);
+        } catch (e) {
+          if (e?.code === "INSUFFICIENT_FUNDS") {
+            alert("Solde insuffisant (5 tokens requis)");
+          } else {
+            console.error(e);
+          }
+        }
+      }
     } finally {
       setLoading(false);
     }
@@ -167,7 +222,7 @@ const CreateStoryPage = () => {
         characters: characters,
         genre: selectedGenre,
         publish: false,
-        is_over: false
+        is_over: false,
       };
 
       // Sauvegarder dans Supabase
@@ -202,6 +257,17 @@ const CreateStoryPage = () => {
           <p className="text-lg" style={{ color: colors.textSecondary }}>
             Laissez l'IA vous guider dans la création de votre webtoon
           </p>
+          {points !== null && (
+            <div
+              className="mt-3 inline-block px-4 py-2 rounded-lg font-semibold"
+              style={{
+                backgroundColor: colors.whiteTransparent,
+                color: colors.text,
+              }}
+            >
+              Solde: {points} tokens
+            </div>
+          )}
         </header>
 
         {/* Stepper */}

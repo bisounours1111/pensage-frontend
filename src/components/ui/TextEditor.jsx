@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import colors from "../../utils/constants/colors";
 import storyApi from "../../utils/api/storyApi";
+import { getCurrentUser } from "../../lib/supabase";
+import { pointsApi } from "../../lib/supabaseApi";
 
 const TextEditor = ({
   text,
@@ -12,6 +14,23 @@ const TextEditor = ({
   const [showActions, setShowActions] = useState(false);
   const [actionPosition, setActionPosition] = useState({ x: 0, y: 0 });
   const [loading, setLoading] = useState(false);
+  const [userId, setUserId] = useState(null);
+  const [points, setPoints] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      const user = await getCurrentUser();
+      if (user) {
+        setUserId(user.id);
+        try {
+          const balance = await pointsApi.getBalance(user.id);
+          setPoints(balance);
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    })();
+  }, []);
 
   const handleTextSelection = () => {
     const selection = window.getSelection();
@@ -47,6 +66,20 @@ const TextEditor = ({
 
       setShowActions(false);
       window.getSelection().removeAllRanges();
+
+      // Débit 2 points
+      if (userId) {
+        try {
+          const newBalance = await pointsApi.debit(userId, 2);
+          setPoints(newBalance);
+        } catch (e) {
+          if (e?.code === "INSUFFICIENT_FUNDS") {
+            alert("Solde insuffisant (2 tokens requis)");
+          } else {
+            console.error(e);
+          }
+        }
+      }
     } catch (error) {
       console.error("Erreur lors de la correction:", error);
       alert("Erreur lors de la correction du texte");
@@ -67,6 +100,20 @@ const TextEditor = ({
 
       setShowActions(false);
       window.getSelection().removeAllRanges();
+
+      // Débit 2 points
+      if (userId) {
+        try {
+          const newBalance = await pointsApi.debit(userId, 2);
+          setPoints(newBalance);
+        } catch (e) {
+          if (e?.code === "INSUFFICIENT_FUNDS") {
+            alert("Solde insuffisant (2 tokens requis)");
+          } else {
+            console.error(e);
+          }
+        }
+      }
     } catch (error) {
       console.error("Erreur lors de la reformulation:", error);
       alert("Erreur lors de la reformulation du texte");
@@ -137,6 +184,17 @@ const TextEditor = ({
             border: `2px solid ${colors.primary}`,
           }}
         >
+          {points !== null && (
+            <span
+              className="px-2 py-1 rounded text-xs font-semibold"
+              style={{
+                backgroundColor: colors.whiteTransparent,
+                color: colors.text,
+              }}
+            >
+              {points} tokens
+            </span>
+          )}
           <button
             className="px-4 py-2 rounded-lg font-semibold text-sm transition-all hover:scale-105"
             style={{
@@ -145,7 +203,7 @@ const TextEditor = ({
             }}
             onClick={handleFixText}
           >
-            Corriger
+            Corriger (2 tokens)
           </button>
           <button
             className="px-4 py-2 rounded-lg font-semibold text-sm transition-all hover:scale-105"
@@ -155,7 +213,7 @@ const TextEditor = ({
             }}
             onClick={handleRephraseText}
           >
-            Reformuler
+            Reformuler (2 tokens)
           </button>
           <button
             className="px-2 py-2 rounded-lg text-sm"
