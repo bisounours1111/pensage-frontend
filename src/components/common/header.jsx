@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import colors from "../../utils/constants/colors";
 import {
@@ -11,12 +11,14 @@ import {
   MdLogout,
 } from "react-icons/md";
 import { signOut } from "../../lib/supabase";
+import NotificationDropdown from "./NotificationDropdown";
 
 // Logo
 import logo from "../../assets/images/pensaga.png";
 
 export default function Header() {
   const navigate = useNavigate();
+  const [showNotifications, setShowNotifications] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -86,14 +88,25 @@ export default function Header() {
             <MdAccountCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
             <span className="font-medium hidden sm:inline">Compte</span>
           </Link>
-          <Link
-            to="/notifications"
-            className="p-3 rounded-lg hover:bg-white/20 transition-all flex items-center gap-2 group relative"
-            style={{ color: colors.white }}
-          >
-            <MdNotifications className="w-6 h-6 group-hover:scale-110 transition-transform" />
-            <span className="font-medium hidden sm:inline">Notifications</span>
-          </Link>
+          <div className="relative">
+            <button
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="p-3 rounded-lg hover:bg-white/20 transition-all flex items-center gap-2 group relative"
+              style={{ color: colors.white }}
+            >
+              <MdNotifications className="w-6 h-6 group-hover:scale-110 transition-transform" />
+              <span className="font-medium hidden sm:inline">Notifications</span>
+              {/* Badge de notification non lue */}
+              <div
+                className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
+                style={{ backgroundColor: colors.primary }}
+              />
+            </button>
+            <NotificationDropdown
+              isOpen={showNotifications}
+              onClose={() => setShowNotifications(false)}
+            />
+          </div>
           <Link
             to="/quests"
             className="p-3 rounded-lg hover:bg-white/20 transition-all flex items-center gap-2 group relative"
