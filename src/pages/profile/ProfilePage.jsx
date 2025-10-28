@@ -299,23 +299,23 @@ const ProfilePage = () => {
                 </p>
               </div>
             </div>
-          </div>
-          <div 
-            className="w-full rounded-full h-8 overflow-hidden border-2"
-            style={{ 
-              backgroundColor: colors.whiteTransparent,
-              borderColor: colors.primaryLight 
-            }}
-          >
-            <div
-              className="h-full transition-all duration-500 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg"
-              style={{
-                backgroundColor: colors.primary,
-                width: `${(xpProgress / xpNeeded) * 100}%`,
-                minWidth: xpProgress > 0 ? '40px' : '0px'
+            <div 
+              className="w-full rounded-full h-8 overflow-hidden border-2"
+              style={{ 
+                backgroundColor: colors.whiteTransparent,
+                borderColor: colors.primaryLight 
               }}
             >
-              {xpProgress > 0 && `${xpProgress}/${xpNeeded}`}
+              <div
+                className="h-full transition-all duration-500 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg"
+                style={{
+                  backgroundColor: colors.primary,
+                  width: `${(xpProgress / xpNeeded) * 100}%`,
+                  minWidth: xpProgress > 0 ? '40px' : '0px'
+                }}
+              >
+                {xpProgress > 0 && `${xpProgress}/${xpNeeded}`}
+              </div>
             </div>
           </div>
         )}
