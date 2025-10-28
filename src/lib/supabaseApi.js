@@ -1020,9 +1020,8 @@ export const notificationsApi = {
       for (const f of follows.value.data) {
         items.push({
           type: "follow",
-          id: `follow-${f.from_id_user}-${f.target_id_user}-${
-            f.created_at || f.id
-          }`,
+          id: `follow-${f.from_id_user}-${f.target_id_user}-${f.created_at || f.id
+            }`,
           timestamp: f.created_at || f.id,
           payload: f,
           actorId: f.from_id_user,
