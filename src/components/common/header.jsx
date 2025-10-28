@@ -1,11 +1,4 @@
-<<<<<<< HEAD
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import colors from "../../utils/constants/colors";
-import { MdAutoStories, MdHome, MdShoppingBag, MdAccountCircle, MdNotifications, MdChecklist } from "react-icons/md";
-import NotificationDropdown from "./NotificationDropdown";
-=======
-import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import colors from "../../utils/constants/colors";
 import {
@@ -18,17 +11,14 @@ import {
   MdLogout,
 } from "react-icons/md";
 import { signOut } from "../../lib/supabase";
->>>>>>> main
+import NotificationDropdown from "./NotificationDropdown";
 
 // Logo
 import logo from "../../assets/images/pensaga.png";
 
 export default function Header() {
-<<<<<<< HEAD
-  const [showNotifications, setShowNotifications] = useState(false);
-=======
   const navigate = useNavigate();
-
+  const [showNotifications, setShowNotifications] = useState(false);
   const handleLogout = async () => {
     try {
       await signOut();
@@ -37,7 +27,6 @@ export default function Header() {
       console.error("Erreur de déconnexion:", e);
     }
   };
->>>>>>> main
 
   return (
     <header
@@ -47,10 +36,6 @@ export default function Header() {
         borderBottom: `3px solid ${colors.primary}`,
       }}
     >
-<<<<<<< HEAD
-
-=======
->>>>>>> main
       {/* Logo à gauche */}
       <Link
         to="/"
@@ -90,14 +75,10 @@ export default function Header() {
         </div>
 
         {/* Icônes principales - Compte, Notifications, Quests (toujours visibles) */}
-<<<<<<< HEAD
-        <div className="flex items-center gap-4 border-l pl-4" style={{ borderColor: 'rgba(255,255,255,0.3)' }}>
-=======
         <div
           className="flex items-center gap-2 sm:gap-4 border-l pl-4"
           style={{ borderColor: "rgba(255,255,255,0.3)" }}
         >
->>>>>>> main
           <Link
             to="/profile"
             className="p-3 rounded-lg hover:bg-white/20 transition-all flex items-center gap-2 group"
@@ -106,7 +87,6 @@ export default function Header() {
             <MdAccountCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
             <span className="font-medium hidden sm:inline">Compte</span>
           </Link>
-<<<<<<< HEAD
           <div className="relative">
             <button
               onClick={() => setShowNotifications(!showNotifications)}
@@ -114,7 +94,9 @@ export default function Header() {
               style={{ color: colors.white }}
             >
               <MdNotifications className="w-6 h-6 group-hover:scale-110 transition-transform" />
-              <span className="font-medium hidden sm:inline">Notifications</span>
+              <span className="font-medium hidden sm:inline">
+                Notifications
+              </span>
               {/* Badge de notification non lue */}
               <div
                 className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
@@ -126,16 +108,6 @@ export default function Header() {
               onClose={() => setShowNotifications(false)}
             />
           </div>
-=======
-          <Link
-            to="/notifications"
-            className="p-3 rounded-lg hover:bg-white/20 transition-all flex items-center gap-2 group relative"
-            style={{ color: colors.white }}
-          >
-            <MdNotifications className="w-6 h-6 group-hover:scale-110 transition-transform" />
-            <span className="font-medium hidden sm:inline">Notifications</span>
-          </Link>
->>>>>>> main
           <Link
             to="/quests"
             className="p-3 rounded-lg hover:bg-white/20 transition-all flex items-center gap-2 group relative"
