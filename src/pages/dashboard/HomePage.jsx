@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { getCurrentUser, getUserExtend } from '../../lib/supabase';
 import { webnovelsApi, historyApi } from '../../lib/supabaseApi';
 import StoryRow from '../../components/stories/StoryRow';
-import colors from '../../utils/constants/colors';
 
 const HomePage = () => {
   const [loading, setLoading] = useState(true);
@@ -21,7 +20,7 @@ const HomePage = () => {
     try {
       setLoading(true);
       const currentUser = await getCurrentUser();
-      
+
       if (!currentUser) {
         setError('Vous devez être connecté');
         setLoading(false);
@@ -36,7 +35,7 @@ const HomePage = () => {
 
       // Charger l'historique de lecture
       const history = await historyApi.getReadingHistory(currentUser.id);
-      
+
       // Grouper par webnovel pour ne garder que le dernier épisode lu
       const historyMap = new Map();
       history.forEach(entry => {
@@ -54,7 +53,7 @@ const HomePage = () => {
           }
         }
       });
-      
+
       const formattedHistory = Array.from(historyMap.values())
         .map(entry => ({
           id: entry.webnovel.id,
@@ -70,7 +69,7 @@ const HomePage = () => {
           ...entry.webnovel
         }))
         .sort((a, b) => b.historyId - a.historyId);
-      
+
       setReadingHistory(formattedHistory);
 
       // Charger les tendances
@@ -111,9 +110,9 @@ const HomePage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b" style={{ background: `linear-gradient(to bottom, ${colors.bgGradientFrom}, ${colors.bgGradientVia}, ${colors.bgGradientTo})` }}>
+      <div className="min-h-screen bg-gradient-to-b" style={{ background: `linear-gradient(to bottom, var(--color-bg-gradient-from), var(--color-bg-gradient-via), var(--color-bg-gradient-to))` }}>
         <div className="flex justify-center items-center h-screen">
-          <div className="text-xl" style={{ color: colors.text }}>Chargement...</div>
+          <div className="text-xl" style={{ color: 'var(--color-text)' }}>Chargement...</div>
         </div>
       </div>
     );
@@ -121,7 +120,7 @@ const HomePage = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-b" style={{ background: `linear-gradient(to bottom, ${colors.bgGradientFrom}, ${colors.bgGradientVia}, ${colors.bgGradientTo})` }}>
+      <div className="min-h-screen bg-gradient-to-b" style={{ background: `linear-gradient(to bottom, var(--color-bg-gradient-from), var(--color-bg-gradient-via), var(--color-bg-gradient-to))` }}>
         <div className="p-6 md:p-12">
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
             {error}
@@ -132,13 +131,13 @@ const HomePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b pb-16" style={{ background: `linear-gradient(to bottom, ${colors.bgGradientFrom}, ${colors.bgGradientVia}, ${colors.bgGradientTo})` }}>
+    <div className="min-h-screen bg-gradient-to-b pb-16" style={{ background: `linear-gradient(to bottom, var(--color-bg-gradient-from), var(--color-bg-gradient-via), var(--color-bg-gradient-to))` }}>
       {/* Header */}
       <header className="p-6 md:p-12">
-        <h1 className="text-4xl md:text-6xl font-bold mb-4" style={{ color: colors.text }}>
+        <h1 className="text-4xl md:text-6xl font-bold mb-4" style={{ color: 'var(--color-text)' }}>
           Bienvenue {userExtend?.name || user?.email?.split('@')[0] || 'Utilisateur'} !
         </h1>
-        <p className="text-lg md:text-xl opacity-80" style={{ color: colors.text }}>
+        <p className="text-lg md:text-xl opacity-80" style={{ color: 'var(--color-text)' }}>
           Découvrez de nouvelles histoires passionnantes
         </p>
       </header>
@@ -180,10 +179,10 @@ const HomePage = () => {
         {/* Message si aucune histoire n'est disponible */}
         {readingHistory.length === 0 && trending.length === 0 && recommendations.length === 0 && (
           <div className="flex flex-col items-center justify-center py-12">
-            <p className="text-xl mb-4" style={{ color: colors.text }}>
+            <p className="text-xl mb-4" style={{ color: 'var(--color-text)' }}>
               Aucune histoire disponible pour le moment
             </p>
-            <p className="text-md opacity-75" style={{ color: colors.text }}>
+            <p className="text-md opacity-75" style={{ color: 'var(--color-text)' }}>
               Revenez bientôt pour découvrir de nouvelles histoires !
             </p>
           </div>

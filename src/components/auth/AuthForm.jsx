@@ -1,7 +1,7 @@
 import React from 'react';
 import colors from '../../utils/constants/colors';
 
-const AuthForm = ({ 
+const AuthForm = ({
     mode = 'signup', // 'signup' ou 'login'
     formData,
     errors,
@@ -19,12 +19,12 @@ const AuthForm = ({
     return (
         <div className="w-full max-w-4xl">
             {/* Formulaire */}
-            <div 
+            <div
                 className="bg-white/50 backdrop-blur-lg rounded-xl shadow-xl p-4 md:p-8 border border-white/40 relative"
             >
                 {/* Bouton retour - uniquement si hideLinks est false */}
                 {!hideLinks && (
-                    <button 
+                    <button
                         onClick={() => onNavigate && onNavigate('/')}
                         className="absolute mb-4 md:mb-6 text-xl md:text-2xl hover:opacity-70 transition"
                         style={{ color: colors.text }}
@@ -40,7 +40,7 @@ const AuthForm = ({
                             {isSignup ? 'Créer un compte' : 'Se connecter'}
                         </h1>
                         <p className="text-xs md:text-sm hidden md:block" style={{ color: colors.text, opacity: 0.8 }}>
-                            {isSignup 
+                            {isSignup
                                 ? "Commencez votre aventure d'écriture dès aujourd'hui"
                                 : "Retrouvez votre espace d'écriture"
                             }
@@ -52,8 +52,8 @@ const AuthForm = ({
                     {/* Nom d'utilisateur (uniquement pour inscription) */}
                     {isSignup && (
                         <div>
-                            <label 
-                                htmlFor="username" 
+                            <label
+                                htmlFor="username"
                                 className="block text-xs font-semibold mb-0.5"
                                 style={{ color: colors.text }}
                             >
@@ -66,11 +66,10 @@ const AuthForm = ({
                                 value={formData.username || ''}
                                 onChange={onChange}
                                 placeholder="Choisissez un nom d'utilisateur"
-                                className={`w-full px-2.5 py-1.5 md:px-3 md:py-2 text-sm rounded-lg border-2 transition-all ${
-                                    errors.username 
-                                        ? 'border-red-400' 
+                                className={`w-full px-2.5 py-1.5 md:px-3 md:py-2 text-sm rounded-lg border-2 transition-all ${errors.username
+                                        ? 'border-red-400'
                                         : 'border-white/50 focus:border-white'
-                                } focus:outline-none focus:ring-2 focus:ring-opacity-50 backdrop-blur-sm bg-white/60`}
+                                    } focus:outline-none focus:ring-2 focus:ring-opacity-50 backdrop-blur-sm bg-white/60`}
                                 style={{ color: colors.text }}
                             />
                             {errors.username && (
@@ -83,8 +82,8 @@ const AuthForm = ({
                     {isSignup && (
                         <div className="grid grid-cols-2 gap-2 md:gap-3">
                             <div>
-                                <label 
-                                    htmlFor="prenom" 
+                                <label
+                                    htmlFor="prenom"
                                     className="block text-xs font-semibold mb-0.5"
                                     style={{ color: colors.text }}
                                 >
@@ -97,11 +96,10 @@ const AuthForm = ({
                                     value={formData.prenom || ''}
                                     onChange={onChange}
                                     placeholder="Prénom"
-                                    className={`w-full px-2.5 py-1.5 md:px-3 md:py-2 text-sm rounded-lg border-2 transition-all ${
-                                        errors.prenom 
-                                            ? 'border-red-400' 
+                                    className={`w-full px-2.5 py-1.5 md:px-3 md:py-2 text-sm rounded-lg border-2 transition-all ${errors.prenom
+                                            ? 'border-red-400'
                                             : 'border-white/50 focus:border-white'
-                                    } focus:outline-none focus:ring-2 focus:ring-opacity-50 backdrop-blur-sm bg-white/60`}
+                                        } focus:outline-none focus:ring-2 focus:ring-opacity-50 backdrop-blur-sm bg-white/60`}
                                     style={{ color: colors.text }}
                                 />
                                 {errors.prenom && (
@@ -110,8 +108,8 @@ const AuthForm = ({
                             </div>
 
                             <div>
-                                <label 
-                                    htmlFor="nom" 
+                                <label
+                                    htmlFor="nom"
                                     className="block text-xs font-semibold mb-0.5"
                                     style={{ color: colors.text }}
                                 >
@@ -124,11 +122,10 @@ const AuthForm = ({
                                     value={formData.nom || ''}
                                     onChange={onChange}
                                     placeholder="Nom"
-                                    className={`w-full px-2.5 py-1.5 md:px-3 md:py-2 text-sm rounded-lg border-2 transition-all ${
-                                        errors.nom 
-                                            ? 'border-red-400' 
+                                    className={`w-full px-2.5 py-1.5 md:px-3 md:py-2 text-sm rounded-lg border-2 transition-all ${errors.nom
+                                            ? 'border-red-400'
                                             : 'border-white/50 focus:border-white'
-                                    } focus:outline-none focus:ring-2 focus:ring-opacity-50 backdrop-blur-sm bg-white/60`}
+                                        } focus:outline-none focus:ring-2 focus:ring-opacity-50 backdrop-blur-sm bg-white/60`}
                                     style={{ color: colors.text }}
                                 />
                                 {errors.nom && (
@@ -141,8 +138,8 @@ const AuthForm = ({
                     {/* Âge (uniquement pour inscription) */}
                     {isSignup && (
                         <div>
-                            <label 
-                                htmlFor="age" 
+                            <label
+                                htmlFor="age"
                                 className="block text-xs font-semibold mb-0.5"
                                 style={{ color: colors.text }}
                             >
@@ -156,11 +153,10 @@ const AuthForm = ({
                                 onChange={onChange}
                                 placeholder="Âge"
                                 min="13"
-                                className={`w-full px-2.5 py-1.5 md:px-3 md:py-2 text-sm rounded-lg border-2 transition-all ${
-                                    errors.age 
-                                        ? 'border-red-400' 
+                                className={`w-full px-2.5 py-1.5 md:px-3 md:py-2 text-sm rounded-lg border-2 transition-all ${errors.age
+                                        ? 'border-red-400'
                                         : 'border-white/50 focus:border-white'
-                                } focus:outline-none focus:ring-2 focus:ring-opacity-50 backdrop-blur-sm bg-white/60`}
+                                    } focus:outline-none focus:ring-2 focus:ring-opacity-50 backdrop-blur-sm bg-white/60`}
                                 style={{ color: colors.text }}
                             />
                             {errors.age && (
@@ -171,8 +167,8 @@ const AuthForm = ({
 
                     {/* Email */}
                     <div>
-                        <label 
-                            htmlFor="email" 
+                        <label
+                            htmlFor="email"
                             className="block text-xs font-semibold mb-0.5"
                             style={{ color: colors.text }}
                         >
@@ -185,11 +181,10 @@ const AuthForm = ({
                             value={formData.email || ''}
                             onChange={onChange}
                             placeholder="email@exemple.com"
-                            className={`w-full px-2.5 py-1.5 md:px-3 md:py-2 text-sm rounded-lg border-2 transition-all ${
-                                errors.email 
-                                    ? 'border-red-400' 
+                            className={`w-full px-2.5 py-1.5 md:px-3 md:py-2 text-sm rounded-lg border-2 transition-all ${errors.email
+                                    ? 'border-red-400'
                                     : 'border-white/50 focus:border-white'
-                            } focus:outline-none focus:ring-2 focus:ring-opacity-50 backdrop-blur-sm bg-white/60`}
+                                } focus:outline-none focus:ring-2 focus:ring-opacity-50 backdrop-blur-sm bg-white/60`}
                             style={{ color: colors.text }}
                         />
                         {errors.email && (
@@ -199,8 +194,8 @@ const AuthForm = ({
 
                     {/* Mot de passe */}
                     <div>
-                        <label 
-                            htmlFor="password" 
+                        <label
+                            htmlFor="password"
                             className="block text-xs font-semibold mb-0.5"
                             style={{ color: colors.text }}
                         >
@@ -214,11 +209,10 @@ const AuthForm = ({
                                 value={formData.password || ''}
                                 onChange={onChange}
                                 placeholder={isSignup ? "Au moins 6 caractères" : "Votre mot de passe"}
-                                className={`w-full px-2.5 py-1.5 md:px-3 md:py-2 text-sm rounded-lg border-2 transition-all pr-8 md:pr-10 ${
-                                    errors.password 
-                                        ? 'border-red-400' 
+                                className={`w-full px-2.5 py-1.5 md:px-3 md:py-2 text-sm rounded-lg border-2 transition-all pr-8 md:pr-10 ${errors.password
+                                        ? 'border-red-400'
                                         : 'border-white/50 focus:border-white'
-                                } focus:outline-none focus:ring-2 focus:ring-opacity-50 backdrop-blur-sm bg-white/60`}
+                                    } focus:outline-none focus:ring-2 focus:ring-opacity-50 backdrop-blur-sm bg-white/60`}
                                 style={{ color: colors.text }}
                             />
                             <button
@@ -238,8 +232,8 @@ const AuthForm = ({
                     {/* Confirmation mot de passe (uniquement pour inscription) */}
                     {isSignup && (
                         <div>
-                            <label 
-                                htmlFor="confirmPassword" 
+                            <label
+                                htmlFor="confirmPassword"
                                 className="block text-xs font-semibold mb-0.5"
                                 style={{ color: colors.text }}
                             >
@@ -252,11 +246,10 @@ const AuthForm = ({
                                 value={formData.confirmPassword || ''}
                                 onChange={onChange}
                                 placeholder="Confirmez votre mot de passe"
-                                className={`w-full px-2.5 py-1.5 md:px-3 md:py-2 text-sm rounded-lg border-2 transition-all ${
-                                    errors.confirmPassword 
-                                        ? 'border-red-400' 
+                                className={`w-full px-2.5 py-1.5 md:px-3 md:py-2 text-sm rounded-lg border-2 transition-all ${errors.confirmPassword
+                                        ? 'border-red-400'
                                         : 'border-white/50 focus:border-white'
-                                } focus:outline-none focus:ring-2 focus:ring-opacity-50 backdrop-blur-sm bg-white/60`}
+                                    } focus:outline-none focus:ring-2 focus:ring-opacity-50 backdrop-blur-sm bg-white/60`}
                                 style={{ color: colors.text }}
                             />
                             {errors.confirmPassword && (
@@ -290,7 +283,7 @@ const AuthForm = ({
                                 }
                             }}
                         >
-{buttonText || (isLoading ? 'Chargement...' : (isSignup ? 'Créer mon compte' : 'Se connecter'))}
+                            {buttonText || (isLoading ? 'Chargement...' : (isSignup ? 'Créer mon compte' : 'Se connecter'))}
                         </button>
                     </div>
 
@@ -299,7 +292,7 @@ const AuthForm = ({
                         <div className="text-center text-xs pt-1 md:pt-2">
                             <p style={{ color: colors.text, opacity: 0.8 }}>
                                 {isSignup ? 'Déjà un compte ?' : "Pas encore de compte ?"}{' '}
-                                <a 
+                                <a
                                     href={isSignup ? "/login" : "/signup"}
                                     className="font-semibold underline hover:opacity-80 transition"
                                     style={{ color: colors.primary }}

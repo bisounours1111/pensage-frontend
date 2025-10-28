@@ -48,10 +48,10 @@ const CreateStoryPage = () => {
     try {
       const result = await storyApi.generatePitch(userRequest);
       const pitchText = result.pitchs;
-      
+
       // Parser les pitchs depuis la réponse
       const pitchArray = parsePitchOptions(pitchText);
-      
+
       return pitchArray;
     } finally {
       setLoading(false);
@@ -121,12 +121,12 @@ const CreateStoryPage = () => {
     try {
       const result = await storyApi.generateCharacters(pitchText, synopsisText);
       const charactersList = result.characters || [];
-      
+
       const charactersWithIds = charactersList.map((character, index) => ({
         ...character,
         id: index + 1
       }));
-      
+
       setCharacters(charactersWithIds);
     } finally {
       setLoading(false);

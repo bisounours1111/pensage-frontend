@@ -22,21 +22,21 @@ export default function ShopPage() {
 
   useEffect(() => {
     loadShopData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadShopData = async () => {
     try {
       setLoading(true);
       const currentUser = await getCurrentUser();
-      
+
       if (!currentUser) {
         navigate('/login');
         return;
       }
 
       setUser(currentUser);
-      
+
       const extendData = await getUserExtend(currentUser.id);
       setUserExtend(extendData);
       setPoints(extendData?.token || 0);
@@ -73,11 +73,11 @@ export default function ShopPage() {
       if (!isStripeConfigured()) {
         // Mode développement sans paiement Stripe
         await shopTokenApi.buy(user.id, packId);
-        
+
         const extendData = await getUserExtend(user.id);
         setUserExtend(extendData);
         setPoints(extendData?.token || 0);
-        
+
         alert('Achat réussi (mode développement) ! Vos points ont été ajoutés.');
       } else {
         // Stripe est configuré - rediriger vers Stripe Checkout
@@ -103,10 +103,10 @@ export default function ShopPage() {
       // Si Stripe N'EST PAS configuré, utiliser le mode développement
       if (!isStripeConfigured()) {
         await shopSubscriptionApi.buy(user.id, subscriptionId);
-        
+
         const extendData = await getUserExtend(user.id);
         setUserExtend(extendData);
-        
+
         alert('Abonnement Premium activé (mode développement) !');
       } else {
         // Stripe est configuré - rediriger vers Stripe Checkout
@@ -130,24 +130,24 @@ export default function ShopPage() {
         nextClaimDate = new Date();
         nextClaimDate.setDate(nextClaimDate.getDate() + 1);
       }
-      
-      const nextDateStr = nextClaimDate.toLocaleDateString('fr-FR', { 
-        weekday: 'long', 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
+
+      const nextDateStr = nextClaimDate.toLocaleDateString('fr-FR', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
       });
-      
+
       const isPremium = userExtend?.has_subscription || false;
       const rewardAmount = isPremium ? 2000 : 100;
-      
+
       alert(`Vous avez déjà récupéré votre récompense cette semaine.\n\nRécompense disponible : ${rewardAmount} points\nProchaine récompense : ${nextDateStr}`);
       return;
     }
 
     try {
       const rewardAmount = await weeklyRewardApi.claimWeekly(user.id);
-      
+
       // Recharger les données utilisateur
       const extendData = await getUserExtend(user.id);
       setUserExtend(extendData);
@@ -197,9 +197,9 @@ export default function ShopPage() {
           </h1>
         </div>
 
-        <PointsBalanceCard 
-          points={points} 
-          onWeekly={handleWeekly} 
+        <PointsBalanceCard
+          points={points}
+          onWeekly={handleWeekly}
           onAd={handleAd}
           isPremium={userExtend?.has_subscription}
           canClaimWeekly={weeklyRewardInfo?.canClaim}
@@ -261,8 +261,8 @@ export default function ShopPage() {
                   {buying === sub.id
                     ? 'Traitement...'
                     : userExtend?.has_subscription
-                    ? 'Abonnement actif ✓'
-                    : `${sub.title} — ${sub.price}€`}
+                      ? 'Abonnement actif ✓'
+                      : `${sub.title} — ${sub.price}€`}
                 </button>
               ))
             ) : (

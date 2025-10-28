@@ -15,7 +15,7 @@ const StoryCard = ({ story, mode = 'read' }) => {
     };
 
     return (
-        <div 
+        <div
             className="flex-shrink-0 w-48 md:w-56 group cursor-pointer"
             onClick={handleClick}
         >

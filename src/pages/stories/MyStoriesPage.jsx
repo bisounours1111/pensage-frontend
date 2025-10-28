@@ -25,7 +25,7 @@ const MyStoriesPage = () => {
                 }
 
                 const userStories = await webnovelsApi.getByUser(user.id);
-                
+
                 // Transformer les données Supabase en format attendu par StoryRow
                 const formattedStories = userStories.map(story => ({
                     id: story.id,
