@@ -509,6 +509,30 @@ const ReadPage = () => {
                 }}
                 dangerouslySetInnerHTML={{ __html: episodePages[currentPage] || '' }}
               />
+              
+              <style>{`
+                .episode-content p {
+                  margin-bottom: 1.5rem !important;
+                  margin-top: 1.5rem !important;
+                }
+                
+                .episode-content p:first-child {
+                  margin-top: 0 !important;
+                }
+                
+                .episode-content p:last-child {
+                  margin-bottom: 0 !important;
+                }
+                
+                .episode-content br {
+                  display: block;
+                  margin: 0.5rem 0 !important;
+                }
+                
+                .episode-content {
+                  white-space: pre-wrap;
+                }
+              `}</style>
             </div>
 
             {/* Navigation épisodes - Bottom */}
