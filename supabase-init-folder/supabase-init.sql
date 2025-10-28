@@ -254,6 +254,27 @@ CREATE INDEX IF NOT EXISTS idx_notification_read ON user_notification(is_read);
 CREATE INDEX IF NOT EXISTS idx_transaction_user ON transaction(id_user);
 
 -- ========================================
+-- TABLE LINK_USERS (FOLLOW)
+-- ========================================
+CREATE TABLE IF NOT EXISTS link_users (
+    from_id_user UUID NOT NULL REFERENCES user_extend(id) ON DELETE CASCADE,
+    target_id_user UUID NOT NULL REFERENCES user_extend(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    PRIMARY KEY (from_id_user, target_id_user)
+);
+
+CREATE INDEX IF NOT EXISTS idx_link_users_from ON link_users(from_id_user);
+CREATE INDEX IF NOT EXISTS idx_link_users_target ON link_users(target_id_user);
+
+-- ========================================
+-- TIMESTAMPS POUR FEED
+-- ========================================
+ALTER TABLE IF EXISTS webnovels ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT now();
+ALTER TABLE IF EXISTS webnovels_episode ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT now();
+ALTER TABLE IF EXISTS webnovels_comment ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT now();
+ALTER TABLE IF EXISTS webnovels_likes ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT now();
+
+-- ========================================
 -- FONCTION FINALE
 -- ========================================
 

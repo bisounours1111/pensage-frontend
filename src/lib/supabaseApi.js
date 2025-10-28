@@ -13,7 +13,7 @@ export const webnovelsApi = {
   getAllPublished: async () => {
     const { data, error } = await supabase
       .from("webnovels")
-      .select("*")
+      .select("*, author:user_extend(*)")
       .eq("publish", true)
       .order("id", { ascending: false });
 
@@ -25,7 +25,7 @@ export const webnovelsApi = {
   getTrending: async (limit = 10) => {
     const { data, error } = await supabase
       .from("webnovels")
-      .select("*")
+      .select("*, author:user_extend(*)")
       .eq("publish", true)
       .order("id", { ascending: false })
       .limit(limit);
@@ -38,7 +38,7 @@ export const webnovelsApi = {
   getRecommendations: async (genres = [], limit = 10) => {
     const { data, error } = await supabase
       .from("webnovels")
-      .select("*")
+      .select("*, author:user_extend(*)")
       .eq("publish", true);
 
     if (error) throw error;
@@ -65,7 +65,7 @@ export const webnovelsApi = {
   getByUser: async (userId) => {
     const { data, error } = await supabase
       .from("webnovels")
-      .select("*")
+      .select("*, author:user_extend(*)")
       .eq("id_author", userId)
       .order("id", { ascending: false });
 
@@ -77,7 +77,7 @@ export const webnovelsApi = {
   getById: async (webnovelId) => {
     const { data, error } = await supabase
       .from("webnovels")
-      .select("*")
+      .select("*, author:user_extend(*)")
       .eq("id", webnovelId)
       .single();
 
@@ -843,6 +843,309 @@ export const weeklyRewardApi = {
   },
 };
 
+/**
+ * FOLLOW API
+ */
+
+export const followApi = {
+  // Suivre un utilisateur
+  follow: async (fromUserId, targetUserId) => {
+    if (!fromUserId || !targetUserId || fromUserId === targetUserId)
+      return false;
+    const { data, error } = await supabase
+      .from("link_users")
+      .insert({ from_id_user: fromUserId, target_id_user: targetUserId })
+      .select()
+      .maybeSingle();
+    if (error && error.code !== "23505") throw error; // ignorer doublons uniques si contrainte ajoutée plus tard
+    return !!data;
+  },
+
+  // Se désabonner
+  unfollow: async (fromUserId, targetUserId) => {
+    const { error } = await supabase
+      .from("link_users")
+      .delete()
+      .eq("from_id_user", fromUserId)
+      .eq("target_id_user", targetUserId);
+    if (error) throw error;
+    return true;
+  },
+
+  // Savoir si on suit déjà
+  isFollowing: async (fromUserId, targetUserId) => {
+    const { data, error } = await supabase
+      .from("link_users")
+      .select("from_id_user")
+      .eq("from_id_user", fromUserId)
+      .eq("target_id_user", targetUserId)
+      .maybeSingle();
+    if (error) throw error;
+    return !!data;
+  },
+
+  // Liste des followers d'un utilisateur
+  getFollowers: async (userId) => {
+    const { data, error } = await supabase
+      .from("link_users")
+      .select(
+        `from_id_user, created_at, user_from:user_extend!link_users_from_id_user_fkey(*)`
+      )
+      .eq("target_id_user", userId)
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    return data || [];
+  },
+
+  // Liste des comptes suivis par un utilisateur
+  getFollowing: async (userId) => {
+    const { data, error } = await supabase
+      .from("link_users")
+      .select(
+        `target_id_user, created_at, user_target:user_extend!link_users_target_id_user_fkey(*)`
+      )
+      .eq("from_id_user", userId)
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    return data || [];
+  },
+};
+
+/**
+ * NOTIFICATIONS / FEED API
+ */
+
+export const notificationsApi = {
+  // Récupère les 10 derniers événements des personnes suivies
+  getFeed: async (userId, limit = 10) => {
+    // 1) récupérer la liste des IDs suivis
+    const following = await followApi.getFollowing(userId);
+    const followingIds = (following || []).map((r) => r.target_id_user);
+    if (followingIds.length === 0) return [];
+
+    // 2) requêtes parallèles
+    const [webnovels, episodes, comments, likes, follows] =
+      await Promise.allSettled([
+        supabase
+          .from("webnovels")
+          .select("*")
+          .in("id_author", followingIds)
+          .order("id", { ascending: false })
+          .limit(limit),
+        supabase
+          .from("webnovels_episode")
+          .select("*, webnovels:webnovels(*)")
+          .order("id", { ascending: false })
+          .limit(limit),
+        supabase
+          .from("webnovels_comment")
+          .select("*", { count: "exact" })
+          .in("id_user", followingIds)
+          .order("created_at", { ascending: false })
+          .limit(limit),
+        supabase
+          .from("webnovels_likes")
+          .select("*")
+          .in("id_user", followingIds)
+          .order("created_at", { ascending: false })
+          .limit(limit),
+        supabase
+          .from("link_users")
+          .select("*")
+          .in("from_id_user", followingIds)
+          .order("created_at", { ascending: false })
+          .limit(limit),
+      ]);
+
+    const items = [];
+
+    // nouveaux webnovels par suivis
+    if (webnovels.status === "fulfilled" && webnovels.value?.data) {
+      for (const w of webnovels.value.data) {
+        if (!followingIds.includes(w.id_author)) continue;
+        items.push({
+          type: "new_webnovel",
+          id: `novel-${w.id}`,
+          timestamp: w.created_at || w.id,
+          payload: w,
+          actorId: w.id_author,
+        });
+      }
+    }
+
+    // nouveaux épisodes des webnovels (filtrer par auteur suivi)
+    if (episodes.status === "fulfilled" && episodes.value?.data) {
+      for (const e of episodes.value.data) {
+        const authorId = e.webnovels?.id_author;
+        if (authorId && followingIds.includes(authorId)) {
+          items.push({
+            type: "new_episode",
+            id: `episode-${e.id}`,
+            timestamp: e.created_at || e.id,
+            payload: e,
+            actorId: authorId,
+          });
+        }
+      }
+    }
+
+    // commentaires
+    if (comments.status === "fulfilled" && comments.value?.data) {
+      for (const c of comments.value.data) {
+        items.push({
+          type: "comment",
+          id: `comment-${c.id}`,
+          timestamp: c.created_at || c.id,
+          payload: c,
+          actorId: c.id_user,
+        });
+      }
+    }
+
+    // likes
+    if (likes.status === "fulfilled" && likes.value?.data) {
+      for (const l of likes.value.data) {
+        items.push({
+          type: "like",
+          id: `like-${l.id}`,
+          timestamp: l.created_at || l.id,
+          payload: l,
+          actorId: l.id_user,
+        });
+      }
+    }
+
+    // follows par les suivis
+    if (follows.status === "fulfilled" && follows.value?.data) {
+      for (const f of follows.value.data) {
+        items.push({
+          type: "follow",
+          id: `follow-${f.from_id_user}-${f.target_id_user}-${
+            f.created_at || f.id
+          }`,
+          timestamp: f.created_at || f.id,
+          payload: f,
+          actorId: f.from_id_user,
+        });
+      }
+    }
+
+    // tri par timestamp desc et limitation
+    items.sort((a, b) => {
+      const av =
+        typeof a.timestamp === "string" ? Date.parse(a.timestamp) : a.timestamp;
+      const bv =
+        typeof b.timestamp === "string" ? Date.parse(b.timestamp) : b.timestamp;
+      return (bv || 0) - (av || 0);
+    });
+    return items.slice(0, limit);
+  },
+
+  // Récupère les dernières notifications persistées de l'utilisateur
+  getUserNotifications: async (userId, limit = 5) => {
+    const { data, error } = await supabase
+      .from("user_notification")
+      .select("*")
+      .eq("id_user", userId)
+      .order("id", { ascending: false })
+      .limit(limit);
+    if (error) throw error;
+    return data || [];
+  },
+
+  // Récupère dynamiquement les 5 derniers commentaires/likes reçus sur les webnovels de l'utilisateur
+  getReceivedInteractions: async (userId, limit = 5) => {
+    // Récupérer les IDs de webnovels de l'utilisateur
+    const { data: myNovels, error: novelsError } = await supabase
+      .from("webnovels")
+      .select("id, title")
+      .eq("id_author", userId);
+    if (novelsError) throw novelsError;
+    const novelIds = (myNovels || []).map((n) => n.id);
+    if (novelIds.length === 0) return [];
+
+    // Requêtes en parallèle pour commentaires et likes reçus
+    const [commentsRes, likesRes] = await Promise.all([
+      supabase
+        .from("webnovels_comment")
+        .select("*, user_extend(*), webnovels:webnovels(*)")
+        .in("id_webnovels", novelIds)
+        .order("created_at", { ascending: false })
+        .limit(limit),
+      supabase
+        .from("webnovels_likes")
+        .select("*, user_extend(*), webnovels:webnovels(*)")
+        .in("id_webnovels", novelIds)
+        .order("created_at", { ascending: false })
+        .limit(limit),
+    ]);
+
+    const items = [];
+    if (commentsRes.data) {
+      for (const c of commentsRes.data) {
+        items.push({
+          type: "comment_received",
+          id: `comment-${c.id}`,
+          timestamp: c.created_at || c.id,
+          payload: c,
+        });
+      }
+    }
+    if (likesRes.data) {
+      for (const l of likesRes.data) {
+        items.push({
+          type: "like_received",
+          id: `like-${l.id}`,
+          timestamp: l.created_at || l.id,
+          payload: l,
+        });
+      }
+    }
+
+    // Tri par date décroissante, limitation globale
+    items.sort((a, b) => {
+      const av =
+        typeof a.timestamp === "string" ? Date.parse(a.timestamp) : a.timestamp;
+      const bv =
+        typeof b.timestamp === "string" ? Date.parse(b.timestamp) : b.timestamp;
+      return (bv || 0) - (av || 0);
+    });
+    return items.slice(0, limit);
+  },
+
+  // Récupère les derniers nouveaux abonnés (qui me suivent)
+  getNewFollowers: async (userId, limit = 5) => {
+    // Lire les liens
+    const { data: links, error: linksError } = await supabase
+      .from("link_users")
+      .select("from_id_user, created_at")
+      .eq("target_id_user", userId)
+      .order("created_at", { ascending: false })
+      .limit(limit);
+    if (linksError) throw linksError;
+    if (!links || links.length === 0) return [];
+
+    // Charger les profils
+    const followerIds = links.map((l) => l.from_id_user);
+    const { data: profiles, error: profError } = await supabase
+      .from("user_extend")
+      .select("*")
+      .in("id", followerIds);
+    if (profError) throw profError;
+    const byId = new Map((profiles || []).map((p) => [p.id, p]));
+
+    return links.map((row) => ({
+      type: "follow_me",
+      id: `followme-${row.from_id_user}-${row.created_at}`,
+      timestamp: row.created_at,
+      payload: {
+        from_id_user: row.from_id_user,
+        user_from: byId.get(row.from_id_user) || null,
+      },
+    }));
+  },
+};
+
 export default {
   webnovelsApi,
   episodesApi,
@@ -854,4 +1157,6 @@ export default {
   shopTokenApi,
   shopSubscriptionApi,
   weeklyRewardApi,
+  followApi,
+  notificationsApi,
 };

@@ -82,6 +82,11 @@ const HomePage = () => {
         category: story.genre || "Non spécifié",
         progress: 0,
         status: story.publish ? "published" : "draft",
+        authorName:
+          story.author?.username ||
+          story.author?.name ||
+          story.author?.lastname ||
+          "Auteur inconnu",
         ...story,
       }));
       setTrending(formattedTrending);
@@ -99,6 +104,11 @@ const HomePage = () => {
         category: story.genre || "Non spécifié",
         progress: 0,
         status: story.publish ? "published" : "draft",
+        authorName:
+          story.author?.username ||
+          story.author?.name ||
+          story.author?.lastname ||
+          "Auteur inconnu",
         ...story,
       }));
       setRecommendations(formattedRecommendations);

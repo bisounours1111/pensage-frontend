@@ -1,16 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { MdCheck } from "react-icons/md";
+import { useParams } from "react-router-dom";
 import { getCurrentUser, getUserExtend } from "../../lib/supabase";
-import { userExtendApi, historyApi } from "../../lib/supabaseApi";
+import {
+  userExtendApi,
+  historyApi,
+  followApi,
+  webnovelsApi,
+  likesApi,
+  commentsApi,
+} from "../../lib/supabaseApi";
 import colors from "../../utils/constants/colors";
 import { genresByCategory, genresList } from "../../utils/constants/genres";
 
 const ProfilePage = () => {
+  const { id: routeUserId } = useParams();
   const [user, setUser] = useState(null);
   const [userExtend, setUserExtend] = useState(null);
   const [likedWebnovels, setLikedWebnovels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
+  const [isPublicView, setIsPublicView] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [totals, setTotals] = useState({ views: 0, likes: 0, comments: 0 });
   const [editForm, setEditForm] = useState({
     name: "",
     lastname: "",
@@ -22,7 +34,7 @@ const ProfilePage = () => {
 
   useEffect(() => {
     loadProfileData();
-  }, []);
+  }, [routeUserId]);
 
   const loadProfileData = async () => {
     try {
@@ -34,12 +46,52 @@ const ProfilePage = () => {
       }
 
       setUser(currentUser);
-      const extendData = await getUserExtend(currentUser.id);
+      const viewingUserId = routeUserId || currentUser.id;
+      setIsPublicView(!!routeUserId && viewingUserId !== currentUser.id);
+
+      const extendData = await getUserExtend(viewingUserId);
       setUserExtend(extendData);
 
       // Charger les webnovels likés
-      const liked = await historyApi.getLikedWebnovels(currentUser.id);
+      const liked = await historyApi.getLikedWebnovels(viewingUserId);
       setLikedWebnovels(liked);
+
+      // Stats + follow en mode public
+      if (viewingUserId !== currentUser.id) {
+        const stories = await webnovelsApi.getByUser(viewingUserId);
+        const novelIds = (stories || []).map((s) => s.id);
+        if (novelIds.length > 0) {
+          const [viewsArr, likesArr, commentsArr] = await Promise.all([
+            Promise.all(novelIds.map((nid) => historyApi.countViews(nid))),
+            Promise.all(novelIds.map((nid) => likesApi.countLikes(nid))),
+            Promise.all(
+              novelIds.map((nid) =>
+                commentsApi.countByWebnovel(nid, { rootOnly: false })
+              )
+            ),
+          ]);
+          const totalViews = (viewsArr || []).reduce((a, b) => a + (b || 0), 0);
+          const totalLikes = (likesArr || []).reduce((a, b) => a + (b || 0), 0);
+          const totalComments = (commentsArr || []).reduce(
+            (a, b) => a + (b || 0),
+            0
+          );
+          setTotals({
+            views: totalViews,
+            likes: totalLikes,
+            comments: totalComments,
+          });
+        } else {
+          setTotals({ views: 0, likes: 0, comments: 0 });
+        }
+        const following = await followApi.isFollowing(
+          currentUser.id,
+          viewingUserId
+        );
+        setIsFollowing(following);
+      } else {
+        setTotals({ views: 0, likes: 0, comments: 0 });
+      }
 
       // Convertir les anciens noms de genres en IDs si nécessaire
       let genres =
@@ -137,7 +189,7 @@ const ProfilePage = () => {
       return `${userExtend.name} ${userExtend.lastname}`;
     } else if (userExtend?.username) {
       return userExtend.username;
-    } else if (user?.email) {
+    } else if (!isPublicView && user?.email) {
       return user.email.split("@")[0];
     }
     return "Utilisateur";
@@ -207,35 +259,45 @@ const ProfilePage = () => {
             className="text-4xl md:text-5xl font-bold mb-2"
             style={{ color: colors.text }}
           >
-            Bienvenue sur votre profil{" "}
+            {isPublicView ? "Profil de " : "Bienvenue sur votre profil "}
             {userExtend?.name || userExtend?.username}
           </h1>
-          <p className="text-lg opacity-80" style={{ color: colors.text }}>
-            Gérez vos informations et suivez votre progression
-          </p>
+          {!isPublicView && (
+            <p className="text-lg opacity-80" style={{ color: colors.text }}>
+              Gérez vos informations et suivez votre progression
+            </p>
+          )}
         </div>
 
-        {/* Barre d'XP */}
-        <div
-          className="bg-white rounded-lg shadow-lg p-6 mb-6"
-          style={{ backgroundColor: colors.whiteTransparent }}
-        >
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <h2
-                className="text-2xl font-semibold"
-                style={{ color: colors.text }}
-              >
-                Niveau {level}
-              </h2>
-              <p className="text-sm opacity-75" style={{ color: colors.text }}>
-                {userExtend?.xp || 0} XP total
-              </p>
-            </div>
-            <div className="text-right">
-              <p className="text-sm opacity-75" style={{ color: colors.text }}>
-                {xpProgress}/{xpNeeded} XP vers le niveau {level + 1}
-              </p>
+        {/* Barre d'XP (privé uniquement) */}
+        {!isPublicView && (
+          <div
+            className="bg-white rounded-lg shadow-lg p-6 mb-6"
+            style={{ backgroundColor: colors.whiteTransparent }}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h2
+                  className="text-2xl font-semibold"
+                  style={{ color: colors.text }}
+                >
+                  Niveau {level}
+                </h2>
+                <p
+                  className="text-sm opacity-75"
+                  style={{ color: colors.text }}
+                >
+                  {userExtend?.xp || 0} XP total
+                </p>
+              </div>
+              <div className="text-right">
+                <p
+                  className="text-sm opacity-75"
+                  style={{ color: colors.text }}
+                >
+                  {xpProgress}/{xpNeeded} XP vers le niveau {level + 1}
+                </p>
+              </div>
             </div>
           </div>
           <div 
@@ -256,7 +318,7 @@ const ProfilePage = () => {
               {xpProgress > 0 && `${xpProgress}/${xpNeeded}`}
             </div>
           </div>
-        </div>
+        )}
 
         {/* Informations utilisateur */}
         <div
@@ -270,19 +332,38 @@ const ProfilePage = () => {
             >
               Informations personnelles
             </h2>
-            <button
-              onClick={() => setIsEditing(!isEditing)}
-              className="px-4 py-2 rounded-lg font-semibold transition hover:scale-105"
-              style={{ backgroundColor: colors.primary, color: colors.white }}
-              onMouseEnter={(e) =>
-                (e.target.style.backgroundColor = colors.primaryLight)
-              }
-              onMouseLeave={(e) =>
-                (e.target.style.backgroundColor = colors.primary)
-              }
-            >
-              {isEditing ? "Annuler" : "Modifier"}
-            </button>
+            {isPublicView ? (
+              <button
+                onClick={async () => {
+                  if (!user || !userExtend) return;
+                  if (isFollowing) {
+                    await followApi.unfollow(user.id, userExtend.id);
+                    setIsFollowing(false);
+                  } else {
+                    await followApi.follow(user.id, userExtend.id);
+                    setIsFollowing(true);
+                  }
+                }}
+                className="px-4 py-2 rounded-lg font-semibold transition hover:scale-105"
+                style={{ backgroundColor: colors.primary, color: colors.white }}
+              >
+                {isFollowing ? "Se désabonner" : "Suivre"}
+              </button>
+            ) : (
+              <button
+                onClick={() => setIsEditing(!isEditing)}
+                className="px-4 py-2 rounded-lg font-semibold transition hover:scale-105"
+                style={{ backgroundColor: colors.primary, color: colors.white }}
+                onMouseEnter={(e) =>
+                  (e.target.style.backgroundColor = colors.primaryLight)
+                }
+                onMouseLeave={(e) =>
+                  (e.target.style.backgroundColor = colors.primary)
+                }
+              >
+                {isEditing ? "Annuler" : "Modifier"}
+              </button>
+            )}
           </div>
 
           {isEditing ? (
@@ -463,7 +544,7 @@ const ProfilePage = () => {
                   {getFullName()}
                 </p>
               </div>
-              {user?.email && (
+              {!isPublicView && user?.email && (
                 <div>
                   <p
                     className="text-sm opacity-75 mb-1"
@@ -503,6 +584,74 @@ const ProfilePage = () => {
             </div>
           )}
         </div>
+
+        {/* Statistiques agrégées (public) */}
+        {isPublicView && (
+          <div
+            className="bg-white rounded-lg shadow-lg p-6 mb-6"
+            style={{ backgroundColor: colors.whiteTransparent }}
+          >
+            <h2
+              className="text-2xl font-semibold mb-4"
+              style={{ color: colors.text }}
+            >
+              Statistiques
+            </h2>
+            <div className="grid grid-cols-3 gap-4">
+              <div
+                className="rounded-lg p-4 text-center"
+                style={{ backgroundColor: colors.white }}
+              >
+                <div
+                  className="text-sm opacity-75"
+                  style={{ color: colors.text }}
+                >
+                  Vues
+                </div>
+                <div
+                  className="text-2xl font-bold"
+                  style={{ color: colors.text }}
+                >
+                  {totals.views}
+                </div>
+              </div>
+              <div
+                className="rounded-lg p-4 text-center"
+                style={{ backgroundColor: colors.white }}
+              >
+                <div
+                  className="text-sm opacity-75"
+                  style={{ color: colors.text }}
+                >
+                  Likes
+                </div>
+                <div
+                  className="text-2xl font-bold"
+                  style={{ color: colors.text }}
+                >
+                  {totals.likes}
+                </div>
+              </div>
+              <div
+                className="rounded-lg p-4 text-center"
+                style={{ backgroundColor: colors.white }}
+              >
+                <div
+                  className="text-sm opacity-75"
+                  style={{ color: colors.text }}
+                >
+                  Commentaires
+                </div>
+                <div
+                  className="text-2xl font-bold"
+                  style={{ color: colors.text }}
+                >
+                  {totals.comments}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Historique des novels likés */}
         <div
