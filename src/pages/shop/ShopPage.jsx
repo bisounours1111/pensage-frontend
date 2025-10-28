@@ -15,6 +15,7 @@ import {
   redirectToStripeCheckout,
   redirectToStripeSubscription,
 } from "../../services/stripeService";
+import { userExtendApi } from "../../lib/supabaseApi";
 import colors from "../../utils/constants/colors";
 
 export default function ShopPage() {
@@ -129,6 +130,40 @@ export default function ShopPage() {
     }
   };
 
+  const handleCancelSubscription = async () => {
+    if (!userExtend?.has_subscription) return;
+    const confirmCancel = confirm(
+      "Êtes-vous sûr de vouloir résilier votre abonnement Premium ?"
+    );
+    if (!confirmCancel) return;
+
+    try {
+      setBuying("cancel");
+      if (isStripeConfigured()) {
+        // Transmettre aussi l'id d'abonnement stripe si présent dans les préférences
+        const stripeSubId = userExtend?.preferences?.stripe_subscription_id;
+        await fetch(`${STRIPE_CONFIG.backendUrl}/stripe/cancel-subscription`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            user_id: user.id,
+            stripe_subscription_id: stripeSubId,
+          }),
+        });
+      }
+      await userExtendApi.update(user.id, { has_subscription: false });
+
+      const extendData = await getUserExtend(user.id);
+      setUserExtend(extendData);
+      alert("Votre abonnement a été résilié.");
+    } catch (error) {
+      console.error("Erreur lors de la résiliation de l'abonnement:", error);
+      alert("Erreur lors de la résiliation de l'abonnement.");
+    } finally {
+      setBuying(null);
+    }
+  };
+
   const handleWeekly = async () => {
     if (!weeklyRewardInfo?.canClaim) {
       let nextClaimDate;
@@ -237,77 +272,73 @@ export default function ShopPage() {
         <SectionTitle>Premium</SectionTitle>
 
         <div className="rounded-2xl p-6 bg-white/40 backdrop-blur border border-white/20 shadow-lg">
-          <p
-            className="text-lg font-semibold mb-6"
-            style={{ color: colors.text }}
-          >
-            Passe à <span className="text-pink-600">Premium</span> et débloque
-            tout le potentiel de l'application{" "}
-            <span className="inline-flex items-center gap-1">
-              <MdAutoAwesome />
-            </span>
-          </p>
-
           <div
-            className="grid grid-cols-2 gap-6"
+            className="grid grid-cols-1 md:grid-cols-2 gap-6"
             style={{ color: colors.text }}
           >
             <div className="bg-white/50 rounded-xl p-4 border border-white/40">
-              <h3 className="text-xl font-bold mb-3">Gratuit</h3>
-              <ul className="text-sm space-y-2">
-                <li>✅ Accès aux histoires publiques</li>
-                <li>✅ 100 points / semaine</li>
-                <li>✅ Lecture standard</li>
-                <li>🚫 Publicités présentes</li>
-                <li>🚫 Peu de bonus</li>
-              </ul>
+              <h3 className="text-xl font-bold mb-2">Gratuit</h3>
+              <p className="text-sm">Récompense hebdomadaire: 100 points</p>
             </div>
-
             <div className="bg-pink-100 rounded-xl p-4 border border-pink-300 shadow-md">
-              <h3 className="text-xl font-bold text-pink-700 mb-3 inline-flex items-center gap-2">
+              <h3 className="text-xl font-bold text-pink-700 mb-2 inline-flex items-center gap-2">
                 Premium <MdAutoAwesome />
               </h3>
-              <ul className="text-sm space-y-2 font-medium">
-                <li>✅ Tout le contenu gratuit</li>
-                <li>✅ 2000 points / semaine</li>
-                <li>✅ Bonus XP + progression rapide</li>
-                <li>✅ Aucune publicité</li>
-                <li>✅ Badges & profil premium</li>
-              </ul>
+              <p className="text-sm font-medium">
+                Récompense hebdomadaire: 2000 points
+              </p>
             </div>
           </div>
 
           <div className="mt-6 flex justify-center">
             {subscriptions.length > 0 ? (
-              subscriptions.map((sub) => (
-                <button
-                  key={sub.id}
-                  className="text-white px-6 py-3 rounded-lg font-semibold transition shadow-lg hover:scale-105 disabled:opacity-50"
-                  style={{ backgroundColor: colors.primary }}
-                  onClick={() => handleSubscribe(sub.id)}
-                  disabled={buying === sub.id || userExtend?.has_subscription}
-                  onMouseEnter={(e) => {
-                    if (!buying && !userExtend?.has_subscription) {
-                      e.target.style.backgroundColor = colors.primaryLight;
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!buying && !userExtend?.has_subscription) {
-                      e.target.style.backgroundColor = colors.primary;
-                    }
-                  }}
-                >
-                  {buying === sub.id ? (
-                    "Traitement..."
-                  ) : userExtend?.has_subscription ? (
-                    <span className="inline-flex items-center gap-1">
+              subscriptions.map((sub) =>
+                userExtend?.has_subscription ? (
+                  <div key={sub.id} className="flex items-center gap-3">
+                    <span
+                      className="inline-flex items-center gap-1 px-4 py-2 rounded-lg font-semibold text-white"
+                      style={{ backgroundColor: colors.primary }}
+                    >
                       Abonnement actif <MdCheck />
                     </span>
-                  ) : (
-                    `${sub.title} — ${sub.price}€`
-                  )}
-                </button>
-              ))
+                    <button
+                      type="button"
+                      onClick={handleCancelSubscription}
+                      disabled={buying === "cancel"}
+                      className="px-4 py-2 rounded-lg font-semibold transition shadow-lg hover:scale-105 disabled:opacity-50"
+                      style={{
+                        backgroundColor: colors.white,
+                        color: colors.text,
+                        border: `1px solid ${colors.text}`,
+                      }}
+                    >
+                      {buying === "cancel" ? "Résiliation..." : "Résilier"}
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    key={sub.id}
+                    className="text-white px-6 py-3 rounded-lg font-semibold transition shadow-lg hover:scale-105 disabled:opacity-50"
+                    style={{ backgroundColor: colors.primary }}
+                    onClick={() => handleSubscribe(sub.id)}
+                    disabled={buying === sub.id}
+                    onMouseEnter={(e) => {
+                      if (!buying) {
+                        e.target.style.backgroundColor = colors.primaryLight;
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!buying) {
+                        e.target.style.backgroundColor = colors.primary;
+                      }
+                    }}
+                  >
+                    {buying === sub.id
+                      ? "Traitement..."
+                      : `${sub.title} — ${sub.price}€`}
+                  </button>
+                )
+              )
             ) : (
               <button
                 className="text-white px-6 py-3 rounded-lg font-semibold transition shadow-lg hover:scale-105"

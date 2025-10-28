@@ -1,12 +1,15 @@
 import React from "react";
 import colors from "../../utils/constants/colors";
-import GhostImage from "./GhostImage";
 
-export default function ProductCard({ title, subtitle, price, onClick, disabled }) {
+export default function ProductCard({
+  title,
+  subtitle,
+  price,
+  onClick,
+  disabled,
+}) {
   return (
     <div className="rounded-2xl p-4 bg-white/30 border border-white/20 backdrop-blur shadow-lg hover:shadow-xl transition">
-      <GhostImage />
-
       <h3 className="mt-4 text-lg font-bold" style={{ color: colors.text }}>
         {title}
       </h3>
@@ -37,7 +40,7 @@ export default function ProductCard({ title, subtitle, price, onClick, disabled 
           }
         }}
       >
-        {disabled ? 'Achat...' : 'Acheter'}
+        {disabled ? "Achat..." : "Acheter"}
       </button>
     </div>
   );
