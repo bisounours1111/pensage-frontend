@@ -31,7 +31,7 @@ export default function Header() {
 
   return (
     <header
-      className="flex items-center justify-between px-4 md:px-8 w-full h-16 shadow-lg sticky top-0 z-50 overflow-hidden"
+      className="flex items-center justify-between px-4 md:px-8 w-full h-16 shadow-lg sticky top-0 z-50"
       style={{
         background: `linear-gradient(to right, ${colors.primarySoft}, ${colors.primaryLight})`,
         borderBottom: `3px solid ${colors.primary}`,
@@ -42,11 +42,15 @@ export default function Header() {
         to="/home"
         className="flex items-center hover:scale-105 transition-transform flex-shrink-0"
       >
-        <img src={logo} alt="Pensaga" className="h-8 md:h-10 w-auto object-contain" />
+        <img
+          src={logo}
+          alt="Pensaga"
+          className="h-8 md:h-10 w-auto object-contain"
+        />
       </Link>
 
       {/* Navigation - responsive */}
-      <div className="flex items-center gap-2 md:gap-4 overflow-hidden">
+      <div className="flex items-center gap-2 md:gap-4">
         {/* Navigation principale - Desktop uniquement */}
         <div className="hidden lg:flex items-center gap-6">
           <Link
@@ -95,7 +99,9 @@ export default function Header() {
               style={{ color: colors.white }}
             >
               <MdNotifications className="w-6 h-6 group-hover:scale-110 transition-transform" />
-              <span className="font-medium hidden sm:inline">Notifications</span>
+              <span className="font-medium hidden sm:inline">
+                Notifications
+              </span>
               {/* Badge de notification non lue */}
               <div
                 className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
