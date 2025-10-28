@@ -2,7 +2,16 @@ import React from "react";
 import EditableCharacterCard from "../ui/EditableCharacterCard";
 import colors from "../../utils/constants/colors";
 
-const CharactersStep = ({ pitch, synopsis, characters, setCharacters, loading, onGenerateCharacters, onNext, onPrevious }) => {
+const CharactersStep = ({
+  pitch,
+  synopsis,
+  characters,
+  setCharacters,
+  loading,
+  onGenerateCharacters,
+  onNext,
+  onPrevious,
+}) => {
   const [error, setError] = React.useState(null);
 
   const handleGenerate = async () => {
@@ -45,10 +54,7 @@ const CharactersStep = ({ pitch, synopsis, characters, setCharacters, loading, o
           >
             Pitch
           </h3>
-          <p
-            className="text-sm line-clamp-2"
-            style={{ color: colors.white }}
-          >
+          <p className="text-sm line-clamp-2" style={{ color: colors.white }}>
             {pitch}
           </p>
         </div>
@@ -66,10 +72,7 @@ const CharactersStep = ({ pitch, synopsis, characters, setCharacters, loading, o
           >
             Synopsis
           </h3>
-          <p
-            className="text-sm line-clamp-2"
-            style={{ color: colors.white }}
-          >
+          <p className="text-sm line-clamp-2" style={{ color: colors.white }}>
             {synopsis.substring(0, 100)}...
           </p>
         </div>
@@ -90,21 +93,15 @@ const CharactersStep = ({ pitch, synopsis, characters, setCharacters, loading, o
 
       <div
         className="p-8 rounded-xl shadow-lg"
-        style={{ 
+        style={{
           backgroundColor: colors.white,
-          border: `4px solid ${colors.primaryLight}`
+          border: `4px solid ${colors.primaryLight}`,
         }}
       >
-        <h2
-          className="text-3xl font-bold mb-4"
-          style={{ color: colors.text }}
-        >
+        <h2 className="text-3xl font-bold mb-4" style={{ color: colors.text }}>
           Personnages de votre histoire
         </h2>
-        <p
-          className="mb-8 text-lg"
-          style={{ color: colors.textSecondary }}
-        >
+        <p className="mb-8 text-lg" style={{ color: colors.textSecondary }}>
           {loading
             ? "L'IA crée vos personnages..."
             : characters.length > 0
@@ -113,7 +110,7 @@ const CharactersStep = ({ pitch, synopsis, characters, setCharacters, loading, o
               } principal${characters.length > 1 ? "aux" : ""} créé${
                 characters.length > 1 ? "s" : ""
               }`
-            : "Cliquez sur le bouton ci-dessous pour générer les personnages avec l'IA."}
+            : "Cliquez sur le bouton ci-dessous pour générer les personnages avec l'IA"}
         </p>
 
         {loading ? (
@@ -139,9 +136,7 @@ const CharactersStep = ({ pitch, synopsis, characters, setCharacters, loading, o
                 <EditableCharacterCard
                   key={character.id || index}
                   character={character}
-                  onUpdate={(updated) =>
-                    handleUpdateCharacter(index, updated)
-                  }
+                  onUpdate={(updated) => handleUpdateCharacter(index, updated)}
                   index={index}
                 />
               ))}
@@ -156,16 +151,13 @@ const CharactersStep = ({ pitch, synopsis, characters, setCharacters, loading, o
                 onClick={handleGenerate}
                 disabled={loading}
               >
-                Régénérer les personnages
+                Régénérer les personnages (5 tokens)
               </button>
             </div>
           </>
         ) : (
           <div className="text-center py-12">
-            <p
-              className="mb-6 text-lg"
-              style={{ color: colors.textSecondary }}
-            >
+            <p className="mb-6 text-lg" style={{ color: colors.textSecondary }}>
               Aucun personnage généré pour le moment
             </p>
             <button
@@ -173,7 +165,7 @@ const CharactersStep = ({ pitch, synopsis, characters, setCharacters, loading, o
               style={{ backgroundColor: colors.primary }}
               onClick={handleGenerate}
             >
-              Générer les personnages avec l'IA
+              Générer les personnages avec l'IA (5 tokens)
             </button>
           </div>
         )}
@@ -193,9 +185,9 @@ const CharactersStep = ({ pitch, synopsis, characters, setCharacters, loading, o
         </button>
         <button
           className="flex-1 px-8 py-4 rounded-xl font-bold text-lg text-white transition-all hover:scale-105 disabled:opacity-50 shadow-lg"
-          style={{ 
+          style={{
             backgroundColor: colors.primary,
-            border: `4px solid ${colors.primary}`
+            border: `4px solid ${colors.primary}`,
           }}
           onClick={handleNext}
           disabled={characters.length === 0 || loading}
@@ -208,4 +200,3 @@ const CharactersStep = ({ pitch, synopsis, characters, setCharacters, loading, o
 };
 
 export default CharactersStep;
-
