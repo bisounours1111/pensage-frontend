@@ -125,10 +125,10 @@ const CreateEpisodeForm = ({
           border: `4px solid ${colors.primary}`,
         }}
       >
-        <h2 className="text-3xl font-bold mb-4" style={{ color: colors.text }}>
+        <h2 className="text-2xl sm:text-3xl font-bold mb-4" style={{ color: colors.text }}>
           {editingEpisode ? "Modifier l'Épisode" : "Créer un Nouvel Épisode"}
         </h2>
-        <p style={{ color: colors.textSecondary }}>
+        <p className="text-sm sm:text-base" style={{ color: colors.textSecondary }}>
           {editingEpisode
             ? "Modifiez le contenu de l'épisode avec l'aide de l'IA"
             : "Remplissez manuellement ou laissez l'IA générer le contenu"}
@@ -164,10 +164,7 @@ const CreateEpisodeForm = ({
           >
             Contexte
           </h3>
-          <div
-            className="space-y-2 text-sm"
-            style={{ color: colors.textSecondary }}
-          >
+        <div className="space-y-2 text-xs sm:text-sm" style={{ color: colors.textSecondary }}>
             <p>
               <strong>Pitch:</strong> {webnovel.pitch}
             </p>
@@ -187,7 +184,7 @@ const CreateEpisodeForm = ({
         }}
       >
         <label
-          className="block text-lg font-semibold mb-3"
+          className="block text-base sm:text-lg font-semibold mb-3"
           style={{ color: colors.text }}
         >
           Numéro de l'épisode
@@ -216,9 +213,9 @@ const CreateEpisodeForm = ({
           border: `3px solid ${colors.primaryLight}`,
         }}
       >
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
           <label
-            className="text-lg font-semibold"
+            className="text-base sm:text-lg font-semibold"
             style={{ color: colors.text }}
           >
             Contenu de l'épisode
@@ -291,9 +288,9 @@ const CreateEpisodeForm = ({
       </div>
 
       {/* Actions */}
-      <div className="flex gap-4">
+      <div className="flex flex-col sm:flex-row gap-4">
         <button
-          className="flex-1 px-8 py-6 rounded-xl font-bold text-xl text-white transition-all hover:scale-105 shadow-xl"
+          className="flex-1 px-6 sm:px-8 py-4 sm:py-6 rounded-xl font-bold text-lg sm:text-xl text-white transition-all hover:scale-105 shadow-xl cursor-pointer"
           style={{ backgroundColor: colors.primary }}
           onClick={handleSave}
           disabled={loading || !content.trim()}
@@ -301,7 +298,7 @@ const CreateEpisodeForm = ({
           {loading ? "Sauvegarde..." : "Sauvegarder"}
         </button>
         <button
-          className="px-8 py-6 rounded-xl font-bold text-xl transition-all hover:scale-105 shadow-xl"
+          className="px-6 sm:px-8 py-4 sm:py-6 rounded-xl font-bold text-lg sm:text-xl transition-all hover:scale-105 shadow-xl cursor-pointer"
           style={{
             backgroundColor: colors.whiteTransparent,
             color: colors.text,

@@ -277,7 +277,7 @@ const EpisodesPage = () => {
           <div className="flex items-center gap-4 mb-4">
             <button
               onClick={() => navigate("/stories")}
-              className="text-2xl hover:scale-110 transition-transform"
+              className="text-2xl hover:scale-110 transition-transform cursor-pointer"
               style={{ color: colors.text }}
             >
               <MdArrowBack />
@@ -419,8 +419,8 @@ const EpisodesPage = () => {
                 <span
                   className="px-4 py-2 rounded-lg font-semibold text-sm"
                   style={{
-                    backgroundColor: colors.published,
-                    color: colors.white,
+                    backgroundColor: "#10B981",
+                    color: "white",
                   }}
                 >
                   <span className="inline-flex items-center gap-1">
@@ -432,19 +432,13 @@ const EpisodesPage = () => {
           </div>
 
           {/* Boutons de contrôle */}
-          <div className="flex gap-4 mb-4">
+          <div className="flex flex-col sm:flex-row gap-4 mb-4">
             {/* Bouton Marquer comme terminé / Reprendre l'écriture */}
             {!webnovel?.is_over ? (
               <button
                 onClick={handleToggleIsOver}
-                className="px-6 py-3 rounded-lg font-semibold text-white transition shadow-lg hover:scale-105"
+                className="px-6 py-3 rounded-lg font-semibold text-white transition shadow-lg hover:scale-105 cursor-pointer"
                 style={{ backgroundColor: colors.primary }}
-                onMouseEnter={(e) =>
-                  (e.target.style.backgroundColor = colors.primaryLight)
-                }
-                onMouseLeave={(e) =>
-                  (e.target.style.backgroundColor = colors.primary)
-                }
               >
                 <span className="inline-flex items-center gap-2">
                   <MdCheck /> Marquer comme terminé
@@ -453,14 +447,8 @@ const EpisodesPage = () => {
             ) : (
               <button
                 onClick={handleToggleIsOver}
-                className="px-6 py-3 rounded-lg font-semibold text-white transition shadow-lg hover:scale-105"
+                className="px-6 py-3 rounded-lg font-semibold text-white transition shadow-lg hover:scale-105 cursor-pointer"
                 style={{ backgroundColor: colors.primaryLight }}
-                onMouseEnter={(e) =>
-                  (e.target.style.backgroundColor = colors.primary)
-                }
-                onMouseLeave={(e) =>
-                  (e.target.style.backgroundColor = colors.primaryLight)
-                }
               >
                 <span className="inline-flex items-center gap-2">
                   <MdEdit /> Reprendre l'écriture
@@ -472,14 +460,8 @@ const EpisodesPage = () => {
             {!webnovel?.publish ? (
               <button
                 onClick={handleTogglePublish}
-                className="px-6 py-3 rounded-lg font-semibold text-white transition shadow-lg hover:scale-105"
-                style={{ backgroundColor: colors.published }}
-                onMouseEnter={(e) =>
-                  (e.target.style.backgroundColor = "#059669")
-                }
-                onMouseLeave={(e) =>
-                  (e.target.style.backgroundColor = colors.published)
-                }
+                className="px-6 py-3 rounded-lg font-semibold text-white transition shadow-lg hover:scale-105 cursor-pointer"
+                style={{ backgroundColor: "#10B981" }}
               >
                 <span className="inline-flex items-center gap-2">
                   <MdPublic /> Publier
@@ -488,17 +470,11 @@ const EpisodesPage = () => {
             ) : (
               <button
                 onClick={handleTogglePublish}
-                className="px-6 py-3 rounded-lg font-semibold transition shadow-lg hover:scale-105"
+                className="px-6 py-3 rounded-lg font-semibold transition shadow-lg hover:scale-105 cursor-pointer"
                 style={{
                   backgroundColor: "#FEE2E2",
                   color: "#991B1B",
                 }}
-                onMouseEnter={(e) =>
-                  (e.target.style.backgroundColor = "#FECACA")
-                }
-                onMouseLeave={(e) =>
-                  (e.target.style.backgroundColor = "#FEE2E2")
-                }
               >
                 <span className="inline-flex items-center gap-2">
                   <MdLock /> Dépublier
@@ -535,9 +511,9 @@ const EpisodesPage = () => {
         ) : (
           <>
             {/* Bouton pour créer un nouvel épisode */}
-            <div className="mb-8 flex justify-end">
+            <div className="mb-8 flex justify-center sm:justify-end">
               <button
-                className="px-6 py-3 rounded-lg font-semibold text-white transition shadow-lg hover:scale-105"
+                className="px-6 py-3 rounded-lg font-semibold text-white transition shadow-lg hover:scale-105 cursor-pointer"
                 style={{ backgroundColor: colors.primary }}
                 onMouseEnter={(e) =>
                   (e.target.style.backgroundColor = colors.primaryLight)
