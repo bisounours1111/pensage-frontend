@@ -1,9 +1,12 @@
 import React from "react";
 import colors from "../../utils/constants/colors";
+import { genresList } from "../../utils/constants/genres";
 
 const TitleGenreStep = ({ pitch, synopsis, storyTitle, setStoryTitle, selectedGenre, setSelectedGenre, onNext, onPrevious }) => {
-  const genres = ["Romance", "Fantastique", "Action", "Drame", "Comédie", "Thriller", "Mystère", "Science-Fiction", "Horreur", "Slice of Life", "Sport", "Historique"];
   const [error, setError] = React.useState(null);
+  
+  // Obtenir la liste des noms de genres uniques
+  const genres = [...new Set(genresList.map(g => g.name))];
 
   const handleNext = () => {
     if (!storyTitle.trim()) {
