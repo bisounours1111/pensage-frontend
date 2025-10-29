@@ -1,67 +1,84 @@
-# 🪶 Pensaga Frontend
+# 🪶 PENSAGA Frontend — React + Vite + Tailwind
 
-Plateforme gamifiée d'écriture collaborative - Frontend React
+Interface du projet PENSAGA, construite avec React, Vite, TailwindCSS, Supabase et Stripe.
 
-## 🚀 Démarrage rapide
+## ⚙️ Prérequis
+
+- Node.js 18+ (recommandé 20+)
+- npm (ou pnpm/yarn)
+- Clés Supabase (URL + Anon key) si appel API direct depuis le front
+- Clé publique Stripe (si paiement côté front)
+
+## 🚀 Installation et démarrage
+
+1) Cloner le dépôt et se placer dans le dossier
 
 ```bash
-# Installer les dépendances (déjà fait)
+git clone <URL_DU_REPO>
+cd front-end
+```
+
+2) Installer les dépendances
+
+```bash
 npm install
+```
 
-# Démarrer le serveur de développement
+3) Variables d’environnement (optionnel mais recommandé)
+
+Créer un fichier `.env` à la racine de `front-end/` et renseigner, si nécessaire:
+
+```
+VITE_STRIPE_PUBLISHABLE_KEY=pk...
+STRIPE_SECRET_KEY=sk....
+...
+```
+
+4) Démarrer en développement
+
+```bash
 npm run dev
+```
 
-# Build de production
+5) Build et prévisualisation
+
+```bash
 npm run build
-
-# Preview de la production
 npm run preview
 ```
 
-## 📁 Structure du projet
+## 📁 Structure du projet (extrait)
 
-Consultez le fichier [`ARCHITECTURE.md`](./ARCHITECTURE.md) pour comprendre la structure des dossiers.
+```
+front-end/
+├── src/
+│   ├── components/
+│   ├── pages/
+│   ├── hooks/
+│   └── lib/
+├── public/
+└── vite.config.js
+```
 
-## 🎨 TailwindCSS
+## 🛣️ Routes principales (dans `src/App.jsx`)
 
-Consultez le fichier [`TAILWIND_GUIDE.md`](./TAILWIND_GUIDE.md) pour apprendre à utiliser TailwindCSS dans ce projet.
+- /signup, /login, /home, /stories, /create, /shop, /profile, /community, /publish
 
-## 🛣️ Routes configurées
+## 🤝 Contribution
 
-Les routes suivantes sont déjà configurées dans `src/App.jsx` :
+1. Créer une branche de fonctionnalité
+2. Commiter et pousser
+3. Ouvrir une Pull Request
 
-- `/signup` - Inscription
-- `/login` - Connexion
-- `/home` - Accueil
-- `/stories` - Mes histoires
-- `/create` - Éditeur
-- `/shop` - Boutique
-- `/profile` - Profil
-- `/community` - Communauté
-- `/publish` - Publication
+## 📄 Licence
 
-## 📦 Dépendances
+Copyright (c) 2025 Yanis DAÏ, Enzo Gérardot, Carla Dupont, Théo Sauval
 
-- **React** ^19.1.1
-- **React Router DOM** ^7.9.4
-- **TailwindCSS** ^4.1.16
-- **Vite** ^7.1.7
+Ce projet a été réalisé dans un cadre strictement pédagogique dans le cadre du hackathon Ynov 2025.  
+Conformément à l'article 1.4 du règlement intérieur Ynov, les droits patrimoniaux et moraux
+demeurent la propriété exclusive de ses auteurs.
 
-## 📝 Prochaines étapes
+Toute utilisation, reproduction, modification, diffusion ou exploitation, totale ou partielle, du code
+en dehors du cadre d'évaluation pédagogique est strictement interdite sans l'accord écrit
+préalable des auteurs.
 
-1. Créer les composants UI de base dans `src/components/ui/`
-2. Implémenter les pages dans `src/pages/`
-3. Configurer le contexte d'authentification dans `src/context/`
-4. Créer les appels API dans `src/utils/api/`
-
-## 🎯 Fonctionnalités à implémenter
-
-Selon `Pensaga_Resume_Projet.md` :
-
-- [ ] Onboarding (stepper 3 étapes)
-- [ ] Authentification (Login/Signup)
-- [ ] Interface d'écriture assistée par IA
-- [ ] Système de progression (XP, badges, pièces)
-- [ ] Publication d'histoires
-- [ ] Boutique virtuelle
-- [ ] Communauté et défis
